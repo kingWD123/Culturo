@@ -1,0 +1,380 @@
+/* Culturo Cinema Page Styles - Harmonized with home.css */
+
+body.cinema {
+    font-family: 'Inter', sans-serif;
+    background: #fafafa;
+    color: #1a1a1a;
+}
+
+.cinema-hero {
+    background: white;
+    padding: 80px 0 32px 0;
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 8px 32px rgba(40, 40, 80, 0.08);
+    position: relative;
+    min-height: 320px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+}
+
+.cinema-hero-overlay {
+    background: rgba(30, 30, 40, 0.45);
+    width: 100%;
+    padding: 2.5rem 2rem 2rem 2rem;
+    border-radius: 0 0 32px 32px;
+}
+
+.cinema-title {
+    color: #fff;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+}
+
+.cinema-subtitle {
+    color: #f3f3f3;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.cinema-quicknav {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.cinema-quicknav .quicknav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.18s;
+}
+
+.cinema-quicknav .quicknav-item:hover {
+    transform: translateY(-4px) scale(1.06);
+}
+
+.cinema-quicknav img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(40, 40, 80, 0.07);
+    margin-bottom: 0.5rem;
+}
+
+.cinema-quicknav span {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+.cinema-section {
+    padding: 80px 0 0 0;
+    margin-bottom: 3.5rem;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+}
+
+/* News Section */
+.cinema-news-item {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(40, 40, 80, 0.10);
+    display: flex;
+    max-width: 540px;
+    min-width: 320px;
+    overflow: hidden;
+    flex: 1 1 320px;
+    margin-bottom: 1.5rem;
+}
+
+.cinema-news-img {
+    width: 160px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cinema-news-content {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cinema-news-date {
+    color: #ff6b35;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.cinema-news-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.cinema-news-list li {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 2px 8px rgba(40, 40, 80, 0.04);
+}
+
+.cinema-news-list a {
+    color: #ff6b35;
+    font-size: 0.98rem;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+/* Agenda Section */
+.cinema-agenda-item {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(40, 40, 80, 0.04);
+    margin-bottom: 1.2rem;
+}
+
+.cinema-agenda-date {
+    color: #ff6b35;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+/* Now Showing Grid */
+.cinema-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2.2rem;
+}
+
+.cinema-movie-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(40, 40, 80, 0.10);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 1.2rem;
+    transition: box-shadow 0.22s, transform 0.22s;
+}
+
+.cinema-movie-card:hover {
+    box-shadow: 0 8px 32px rgba(40, 40, 80, 0.18);
+    transform: translateY(-4px) scale(1.025);
+}
+
+.cinema-movie-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+}
+
+.cinema-movie-info {
+    padding: 1rem 1.2rem 0 1.2rem;
+    text-align: center;
+}
+
+.cinema-movie-date {
+    color: #ff6b35;
+    font-size: 0.98rem;
+    margin-bottom: 0.7rem;
+    display: block;
+}
+
+/* Nearby Cinemas Section */
+.cinema-local-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.cinema-local-img {
+    width: 320px;
+    max-width: 100%;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(40, 40, 80, 0.10);
+}
+
+.cinema-local-text {
+    flex: 1 1 320px;
+    min-width: 220px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background: #ff6b35;
+    color: white;
+    padding: 16px 32px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.13);
+    border: none;
+    margin-top: 0.7em;
+}
+
+.btn:hover,
+.btn-primary:hover {
+    background: #e55a2b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.18);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #ff6b35;
+    border: 2px solid #ff6b35;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.07);
+}
+
+.btn-secondary:hover {
+    background: #ff6b35;
+    color: #fff;
+}
+
+/* Chatbot message bubbles */
+.user-message {
+    align-self: flex-end;
+    background: #ff6b35;
+    color: #fff;
+    border-radius: 16px 16px 4px 16px;
+    padding: 0.7rem 1.1rem;
+    margin: 2px 0;
+    max-width: 80%;
+    box-shadow: 0 2px 8px rgba(40, 40, 80, 0.07);
+    font-size: 1rem;
+    animation: fadeInRight 0.3s;
+}
+
+.bot-message {
+    align-self: flex-start;
+    background: #fff;
+    color: #222;
+    border-radius: 16px 16px 16px 4px;
+    padding: 0.7rem 1.1rem;
+    margin: 2px 0;
+    max-width: 80%;
+    box-shadow: 0 2px 8px rgba(40, 40, 80, 0.07);
+    font-size: 1rem;
+    animation: fadeInLeft 0.3s;
+}
+
+/* Typing animation (three dots) */
+.typing-indicator {
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background: #ff6b35;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: typing-bounce 1s infinite alternate;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+    0% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(-6px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 900px) {
+    .cinema-hero {
+        min-height: 200px;
+        padding: 40px 0 16px 0;
+    }
+
+    .cinema-title {
+        font-size: 2rem;
+    }
+
+    .cinema-section {
+        padding: 40px 0 0 0;
+        margin-bottom: 2rem;
+    }
+
+    .cinema-local-info {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .cinema-news-list {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

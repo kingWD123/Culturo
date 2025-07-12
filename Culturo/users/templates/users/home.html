@@ -1,0 +1,181 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<body class="home">
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Discover the <span class="highlight">wonders</span> of culture near you</h1>
+                    <p>Explore universes, artists, works, and events that vibrate your region.
+                        Let yourself be inspired by local cultural diversity.</p>
+
+                    <div class="quote">
+                        <p>"Culture is the journey of the soul without leaving your city."</p>
+                    </div>
+
+                    <a href="#" class="cta-button">Find my universe</a>
+                </div>
+
+                <div class="hero-images">
+                    <div class="hero-image">
+                        <img src="{% static 'images/saxophone.jpg' %}" alt="Music">
+                    </div>
+                    <div class="hero-image large">
+                        <img src="{% static 'images/tokyo-skytree-8645455_1280.jpg' %}" alt="Cinema">
+                        <div class="image-badge">Popular</div>
+                    </div>
+                    <div class="hero-image">
+                        <img src="{% static 'images/nourriture.jpeg' %}" alt="Gastronomy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UNIVERS SECTION -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Top Univers</h2>
+                <a href="#" class="view-all">View all →</a>
+            </div>
+
+            <div class="univers-grid">
+                <div class="univers-card">
+                    <img src="{%static 'images/squid.jpeg' %}" alt="Cinema">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Popular</span>
+                    <div class="card-content">
+                        <div class="card-title">Cinema</div>>
+                    </div>
+                </div>
+
+                <div class="univers-card">
+                    <img src="{% static 'images/musique.jpeg' %}" alt="Music">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">New</span>
+                    <div class="card-content">
+                        <div class="card-title">Music</div>
+                    </div>
+                </div>
+
+                <div class="univers-card">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400" alt="Gastronomy">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">To savor</span>
+                    <div class="card-content">
+                        <div class="card-title">Gastronomy</div>
+                    </div>
+                </div>
+
+                <div class="univers-card">
+                    <img src="{% static 'images/livre.jpeg' %}" alt="Books">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Selection</span>
+                    <div class="card-content">
+                        <div class="card-title">Books</div>
+
+                    </div>
+                </div>
+
+                <div class="univers-card">
+                    <img src="{% static 'images/event.jpeg' %}" alt="Events">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Upcoming</span>
+                    <div class="card-content">
+                        <div class="card-title">Events</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DÉCOUVERTES SECTION -->
+    <section class="section decouvertes">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Latest discoveries</h2>
+                <a href="#" class="view-all">View all →</a>
+            </div>
+
+            <div class="decouvertes-grid">
+                <div class="decouverte-card">
+                    <img src="{% static 'images/music.jpg' %}" alt="Playlist">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Playlist</span>
+                    <div class="card-content">
+                        <div class="card-title">Sound journey</div>
+                        <div class="card-desc">A musical selection to travel without leaving your living room.</div>
+                    </div>
+                </div>
+
+                <div class="decouverte-card">
+                    <img src="{% static 'images/vice.jpeg' %}" alt="Book">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Book</span>
+                    <div class="card-content">
+                        <div class="card-title">Tokyo Vice</div>
+                        <div class="card-desc">Dive into contemporary Japan through this thrilling narrative.</div>
+                    </div>
+                </div>
+
+                <div class="decouverte-card">
+                    <img src="{% static 'images/vita.jpeg' %}" alt="Film">
+                    <div class="card-overlay"></div>
+                    <span class="card-badge">Film</span>
+                    <div class="card-content">
+                        <div class="card-title">La Dolce Vita</div>
+                        <div class="card-desc">A masterpiece of Italian cinema for an immersive evening.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIAL -->
+    <section class="section testimonial">
+        <div class="container">
+            <div class="testimonial-content">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Clara" class="testimonial-avatar">
+
+                <div class="testimonial-text">
+                    <h4>Heartfelt recommendation from Clara</h4>
+                    <blockquote>"Thanks to Culturo, I discovered an incredible local jazz festival and an independent
+                        bookstore
+                        full of treasures!"</blockquote>
+                    <div class="testimonial-author">Culturo member, Paris</div>
+                </div>
+
+                <div class="testimonial-card">
+                    <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400" alt="Jazz Festival">
+                    <h5>Jazz Festival Paris</h5>
+                    <p>An event not to be missed for music lovers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEWSLETTER SECTION (bien visible) -->
+    <section class="newsletter-section">
+        <h3>Cultural inspiration</h3>
+        <p>Receive our best discoveries and tips directly in your inbox.</p>
+        <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email">
+            <button type="submit">Subscribe</button>
+        </form>
+    </section>
+</body>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

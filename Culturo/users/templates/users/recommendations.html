@@ -1,0 +1,348 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block title %}Recommandations - Culturo{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Vos <span class="gradient-text">destinations parfaites</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Basé sur votre profil culturel, voici les destinations qui correspondent le mieux à vos goûts et
+                préférences.
+            </p>
+        </div>
+
+        <!-- Profile Summary -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-8 card-hover">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-circle text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{{ user.username }}</h3>
+                        <p class="text-gray-600">Profil culturel personnalisé</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-600">Score de compatibilité</p>
+                    <p class="text-2xl font-bold gradient-text">{{ destinations.0.match_score|default:85 }}%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Destinations Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {% for destination in destinations %}
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover animate-on-scroll"
+                x-data="{ isHovered: false }" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+
+                <!-- Destination Image -->
+                <div class="relative h-64 overflow-hidden">
+                    <img src="{{ destination.main_image }}" alt="{{ destination.city }}"
+                        class="w-full h-full object-cover transition-transform duration-500"
+                        :class="{ 'scale-110': isHovered }">
+
+                    <!-- Match Score Badge -->
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+                        <span class="text-sm font-bold gradient-text">{{ destination.match_score }}%</span>
+                    </div>
+
+                    <!-- Cultural Tags -->
+                    <div class="absolute bottom-4 left-4 flex flex-wrap gap-2">
+                        {% for tag in destination.cultural_tags|slice:":3" %}
+                        <span
+                            class="bg-white/90 backdrop-blur-sm text-xs font-medium text-gray-700 px-2 py-1 rounded-full">
+                            {{ tag|title }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Destination Content -->
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ destination.city }}</h3>
+                            <p class="text-gray-600">{{ destination.country }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Prix moyen</p>
+                            <p class="font-semibold text-gray-900">{{ destination.average_cost }}</p>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-4 line-clamp-3">{{ destination.description|truncatewords:20 }}</p>
+
+                    <!-- Cultural Highlights -->
+                    <div class="space-y-2 mb-6">
+                        {% if destination.music_scene %}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-music text-purple-500 mr-2"></i>
+                            <span>{{ destination.music_scene|truncatewords:8 }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if destination.culinary_highlights %}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-utensils text-purple-500 mr-2"></i>
+                            <span>{{ destination.culinary_highlights|truncatewords:8 }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if destination.film_culture %}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-film text-purple-500 mr-2"></i>
+                            <span>{{ destination.film_culture|truncatewords:8 }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Best Time to Visit -->
+                    {% if destination.best_time_to_visit %}
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+                            <div>
+                                <p class="text-xs text-gray-500">Meilleure période</p>
+                                <p class="text-sm font-medium text-gray-900">{{ destination.best_time_to_visit }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-3">
+                        <a href="{% url 'destination_detail' destination.id %}"
+                            class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
+                            <i class="fas fa-eye mr-2"></i>
+                            Découvrir
+                        </a>
+                        <a href="{% url 'create_itinerary' destination.id %}"
+                            class="flex-1 bg-white border-2 border-purple-600 text-purple-600 text-center py-3 rounded-lg font-semibold hover:bg-purple-50 transition-all duration-200">
+                            <i class="fas fa-route mr-2"></i>
+                            Planifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- No Destinations Message -->
+        {% if not destinations %}
+        <div class="text-center py-12">
+            <div
+                class="w-24 h-24 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-compass text-purple-600 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Aucune recommandation trouvée</h3>
+            <p class="text-gray-600 mb-8">
+                Il semble que nous n'ayons pas encore de destinations qui correspondent parfaitement à votre profil.
+                Essayez d'ajuster vos préférences ou revenez plus tard !
+            </p>
+            <a href="{% url 'cultural_profile' %}"
+                class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-200">
+                <i class="fas fa-edit mr-2"></i>
+                Modifier mon profil
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Why These Recommendations -->
+        {% if destinations %}
+        <div class="bg-white rounded-2xl p-8 shadow-lg card-hover">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">
+                Pourquoi ces destinations ?
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Votre profil culturel</h3>
+                    <div class="space-y-3">
+                        {% if profile.preferred_music_genres %}
+                        <div class="flex items-center">
+                            <i class="fas fa-music text-purple-500 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-gray-900">Musique</p>
+                                <p class="text-sm text-gray-600">{{ profile.preferred_music_genres|join:", " }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profile.preferred_film_genres %}
+                        <div class="flex items-center">
+                            <i class="fas fa-film text-purple-500 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-gray-900">Cinéma</p>
+                                <p class="text-sm text-gray-600">{{ profile.preferred_film_genres|join:", " }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profile.preferred_cuisine_types %}
+                        <div class="flex items-center">
+                            <i class="fas fa-utensils text-purple-500 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-gray-900">Cuisine</p>
+                                <p class="text-sm text-gray-600">{{ profile.preferred_cuisine_types|join:", " }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profile.preferred_activities %}
+                        <div class="flex items-center">
+                            <i class="fas fa-palette text-purple-500 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-gray-900">Activités</p>
+                                <p class="text-sm text-gray-600">{{ profile.preferred_activities|join:", " }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Notre algorithme IA</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-brain text-purple-600 mr-2"></i>
+                                <span class="font-semibold text-gray-900">Analyse des préférences</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Notre IA analyse vos goûts musicaux, cinématographiques et culinaires pour identifier
+                                des patterns culturels.
+                            </p>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
+                                <span class="font-semibold text-gray-900">Matching culturel</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Nous comparons votre profil avec les caractéristiques culturelles de chaque destination.
+                            </p>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-star text-purple-600 mr-2"></i>
+                                <span class="font-semibold text-gray-900">Score de compatibilité</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Chaque destination reçoit un score de 0 à 100% basé sur la correspondance avec vos
+                                préférences.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- CTA Section -->
+        <div class="text-center mt-12">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Prêt à planifier votre prochaine aventure ?
+            </h3>
+            <p class="text-gray-600 mb-6">
+                Sélectionnez une destination et laissez-nous créer un itinéraire personnalisé pour vous.
+            </p>
+            <a href="{% url 'cultural_profile' %}"
+                class="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
+                <i class="fas fa-magic mr-2"></i>
+                Affiner mes préférences
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all cards
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.card-hover, .animate-on-scroll');
+        cards.forEach(card => observer.observe(card));
+    });
+
+    // Smooth hover effects
+    document.querySelectorAll('.card-hover').forEach(card => {
+        card.addEventListener('mouseenter', function () {
+            this.style.transform = 'translateY(-8px)';
+        });
+
+        card.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Match score animation
+    function animateMatchScores() {
+        const scores = document.querySelectorAll('[class*="match_score"]');
+        scores.forEach(score => {
+            const targetScore = parseInt(score.textContent);
+            let currentScore = 0;
+            const increment = targetScore / 20;
+
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(timer);
+                }
+                score.textContent = Math.round(currentScore) + '%';
+            }, 50);
+        });
+    }
+
+    // Trigger animation when page loads
+    document.addEventListener('DOMContentLoaded', animateMatchScores);
+</script>
+
+<style>
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease-out;
+    }
+
+    .animate-on-scroll.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}

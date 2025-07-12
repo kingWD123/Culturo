@@ -1,0 +1,440 @@
+/* Culturo main stylesheet: extracted from base.html */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.pulse-glow {
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
+    }
+}
+
+/* Navbar styles déplacés depuis home.css */
+.header {
+    background: white;
+    padding: 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #666;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #1a1a1a;
+}
+
+.header-cta {
+    background: #1a1a1a;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.header-cta:hover {
+    background: #333;
+    transform: translateY(-1px);
+}
+
+/* Footer styles */
+footer {
+    background: #1a1a1a;
+    color: #ccc;
+    padding: 60px 0 40px;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.footer-brand {
+    flex: 1 1 220px;
+}
+
+.footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.footer-tagline {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.footer-social a {
+    font-size: 1.3rem;
+    margin-right: 0.7rem;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-social a:hover {
+    color: #ff6b35;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2.5rem;
+    flex: 2 1 400px;
+}
+
+.footer-links h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    color: #1a1a1a;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: #ff6b35;
+}
+
+.footer-bottom {
+    text-align: center;
+    color: #999;
+    font-size: 0.95rem;
+    padding: 1.2rem 0 0.5rem 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* === CINEMA PAGE STYLES === */
+.cinema-hero {
+    position: relative;
+    min-height: 320px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    border-radius: 0 0 32px 32px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+}
+
+.cinema-hero-overlay {
+    background: rgba(30, 30, 40, 0.45);
+    width: 100%;
+    padding: 2.5rem 2rem 2rem 2rem;
+    border-radius: 0 0 32px 32px;
+}
+
+.cinema-title {
+    color: #fff;
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+}
+
+.cinema-subtitle {
+    color: #f3f3f3;
+    font-size: 1.3rem;
+    font-weight: 400;
+}
+
+.cinema-section {
+    margin-bottom: 3.5rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+}
+
+/* Actualités cinéma */
+.cinema-news-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+}
+
+.cinema-news-item {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.07);
+    display: flex;
+    max-width: 540px;
+    min-width: 320px;
+    overflow: hidden;
+    flex: 1 1 320px;
+}
+
+.cinema-news-img {
+    width: 160px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cinema-news-content {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cinema-news-date {
+    color: #764ba2;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+/* À l'affiche */
+.cinema-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+}
+
+.cinema-movie-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.cinema-movie-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13);
+}
+
+.cinema-movie-img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+}
+
+.cinema-movie-info {
+    padding: 1rem 1.2rem 0 1.2rem;
+    text-align: center;
+}
+
+.cinema-movie-date {
+    color: #667eea;
+    font-size: 0.98rem;
+    margin-bottom: 0.7rem;
+    display: block;
+}
+
+/* Agenda cinéma */
+.cinema-agenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cinema-agenda-item {
+    background: #f7f7fa;
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.04);
+}
+
+.cinema-agenda-date {
+    color: #764ba2;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+/* Présentation cinéma local */
+.cinema-local-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.cinema-local-img {
+    width: 320px;
+    max-width: 100%;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.09);
+}
+
+.cinema-local-text {
+    flex: 1 1 320px;
+    min-width: 220px;
+}
+
+/* Boutons cinéma (réutilise les classes globales si possible) */
+.btn {
+    display: inline-block;
+    padding: 0.7em 1.5em;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.07);
+    font-size: 1rem;
+    margin-top: 0.7em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #764ba2;
+    color: #fff;
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #764ba2;
+    border: 2px solid #764ba2;
+}
+
+.btn-secondary:hover {
+    background: #764ba2;
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .cinema-hero {
+        min-height: 200px;
+    }
+
+    .cinema-title {
+        font-size: 2rem;
+    }
+
+    .cinema-section {
+        margin-bottom: 2rem;
+    }
+
+    .cinema-local-info {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .cinema-news-list {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

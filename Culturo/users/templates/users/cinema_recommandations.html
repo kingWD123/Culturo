@@ -1,0 +1,194 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cinema.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cinema-hero"
+    style="background-image: url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80');">
+    <div class="cinema-hero-overlay">
+        <h1 class="cinema-title">Culturo Cinema</h1>
+        <p class="cinema-subtitle">Discover, share, and experience cinema differently: recommendations, events, and
+            local discoveries.</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Quick Navigation -->
+    <nav class="cinema-quicknav">
+        <a href="#now-showing" class="quicknav-item">
+            <img src="https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=100&q=80"
+                alt="Now Showing">
+            <span>Now Showing</span>
+        </a>
+        <a href="#agenda" class="quicknav-item">
+            <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=100&q=80"
+                alt="Agenda">
+            <span>Agenda</span>
+        </a>
+        <a href="#news" class="quicknav-item">
+            <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=100&q=80"
+                alt="News">
+            <span>News</span>
+        </a>
+        <a href="#nearby" class="quicknav-item">
+            <img src="https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=100&q=80"
+                alt="Nearby Cinemas">
+            <span>Nearby Cinemas</span>
+        </a>
+    </nav>
+
+    <!-- Cinema News Section -->
+    <section class="cinema-section" id="news">
+        <div style="display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start;">
+            <div style="flex: 2 1 340px; min-width: 320px;">
+                <h2 class="section-title" style="margin-bottom: 1rem;">Cinema News</h2>
+                <article class="cinema-news-item">
+                    <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"
+                        alt="Cinema news" class="cinema-news-img">
+                    <div class="cinema-news-content">
+                        <span class="cinema-news-date">Published May 5, 2025</span>
+                        <h3>European Film Festival: Our Top Picks</h3>
+                        <p>Discover Culturo's selection of must-see films at this year's festival.</p>
+                        <a href="#" class="btn btn-primary">Read more</a>
+                    </div>
+                </article>
+            </div>
+            <div style="flex: 1 1 260px; min-width: 260px;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: #1a1a1a;">Latest News</h3>
+                <ul class="cinema-news-list">
+                    <li>
+                        <span class="cinema-news-date">May 3, 2025</span><br>
+                        <span style="font-weight: 600;">Cinema Night: Debate &amp; Screening</span><br>
+                        <a href="#" style="color: #ff6b35; font-size: 0.98rem; text-decoration: underline;">Read
+                            more</a>
+                    </li>
+                    <li>
+                        <span class="cinema-news-date">April 24, 2025</span><br>
+                        <span style="font-weight: 600;">New Local Cinema Opens</span><br>
+                        <a href="#" style="color: #ff6b35; font-size: 0.98rem; text-decoration: underline;">Read
+                            more</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agenda Section -->
+    <section class="cinema-section" id="agenda">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2 class="section-title" style="margin-bottom: 0;">Agenda</h2>
+                <a href="#" class="btn btn-secondary" style="margin-top: 0;">All Events</a>
+            </div>
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <div class="cinema-agenda-item" style="flex: 1 1 260px; min-width: 220px;">
+                    <span class="cinema-agenda-date">Saturday, May 18, 2025</span>
+                    <h4>Screening &amp; Debate: "Cinema and Society"</h4>
+                    <p>Join us for an evening of discussion on social cinema, followed by a debate with passionate
+                        speakers.</p>
+                </div>
+                <div class="cinema-agenda-item" style="flex: 1 1 260px; min-width: 220px;">
+                    <span class="cinema-agenda-date">Sunday, May 25, 2025</span>
+                    <h4>Outdoor Movie Night</h4>
+                    <p>Enjoy a movie under the stars in your local park. Bring your friends and family!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Now Showing Section -->
+    <section class="cinema-section" id="now-showing">
+        <h2 class="section-title">Now Showing</h2>
+        <div class="cinema-movies-grid">
+            <div class="cinema-movie-card">
+                <img src="https://images.unsplash.com/photo-1465101178521-c1a9136a3b43?auto=format&fit=crop&w=400&q=80"
+                    alt="Movie 1" class="cinema-movie-img">
+                <div class="cinema-movie-info">
+                    <h4>"Lights Beyond"</h4>
+                    <span class="cinema-movie-date">May 10–16</span>
+                    <a href="#" class="btn btn-secondary">Discover</a>
+                </div>
+            </div>
+            <div class="cinema-movie-card">
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+                    alt="Movie 2" class="cinema-movie-img">
+                <div class="cinema-movie-info">
+                    <h4>"Crossed Perspectives"</h4>
+                    <span class="cinema-movie-date">May 10–16</span>
+                    <a href="#" class="btn btn-secondary">Discover</a>
+                </div>
+            </div>
+            <!-- Add more movie cards as needed -->
+        </div>
+    </section>
+
+    <!-- Nearby Cinemas Section -->
+    <section class="cinema-section" id="nearby">
+        <div class="cinema-local-info">
+            <div class="cinema-local-text">
+                <h2 class="section-title">Discover Cinemas Near You</h2>
+                <p>Cinema is more than a venue: it's a place for encounters, discoveries, and sharing. Find programming,
+                    events, and cultural initiatives in your region on Culturo.</p>
+                <a href="#" class="btn btn-primary">Learn more</a>
+            </div>
+            <div>
+                <img src="https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=400&q=80"
+                    alt="Local Cinema" class="cinema-local-img">
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Floating Chatbot Icon and Chat Window -->
+<button id="chatbot-toggle" aria-label="Open Chatbot"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 9999; background: #ff6b35; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 16px rgba(40,40,80,0.13); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;">
+    <i class="fas fa-comments"></i>
+</button>
+<div id="cinema-chatbot"
+    style="display: none; position: fixed; bottom: 100px; right: 32px; width: 340px; max-width: 90vw; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); z-index: 10000; overflow: hidden; display: flex; flex-direction: column; height: 420px;">
+    <div
+        style="background: #ff6b35; color: #fff; padding: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
+        <button id="chatbot-close" aria-label="Close Chatbot"
+            style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">&times;</button>
+    </div>
+    <div id="chatbot-messages"
+        style="flex: 1 1 auto; padding: 1rem; background: #f8f9fa; overflow-y: auto; font-size: 1rem; color: #333; display: flex; flex-direction: column; gap: 0.7rem;">
+        <div
+            style="align-self: flex-start; background: #fff; border-radius: 12px; padding: 0.7rem 1rem; box-shadow: 0 2px 8px rgba(40,40,80,0.07); max-width: 85%;">
+            Hello! How can I help you with cinema recommendations or events?</div>
+    </div>
+    <form id="chatbot-form"
+        style="display: flex; align-items: center; padding: 0.7rem 1rem; background: #fff; border-top: 1px solid #eee;">
+        <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off"
+            style="flex: 1 1 auto; border: none; background: #f8f9fa; border-radius: 20px; padding: 0.6rem 1rem; font-size: 1rem; margin-right: 0.7rem; outline: none;">
+        <button id="chatbot-send" type="submit"
+            style="background: #ff6b35; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;"><i
+                class="fas fa-paper-plane"></i></button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/culturo.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggle = document.getElementById('chatbot-toggle');
+        var chatbot = document.getElementById('cinema-chatbot');
+        var closeBtn = document.getElementById('chatbot-close');
+        if (toggle && chatbot) {
+            toggle.addEventListener('click', function () {
+                chatbot.style.display = chatbot.style.display === 'none' ? 'flex' : 'none';
+            });
+        }
+        if (closeBtn && chatbot) {
+            closeBtn.addEventListener('click', function () {
+                chatbot.style.display = 'none';
+            });
+        }
+    });
+</script>
+{% endblock %}
