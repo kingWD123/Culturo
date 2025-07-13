@@ -1,27 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django.core.paginator import Paginator
 from django.db.models import Q
 import json
 import random
 from datetime import datetime, timedelta
-
 import google.generativeai as genai
 from django.conf import settings
 from urllib.parse import urlencode
 import requests
+import time
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
-from .models import (
-    CulturalProfile, Destination, CulturalHighlight, 
-    Itinerary, ItineraryDay, ItineraryItem,
-    Artiste, Oeuvre, Evenement, Playlist, ConseilCulturel
-)
 
 def home(request):
     """Culturo homepage"""
@@ -38,6 +31,34 @@ def ArtistsRecommandations(request):
 def EventsRecommandations(request):
     """Page of events recommendations"""
 
+def get_movie_urns_from_titles(titles):
+    """Recherche les URNs ClooAI pour une liste de titres de films."""
+    urns = []
+    not_found = []
+    for title in titles:
+        try:
+            url = f"https://hackathon.api.qloo.com/v2/entities/search?query={title}&type=movie"
+            headers = {
+                "x-api-key": settings.GEMINI_API_KEY,  # ou la clé API ClooAI si différente
+                "Accept": "application/json"
+            }
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                # Prendre le premier résultat si disponible
+                if data.get("entities"):
+                    urn = data["entities"][0]["urn"]
+                    urns.append(urn)
+                else:
+                    not_found.append(title)
+            else:
+                not_found.append(title)
+            time.sleep(0.2)  # Petite pause pour éviter le rate limit
+        except Exception as e:
+            print(f"Erreur lors de la recherche d'URN pour {title}: {e}")
+            not_found.append(title)
+    return urns, not_found
+
 @csrf_exempt
 def cinema_chatbot_api(request):
     if request.method == "POST":
@@ -45,11 +66,32 @@ def cinema_chatbot_api(request):
         history = data.get("history", [])
 
         system_prompt = (
-            "Tu es un assistant qui aide l’utilisateur à obtenir des recommandations de films et séries via ClooAI. "
-            "Pose une question à la fois pour recueillir : le genre préféré, la langue, la plateforme de streaming, l’âge, le pays. "
-            "Quand tu as toutes les informations, affiche un résumé en JSON structuré comme ceci : "
-            '{"genre": "...", "langue": "...", "plateforme": "...", "age": "...", "pays": "..."}. '
-            "Ne propose le résumé JSON qu’à la toute fin."
+            "Tu es un assistant spécialisé dans les recommandations de films et séries via ClooAI. "
+            "Pose des questions adaptatives pour recueillir les informations disponibles. "
+            "L'utilisateur n'est pas obligé de fournir toutes les informations.\n\n"
+            "Questions à poser (une par une, selon les réponses) :\n"
+            "1. Quels films ou séries aimes-tu ? (optionnel)\n"
+            "2. Quels genres préfères-tu ? (action, thriller, comédie, etc.) (optionnel)\n"
+            "3. Dans quelle ville/pays te trouves-tu ? (optionnel)\n"
+            "4. Quel est ton âge approximatif ? (optionnel)\n"
+            "5. Quelle période de films préfères-tu ? (années récentes, classiques, etc.) (optionnel)\n"
+            "6. Quelle note minimale souhaites-tu ? (optionnel)\n"
+            "7. Quelle langue préfères-tu ? (optionnel)\n\n"
+            "Quand tu as suffisamment d'informations (au moins 2-3 critères), affiche un résumé en JSON avec seulement les informations fournies :\n"
+            '{\n'
+            '  "films_aimes": ["titre1", "titre2"], // seulement si fourni\n'
+            '  "genres": ["action", "thriller"], // seulement si fourni\n'
+            '  "localisation": "Paris", // seulement si fourni\n'
+            '  "age": "18_to_35", // seulement si fourni\n'
+            '  "genre": "male", // seulement si fourni\n'
+            '  "annee_min": 2000, // seulement si fourni\n'
+            '  "annee_max": 2024, // seulement si fourni\n'
+            '  "note_min": 3.5, // seulement si fourni\n'
+            '  "langue": "français" // seulement si fourni\n'
+            '}\n\n'
+            "Ne propose le résumé JSON que quand tu as au moins quelques informations utiles. "
+            "Adapte tes questions selon les réponses précédentes."
+            "Adapte toi à la langue de l'utilisateur, et garde à l'esprit que l'utilisateur est là pour découvrir"
         )
 
         messages = [{"role": "user", "parts": [system_prompt]}]
@@ -62,53 +104,170 @@ def cinema_chatbot_api(request):
 
         user_data = None
         qloo_url = None
+        urn_not_found = []
         try:
             start = bot_message.index("{")
             end = bot_message.rindex("}") + 1
             user_data = json.loads(bot_message[start:end])
-            # Mapping simple : ici on suppose que user_data['entity_id'] existe, sinon à adapter
-            entity_ids = user_data.get("entity_id") or []
-            if isinstance(entity_ids, str):
-                entity_ids = [entity_ids]
+            
+            # Préparer les paramètres pour l'URL ClooAI (seulement les infos fournies)
             extra_params = {}
-            if 'langue' in user_data:
-                extra_params['filter.language'] = user_data['langue']
-            if 'pays' in user_data:
-                extra_params['filter.country'] = user_data['pays']
-            qloo_url = build_qloo_url(
-                entity_type="urn:entity:movie",
-                entity_ids=entity_ids,
-                extra_params=extra_params
-            )
-            print("[Qloo URL]", qloo_url)
-        except Exception:
+            
+            # Films aimés (entités d'intérêt)
+            entity_ids = user_data.get("films_aimes", [])
+            if entity_ids:
+                entity_ids, urn_not_found = get_movie_urns_from_titles(entity_ids)
+            
+            # Genres avec poids (seulement si fournis)
+            genres = user_data.get("genres", [])
+            if genres:
+                genre_tags = []
+                for genre in genres:
+                    # Mapping des genres vers les URNs ClooAI
+                    genre_mapping = {
+                        "action": "urn:tag:genre:media:action",
+                        "thriller": "urn:tag:genre:media:thriller",
+                        "comedie": "urn:tag:genre:media:comedy",
+                        "drame": "urn:tag:genre:media:drama",
+                        "science_fiction": "urn:tag:genre:media:sci_fi",
+                        "horreur": "urn:tag:genre:media:horror",
+                        "romance": "urn:tag:genre:media:romance",
+                        "aventure": "urn:tag:genre:media:adventure",
+                        "animation": "urn:tag:genre:media:animation",
+                        "documentaire": "urn:tag:genre:media:documentary"
+                    }
+                    if genre.lower() in genre_mapping:
+                        genre_tags.append({"tag": genre_mapping[genre.lower()], "weight": 20})
+                
+                if genre_tags:
+                    extra_params['signal.interests.tags'] = json.dumps(genre_tags)
+            
+            # Localisation géographique (seulement si fournie)
+            if user_data.get("localisation"):
+                extra_params['filter.location.query'] = user_data["localisation"]
+            
+            # Démographie - âge (mapping vers valeurs acceptées par ClooAI)
+            if user_data.get("age"):
+                age_value = user_data["age"].lower().replace(" ", "").replace("_", "")
+                age_map = {
+                    "18to35": "35_and_younger",
+                    "18to25": "24_and_younger",
+                    "25to29": "25_to_29",
+                    "30to34": "30_to_34",
+                    "35to44": "35_to_44",
+                    "36to55": "36_to_55",
+                    "45to54": "45_to_54",
+                    "55andolder": "55_and_older",
+                    "35andyounger": "35_and_younger",
+                    "24andyounger": "24_and_younger"
+                }
+                mapped_age = None
+                for key, val in age_map.items():
+                    if key in age_value:
+                        mapped_age = val
+                        break
+                if mapped_age:
+                    extra_params['signal.demographics.age'] = mapped_age
+            
+            # Démographie - genre (seulement si fourni)
+            if user_data.get("genre"):
+                extra_params['signal.demographics.gender'] = user_data["genre"]
+            
+            # Filtrage temporel (seulement si fourni)
+            if user_data.get("annee_min"):
+                extra_params['filter.release_year.min'] = user_data["annee_min"]
+            if user_data.get("annee_max"):
+                extra_params['filter.release_year.max'] = user_data["annee_max"]
+            
+            # Note minimale (seulement si fournie)
+            if user_data.get("note_min"):
+                extra_params['filter.rating.min'] = user_data["note_min"]
+            
+            # Langue (seulement si fournie)
+            if user_data.get("langue"):
+                extra_params['filter.language'] = user_data["langue"]
+            
+            # Activer l'explicabilité seulement si on a des paramètres
+            if extra_params:
+                extra_params['feature.explainability'] = True
+            
+            # Générer l'URL seulement si on a au moins quelques paramètres
+            if entity_ids or extra_params:
+                if 'feature.explainability' in extra_params:
+                    extra_params['feature.explainability'] = True
+                qloo_url = build_qloo_url(
+                    entity_type="urn:entity:movie",
+                    entity_ids=entity_ids,
+                    extra_params=extra_params
+                )
+                print("[Qloo URL]", qloo_url)
+            else:
+                print("Pas assez d'informations pour générer une URL de recommandation")
+                
+        except Exception as e:
+            print(f"Erreur lors du parsing JSON: {e}")
             pass
+
+        # Message d'avertissement si certains titres n'ont pas d'URN
+        warning = None
+        if urn_not_found:
+            warning = f"Aucun identifiant ClooAI trouvé pour : {', '.join(urn_not_found)}. Les recommandations seront moins précises."
 
         return JsonResponse({
             "message": bot_message,
             "user_data": user_data,
             "qloo_url": qloo_url,
-            "done": user_data is not None
+            "done": user_data is not None and (entity_ids or extra_params),
+            "warning": warning
         })
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
 
-# Fonction pour générer une URL Qloo/ClooAI GET
-
+# Fonction améliorée pour générer une URL Qloo/ClooAI GET
 def build_qloo_url(
     entity_type="urn:entity:movie",
     entity_ids=None,
     extra_params=None
 ):
+    """
+    Génère une URL ClooAI avec tous les paramètres de recommandation de films
+    
+    Args:
+        entity_type: Type d'entité (urn:entity:movie par défaut)
+        entity_ids: Liste des films aimés (URNs)
+        extra_params: Paramètres supplémentaires (genres, localisation, démographie, etc.)
+    """
     base_url = "https://hackathon.api.qloo.com/v2/insights/"
     params = {
         "filter.type": entity_type
     }
+    
+    # Ajouter les entités d'intérêt (films aimés)
     if entity_ids:
         if isinstance(entity_ids, list):
-            params["signal.interests.entities"] = ",".join(entity_ids)
+            # Convertir les titres de films en URNs si nécessaire
+            urn_entities = []
+            for entity in entity_ids:
+                if entity.startswith("urn:entity:movie:"):
+                    urn_entities.append(entity)
+                else:
+                    # Convertir le titre en URN (format simplifié)
+                    urn_entity = f"urn:entity:movie:{entity.lower().replace(' ', '_').replace('-', '_')}"
+                    urn_entities.append(urn_entity)
+            params["signal.interests.entities"] = ",".join(urn_entities)
         else:
             params["signal.interests.entities"] = entity_ids
+    
+    # Ajouter tous les paramètres supplémentaires
     if extra_params:
-        params.update(extra_params)
+        for key, value in extra_params.items():
+            if key == 'feature.explainability' and isinstance(value, bool):
+                # Encoder en 'true' ou 'false' (string, lowercase)
+                params[key] = 'true' if value else 'false'
+            elif isinstance(value, (list, dict)):
+                # Pour les listes et dictionnaires, utiliser JSON
+                params[key] = json.dumps(value)
+            else:
+                params[key] = value
+    
     return base_url + "?" + urlencode(params)
