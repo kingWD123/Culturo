@@ -66,11 +66,10 @@ def cinema_chatbot_api(request):
         history = data.get("history", [])
 
         system_prompt = (
-            "Tu es un assistant spécialisé dans les recommandations de films et séries via ClooAI. "
+            "Tu es un assistant spécialisé dans les recommandations de films via ClooAI. "
             "Pose des questions adaptatives pour recueillir les informations disponibles. "
             "L'utilisateur n'est pas obligé de fournir toutes les informations.\n\n"
             "Questions à poser (une par une, selon les réponses) :\n"
-            "1. Quels films ou séries aimes-tu ? (optionnel)\n"
             "2. Quels genres préfères-tu ? (action, thriller, comédie, etc.) (optionnel)\n"
             "3. Dans quelle ville/pays te trouves-tu ? (optionnel)\n"
             "4. Quel est ton âge approximatif ? (optionnel)\n"
