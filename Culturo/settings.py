@@ -129,3 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Gemini API Key (à remplacer par ta vraie clé)
 GEMINI_API_KEY = "AIzaSyB3mLRx22oRcSAheuUIPx7dj66KNsDB6-8"
+
+# Qloo API Key (à remplacer par votre vraie clé API Qloo)
+QLOO_API_KEY = "pCqdMaolbE54li0mShpCoSHibmAovQ4XkTA33RCAY-w"
+QLOO_BASE_URL = "https://hackathon.api.qloo.com"

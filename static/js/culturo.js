@@ -433,20 +433,85 @@ class CulturoApp {
             removeTypingIndicator();
             appendBotMessageAnimated(data.message);
             history.push({ role: "assistant", content: data.message });
+            
+            // Affichage des données utilisateur si disponibles
             if (data.done && data.user_data) {
-                const pre = document.createElement('pre');
-                pre.textContent = JSON.stringify(data.user_data, null, 2);
-                pre.style.background = '#f8f9fa';
-                pre.style.borderRadius = '10px';
-                pre.style.padding = '0.7rem 1rem';
-                pre.style.margin = '8px 0 0 0';
-                pre.style.fontSize = '0.98rem';
-                messagesDiv.appendChild(pre);
+                const userDataDiv = document.createElement('div');
+                userDataDiv.className = 'bot-message user-data-display';
+                userDataDiv.innerHTML = `
+                    <h4>📊 Vos Préférences Collectées :</h4>
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 0.7rem 1rem; margin: 8px 0;">
+                        <strong>Genre :</strong> ${data.user_data.genre || 'Non spécifié'}<br>
+                        <strong>Langue :</strong> ${data.user_data.langue || 'Non spécifié'}<br>
+                        <strong>Plateforme :</strong> ${data.user_data.plateforme || 'Non spécifié'}<br>
+                        <strong>Âge :</strong> ${data.user_data.age || 'Non spécifié'}<br>
+                        <strong>Pays :</strong> ${data.user_data.pays || 'Non spécifié'}
+                    </div>
+                `;
+                messagesDiv.appendChild(userDataDiv);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
+            
+            // Affichage de l'URL Qloo générée
+            if (data.qloo_url) {
+                const qlooUrlDiv = document.createElement('div');
+                qlooUrlDiv.className = 'bot-message qloo-url-display';
+                qlooUrlDiv.innerHTML = `
+                    <h4>🔗 URL Qloo API Générée :</h4>
+                    <div style="background: #e3f2fd; border-radius: 10px; padding: 0.7rem 1rem; margin: 8px 0; word-break: break-all; font-family: monospace; font-size: 0.9rem;">
+                        ${data.qloo_url}
+                    </div>
+                `;
+                messagesDiv.appendChild(qlooUrlDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            
+            // Affichage de la réponse de l'API Qloo et mise à jour de la section Now Showing
+            if (data.qloo_response) {
+                // Message simple dans le chatbot
+                const qlooResponseDiv = document.createElement('div');
+                qlooResponseDiv.className = 'bot-message qloo-response-display';
+                
+                if (data.qloo_response.success) {
+                    qlooResponseDiv.innerHTML = `
+                        <h4>🎬 Recommandations générées !</h4>
+                        <div style="background: #e8f5e8; border-radius: 10px; padding: 0.7rem 1rem; margin: 8px 0;">
+                            <p>Vos recommandations personnalisées ont été ajoutées à la section "Now Showing" ci-dessous !</p>
+                            <div style="margin-top: 12px; font-size: 0.9rem; color: #666; text-align: center;">
+                                ${data.qloo_response.data.source === 'demo_mode' ? 
+                                    '🎭 Mode démo - Recommandations basées sur vos préférences' : 
+                                    '✅ Données réelles de l\'API Qloo'
+                                }
+                            </div>
+                            <div style="margin-top: 16px; text-align: center;">
+                                <button onclick="showMoreRecommendations('${data.qloo_response.data.source === 'demo_mode' ? 'demo' : 'api'}')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; font-size: 0.9rem;">
+                                    🎬 Voir Plus de Films
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Mise à jour dynamique de la section Now Showing
+                    updateNowShowingSection(data.qloo_response);
+                } else {
+                    // Affichage des erreurs
+                    qlooResponseDiv.innerHTML = `
+                        <h4>❌ Erreur API Qloo :</h4>
+                        <div style="background: #ffebee; border-radius: 10px; padding: 0.7rem 1rem; margin: 8px 0;">
+                            <strong>Erreur :</strong> ${data.qloo_response.error}<br>
+                            <strong>Statut :</strong> ${data.qloo_response.status_code || 'N/A'}<br>
+                            <strong>Détails :</strong> ${data.qloo_response.response_text || 'Aucun détail'}
+                        </div>
+                    `;
+                }
+                messagesDiv.appendChild(qlooResponseDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            
         } catch (e) {
             removeTypingIndicator();
             appendBotMessageAnimated("Erreur lors de la connexion au chatbot.");
+            console.error("Erreur chatbot:", e);
         }
         isBotTyping = false;
     }
@@ -466,6 +531,322 @@ class CulturoApp {
         }
     });
 })();
+
+// Fonction pour mettre à jour dynamiquement la section Now Showing
+function updateNowShowingSection(qlooResponse) {
+    const nowShowingGrid = document.querySelector('.cinema-movies-grid');
+    if (!nowShowingGrid) return;
+
+    console.log("=== DEBUG: Données reçues de l'API ===");
+    console.log("qlooResponse:", qlooResponse);
+    console.log("qlooResponse.data:", qlooResponse.data);
+    console.log("Type de qlooResponse.data:", typeof qlooResponse.data);
+    if (qlooResponse.data) {
+        console.log("Clés disponibles:", Object.keys(qlooResponse.data));
+        if (qlooResponse.data.recommendations) {
+            console.log("Première recommandation:", qlooResponse.data.recommendations[0]);
+        }
+        if (qlooResponse.data.entities) {
+            console.log("Première entité:", qlooResponse.data.entities[0]);
+        }
+    }
+    console.log("=====================================");
+
+    // Données de démonstration pour plus de recommandations
+    const demoRecommendations = [
+        {
+            title: "Inception",
+            year: 2010,
+            rating: 8.8,
+            language: "Anglais",
+            genre: "Science-Fiction",
+            director: "Christopher Nolan",
+            description: "Un thriller de science-fiction révolutionnaire sur les rêves et la réalité.",
+            image: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            title: "Parasite",
+            year: 2019,
+            rating: 8.6,
+            language: "Coréen",
+            genre: "Thriller",
+            director: "Bong Joon-ho",
+            description: "Un film acclamé qui explore les inégalités sociales avec humour noir.",
+            image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            title: "La La Land",
+            year: 2016,
+            rating: 8.0,
+            language: "Anglais",
+            genre: "Comédie musicale",
+            director: "Damien Chazelle",
+            description: "Une romance musicale moderne qui célèbre les rêves d'Hollywood.",
+            image: "https://images.unsplash.com/photo-1465101046530-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            title: "Spirited Away",
+            year: 2001,
+            rating: 8.6,
+            language: "Japonais",
+            genre: "Animation",
+            director: "Hayao Miyazaki",
+            description: "Un chef-d'œuvre d'animation japonaise sur la magie et l'aventure.",
+            image: "https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=400&q=80"
+        }
+    ];
+
+    const apiRecommendations = [
+        {
+            name: "The Matrix",
+            id: "movie_001",
+            type: "movie",
+            score: 0.95,
+            metadata: { year: 1999, rating: 8.7 },
+            image_url: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "Pulp Fiction",
+            id: "movie_002",
+            type: "movie",
+            score: 0.92,
+            metadata: { year: 1994, rating: 8.9 },
+            image_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "Fight Club",
+            id: "movie_003",
+            type: "movie",
+            score: 0.89,
+            metadata: { year: 1999, rating: 8.8 },
+            image_url: "https://images.unsplash.com/photo-1465101046530-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "The Godfather",
+            id: "movie_004",
+            type: "movie",
+            score: 0.96,
+            metadata: { year: 1972, rating: 9.2 },
+            image_url: "https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=400&q=80"
+        }
+    ];
+
+    let recommendations = [];
+    
+    if (qlooResponse.data.recommendations) {
+        // Mode démo - données structurées avec title, year, rating
+        recommendations = qlooResponse.data.recommendations;
+        console.log("Mode démo détecté:", recommendations);
+    } else if (qlooResponse.data.entities) {
+        // Données API Qloo - format entities
+        recommendations = qlooResponse.data.entities;
+        console.log("Mode API Qloo détecté:", recommendations);
+    } else if (qlooResponse.data && Array.isArray(qlooResponse.data)) {
+        // Données API Qloo - format array direct
+        recommendations = qlooResponse.data;
+        console.log("Mode API Qloo (array) détecté:", recommendations);
+    } else {
+        // Fallback vers les données de démo
+        console.log("Fallback vers données de démo");
+        recommendations = demoRecommendations;
+    }
+
+    // Vider la grille existante
+    nowShowingGrid.innerHTML = '';
+
+    // Ajouter les nouvelles recommandations
+    recommendations.forEach((movie, index) => {
+        const movieCard = document.createElement('div');
+        movieCard.className = 'cinema-movie-card';
+        movieCard.style.animation = `fadeInUp 0.6s ease ${index * 0.1}s both`;
+        
+        let title, year, rating, imageUrl;
+        
+        // Détection du type de données
+        if (movie.title && movie.year && movie.rating) {
+            // Mode démo - données structurées
+            title = movie.title;
+            year = movie.year;
+            rating = movie.rating;
+            imageUrl = movie.image || movie.image_url || `https://images.unsplash.com/photo-${1517602302552 + index}?auto=format&fit=crop&w=400&q=80`;
+        } else if (movie.name || movie.title) {
+            // Mode API Qloo - format entities
+            title = movie.name || movie.title || 'Film';
+            
+            // Extraction de l'année depuis metadata ou autres champs
+            if (movie.metadata && movie.metadata.year) {
+                year = movie.metadata.year;
+            } else if (movie.year) {
+                year = movie.year;
+            } else if (movie.release_date) {
+                year = new Date(movie.release_date).getFullYear();
+            } else {
+                year = 'N/A';
+            }
+            
+            // Extraction de la note depuis metadata ou autres champs
+            if (movie.metadata && movie.metadata.rating) {
+                rating = movie.metadata.rating;
+            } else if (movie.rating) {
+                rating = movie.rating;
+            } else if (movie.score) {
+                rating = (movie.score * 10).toFixed(1);
+            } else {
+                rating = 'N/A';
+            }
+            
+            // Extraction de l'image depuis différents champs possibles
+            imageUrl = movie.image_url || movie.poster_url || movie.thumbnail || movie.image || movie.poster || `https://images.unsplash.com/photo-${1517602302552 + index}?auto=format&fit=crop&w=400&q=80`;
+        } else {
+            // Fallback pour données inconnues
+            title = 'Film Inconnu';
+            year = 'N/A';
+            rating = 'N/A';
+            imageUrl = `https://images.unsplash.com/photo-${1517602302552 + index}?auto=format&fit=crop&w=400&q=80`;
+        }
+
+        movieCard.innerHTML = `
+            <img src="${imageUrl}" alt="${title}" class="cinema-movie-img">
+            <div class="cinema-movie-info">
+                <h4>"${title}"</h4>
+                <span class="cinema-movie-date">${year} • ⭐ ${rating}/10</span>
+                <a href="#" class="btn btn-secondary">Discover</a>
+            </div>
+        `;
+        
+        nowShowingGrid.appendChild(movieCard);
+    });
+
+    // Ajouter les styles d'animation si pas déjà présents
+    if (!document.getElementById('cinema-animations')) {
+        const style = document.createElement('style');
+        style.id = 'cinema-animations';
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Faire défiler vers la section Now Showing
+    const nowShowingSection = document.getElementById('now-showing');
+    if (nowShowingSection) {
+        nowShowingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Fonction pour afficher plus de recommandations dans la section Now Showing
+function showMoreRecommendations(type) {
+    // Créer un objet de réponse simulé pour utiliser updateNowShowingSection
+    const mockResponse = {
+        data: {
+            recommendations: type === 'demo' ? [
+                {
+                    title: "The Grand Budapest Hotel",
+                    year: 2014,
+                    rating: 8.1,
+                    language: "Anglais",
+                    genre: "Comédie",
+                    director: "Wes Anderson",
+                    description: "Une comédie excentrique avec une esthétique visuelle unique.",
+                    image: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    title: "Amélie",
+                    year: 2001,
+                    rating: 8.3,
+                    language: "Français",
+                    genre: "Comédie romantique",
+                    director: "Jean-Pierre Jeunet",
+                    description: "Un film français charmant sur l'amour et la magie du quotidien.",
+                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    title: "Blade Runner 2049",
+                    year: 2017,
+                    rating: 8.0,
+                    language: "Anglais",
+                    genre: "Science-Fiction",
+                    director: "Denis Villeneuve",
+                    description: "Une suite visuellement époustouflante du classique de science-fiction.",
+                    image: "https://images.unsplash.com/photo-1465101046530-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    title: "Mad Max: Fury Road",
+                    year: 2015,
+                    rating: 8.1,
+                    language: "Anglais",
+                    genre: "Action",
+                    director: "George Miller",
+                    description: "Un film d'action post-apocalyptique spectaculaire.",
+                    image: "https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=400&q=80"
+                }
+            ] : [
+                {
+                    name: "Interstellar",
+                    id: "movie_005",
+                    type: "movie",
+                    score: 0.88,
+                    metadata: { year: 2014, rating: 8.6 },
+                    image_url: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    name: "The Dark Knight",
+                    id: "movie_006",
+                    type: "movie",
+                    score: 0.94,
+                    metadata: { year: 2008, rating: 9.0 },
+                    image_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    name: "Inception",
+                    id: "movie_007",
+                    type: "movie",
+                    score: 0.91,
+                    metadata: { year: 2010, rating: 8.8 },
+                    image_url: "https://images.unsplash.com/photo-1465101046530-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+                },
+                {
+                    name: "The Shawshank Redemption",
+                    id: "movie_008",
+                    type: "movie",
+                    score: 0.97,
+                    metadata: { year: 1994, rating: 9.3 },
+                    image_url: "https://images.unsplash.com/photo-1468071174046-657d9d351a40?auto=format&fit=crop&w=400&q=80"
+                }
+            ]
+        }
+    };
+
+    // Mettre à jour la section Now Showing avec les nouvelles recommandations
+    updateNowShowingSection(mockResponse);
+
+    // Afficher un message dans le chatbot pour confirmer
+    const messagesDiv = document.getElementById('chatbot-messages');
+    if (messagesDiv) {
+        const confirmDiv = document.createElement('div');
+        confirmDiv.className = 'bot-message';
+        confirmDiv.innerHTML = `
+            <h4>🎬 Plus de Recommandations Ajoutées !</h4>
+            <div style="background: #e8f5e8; border-radius: 10px; padding: 0.7rem 1rem; margin: 8px 0;">
+                <p>De nouvelles recommandations ont été ajoutées à la section "Now Showing" !</p>
+                <div style="margin-top: 12px; font-size: 0.9rem; color: #666; text-align: center;">
+                    ${type === 'demo' ? '🎭 Mode démo - Recommandations supplémentaires' : '✅ Données API Qloo supplémentaires'}
+                </div>
+            </div>
+        `;
+        messagesDiv.appendChild(confirmDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+}
 
 // Initialisation de l'application
 document.addEventListener('DOMContentLoaded', () => {
@@ -568,6 +949,41 @@ const styles = `
     .error {
         border-color: #ef4444 !important;
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+
+    .recommendation-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin: 12px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .recommendation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .recommendation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .recommendation-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .recommendation-item:hover {
+        background: #e9ecef;
+        transform: translateY(-1px);
     }
 
     .checkbox-group.error {

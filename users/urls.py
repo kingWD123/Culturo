@@ -5,5 +5,6 @@ urlpatterns = [
     # Pages principales
     path('', views.home, name='home'),
     path('cinema-recommandations/', views.CinemaRecommandations, name='cinema_recommandations'),
+    path('recommendations/', views.recommendations_page, name='recommendations_page'),
     path('cinema_chatbot_api/', views.cinema_chatbot_api, name='cinema_chatbot_api'),
 ] 
