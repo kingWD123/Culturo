@@ -270,6 +270,65 @@ def cinema_chatbot_api(request):
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
 
+@csrf_exempt
+def get_movies_from_qloo(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+    try:
+        data = json.loads(request.body)
+        qloo_url = data.get("qloo_url")
+        if not qloo_url:
+            return JsonResponse({"error": "Aucune URL fournie"}, status=400)
+        # Utiliser la clé API fournie par l'utilisateur
+        api_key = "ELT40OrStBysskCLRvuxrB9-h6ZakP_jZ2O0j9TMHZI"
+        headers = {
+            "x-api-key": api_key,
+            "Accept": "application/json"
+        }
+        response = requests.get(qloo_url, headers=headers)
+        if response.status_code != 200:
+            return JsonResponse({"error": f"Erreur API externe: {response.status_code}"}, status=502)
+        data = response.json()
+        # Extraire les films (nom, image, date de sortie)
+        movies = []
+        entities = data.get("results", {}).get("entities", [])
+        for entity in entities:
+            movie_data = {
+                "name": entity.get("name"),
+                "entity_id": entity.get("entity_id"),
+            }
+            # Ajoute toutes les propriétés brutes
+            movie_data.update(entity.get("properties", {}))
+            # Ajoute aussi tags, external, etc. si présents
+            if "tags" in entity:
+                movie_data["tags"] = entity["tags"]
+            if "external" in entity:
+                movie_data["external"] = entity["external"]
+            movies.append(movie_data)
+        return JsonResponse({"movies": movies})
+    except Exception as e:
+        return JsonResponse({"error": f"Erreur serveur: {str(e)}"}, status=500)
+
+def movie_detail(request):
+    entity_id = request.GET.get('id')
+    if not entity_id:
+        return render(request, 'users/movie_detail.html', {'error': "Aucun identifiant de film fourni."})
+    api_key = "ELT40OrStBysskCLRvuxrB9-h6ZakP_jZ2O0j9TMHZI"
+    url = f"https://hackathon.api.qloo.com/v2/entities/{entity_id}"
+    headers = {
+        "x-api-key": api_key,
+        "Accept": "application/json"
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            return render(request, 'users/movie_detail.html', {'error': f"Erreur API externe: {response.status_code}"})
+        data = response.json()
+        entity = data.get('entity', {})
+        return render(request, 'users/movie_detail.html', {'movie': entity})
+    except Exception as e:
+        return render(request, 'users/movie_detail.html', {'error': f"Erreur serveur: {str(e)}"})
+
 # Fonction améliorée pour générer une URL Qloo/ClooAI GET
 def build_qloo_url(
     entity_type="urn:entity:movie",

@@ -444,6 +444,25 @@ class CulturoApp {
                 messagesDiv.appendChild(pre);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
+            // Ajout dynamique des films Now Showing
+            if (data.qloo_url) {
+                fetch('/api/get_movies_from_qloo/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qloo_url: data.qloo_url })
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    const grid = document.querySelector('.cinema-movies-grid');
+                    if (!grid) return;
+                    let allMovies = resData.movies || [];
+                    renderNowShowing(allMovies);
+                })
+                .catch(() => {
+                    const grid = document.querySelector('.cinema-movies-grid');
+                    if (grid) grid.innerHTML = '<div style="padding:1rem;">Erreur lors du chargement des films.</div>';
+                });
+            }
         } catch (e) {
             removeTypingIndicator();
             appendBotMessageAnimated("Erreur lors de la connexion au chatbot.");
@@ -580,4 +599,122 @@ const styles = `
 // Injection des styles
 const styleSheet = document.createElement('style');
 styleSheet.textContent = styles;
-document.head.appendChild(styleSheet); 
+document.head.appendChild(styleSheet);
+
+// Section Now Showing : affichage par défaut de films populaires si aucune recommandation
+const defaultMovies = [
+    {
+        name: "The Godfather",
+        release_year: 1972,
+        image_url: "https://postercinema.eu/cdn/shop/files/the-godfather_4f919463.jpg?v=1707474775",
+    },
+    {
+        name: "Inception",
+        release_year: 2010,
+        image_url: "https://play-lh.googleusercontent.com/-qtECEmfe9yjg9w57QlILDP8Bgk5mT-cOUduloX_48y_NGYaP4dgZnrY0tUP7WX5x-vXEKhOzWL-QgFXyp4=w240-h480-rw",
+    },
+    {
+        name: "Amélie (Le Fabuleux Destin d'Amélie Poulain)",
+        release_year: 2001,
+        image_url: "https://fr.web.img2.acsta.net/img/14/28/14285c344d92ed68b26bffc6afbca358.jpg",
+    },
+    {
+        name: "Parasite",
+        release_year: 2019,
+        image_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTHqERudQeMKbEpp97lLK_unmW1aJZLdP_-A&s",
+    },
+    {
+        name: "Interstellar",
+        release_year: 2014,
+        image_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfw8Ic__jQPSqabC3yvz0-CMMZ1_eZKN41DQ&s",
+    },
+];
+
+// Fonction pour afficher une liste de films dans Now Showing
+function renderNowShowing(movies) {
+    const grid = document.querySelector('.cinema-movies-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    let allMovies = movies || [];
+    let currentPage = 0;
+    const pageSize = 10;
+    function renderPage(page) {
+        grid.innerHTML = '';
+        const start = page * pageSize;
+        const end = Math.min(start + pageSize, allMovies.length);
+        for (let i = start; i < end; i++) {
+            const movie = allMovies[i];
+            if (movie.entity_id) {
+                try {
+                    localStorage.setItem('movie_' + movie.entity_id, JSON.stringify(movie));
+                } catch (e) {}
+            }
+            const imgSrc = movie.image_url || (movie.image && movie.image.url) || movie.image || '';
+            const card = document.createElement('div');
+            card.className = 'cinema-movie-card';
+            card.innerHTML = `
+                <img src="${imgSrc}" alt="${movie.name || ''}" class="cinema-movie-img">
+                <div class="cinema-movie-info">
+                    <h4>${movie.name ? '"' + movie.name + '"' : ''}</h4>
+                    <span class="cinema-movie-date">${movie.release_year || ''}</span>
+                    <a href="#" class="btn btn-secondary discover-btn" data-entity-id="${movie.entity_id || ''}">Discover</a>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+        // Ajout du handler Discover
+        setTimeout(() => {
+            document.querySelectorAll('.discover-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    const entityId = btn.getAttribute('data-entity-id');
+                    if (entityId) {
+                        window.location.href = `/movie_detail/?id=${encodeURIComponent(entityId)}`;
+                    }
+                };
+            });
+        }, 10);
+        // Pagination controls
+        let controls = document.getElementById('now-showing-pagination');
+        if (!controls) {
+            controls = document.createElement('div');
+            controls.id = 'now-showing-pagination';
+            controls.style.display = 'flex';
+            controls.style.justifyContent = 'center';
+            controls.style.gap = '1rem';
+            controls.style.margin = '1.5rem 0 0 0';
+            grid.parentElement.appendChild(controls);
+        }
+        controls.innerHTML = '';
+        if (page > 0) {
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Précédent';
+            prevBtn.className = 'btn btn-secondary';
+            prevBtn.onclick = () => {
+                currentPage--;
+                renderPage(currentPage);
+            };
+            controls.appendChild(prevBtn);
+        }
+        if (end < allMovies.length) {
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Suivant';
+            nextBtn.className = 'btn btn-secondary';
+            nextBtn.onclick = () => {
+                currentPage++;
+                renderPage(currentPage);
+            };
+            controls.appendChild(nextBtn);
+        }
+        if (allMovies.length === 0) {
+            grid.innerHTML = '<div style="padding:1rem;">Aucun film trouvé.</div>';
+            controls.innerHTML = '';
+        }
+    }
+    renderPage(currentPage);
+}
+
+// Affichage par défaut au chargement
+window.addEventListener('DOMContentLoaded', function() {
+    renderNowShowing(defaultMovies);
+}); 
