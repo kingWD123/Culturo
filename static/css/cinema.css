@@ -85,6 +85,8 @@ body.cinema {
 .cinema-section {
     padding: 80px 0 0 0;
     margin-bottom: 3.5rem;
+    border-radius: 36px;
+    width:100%;
 }
 
 .section-title {
@@ -92,13 +94,14 @@ body.cinema {
     font-weight: 900;
     color: #fff;
     margin-bottom: 1.5rem;
+    padding-left:30px;
 }
 
 /* News Section */
 .cinema-news-item {
     background: #181818;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+    border-radius: 24px 56px 24px 56px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.22);
     display: flex;
     max-width: 540px;
     min-width: 320px;
@@ -106,6 +109,14 @@ body.cinema {
     flex: 1 1 320px;
     margin-bottom: 1.5rem;
     color: #fff;
+    padding: 1.6rem 2.2rem;
+    transition: box-shadow 0.25s, border 0.25s, transform 0.22s;
+    position: relative;
+}
+.cinema-news-item:hover {
+    box-shadow: 0 12px 40px 0 rgba(229,9,20,0.18), 0 2px 24px 0 rgba(0,0,0,0.18);
+    border: 2px solid #e50914;
+    transform: translateY(-4px) scale(1.03);
 }
 
 .cinema-news-img {
@@ -138,17 +149,39 @@ body.cinema {
 }
 
 .cinema-news-list li {
-    background: #232323;
-    border-radius: 12px;
-    padding: 1rem 1.2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background: linear-gradient(135deg, #232323 70%, #181818 100%);
+    border-radius: 18px 48px 18px 48px;
+    padding: 1.6rem 2.2rem;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.22);
+    color: #fff;
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.25s, border 0.25s, transform 0.22s;
+    position: relative;
 }
-
-.cinema-news-list a {
+.cinema-news-list li:hover {
+    box-shadow: 0 12px 40px 0 rgba(229,9,20,0.18), 0 2px 24px 0 rgba(0,0,0,0.18);
+    border: 2px solid #e50914;
+    transform: translateY(-4px) scale(1.03);
+}
+.cinema-news-list li span {
     color: #e50914;
-    font-size: 0.98rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.cinema-news-list li a {
+    color: #fff;
     text-decoration: underline;
     font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+.cinema-news-list li a:hover {
+    color: #e50914;
+}
+/* Correction du titre Latest News */
+.cinema-section h3[style*="color: #1a1a1a"] {
+    color: #fff !important;
+    text-shadow: 0 2px 8px #000;
 }
 
 /* Agenda Section */
@@ -393,4 +426,14 @@ body.cinema {
 
 body.cinema, .cinema-hero, .cinema-section, .cinema-movie-card, .cinema-news-item, .cinema-agenda-item, .cinema-local-info, .cinema-local-img, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
     background: #181818 !important;
+}
+
+body.cinema .container {
+    max-width: 98vw;
+    border-radius: 36px !important;
+    background: #181818 !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    padding: 2.5rem 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }

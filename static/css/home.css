@@ -8,25 +8,52 @@
 /* Spécificité accrue pour éviter d'impacter la navbar/footer globaux */
 body.home {
     line-height: 1.6;
-    background: #141414;
+    background: #181818 !important;
     color: #fff;
     font-family: 'Roboto', Arial, sans-serif;
 }
 
-body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .newsletter, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
+body.home, .home .container, .section, .hero, .univers-card, .decouverte-card, .testimonial-content, .newsletter-section, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
     background: #181818 !important;
+    color: #fff !important;
+    border-radius: 36px !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18) !important;
+    padding: 2.5rem 2.5rem !important;
 }
-
-.home .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
+.univers-card, .decouverte-card, .testimonial-card {
+    border-radius: 18px !important;
+    background: #222 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18) !important;
 }
-
-/* HERO SECTION */
-.hero {
-    background: #181818;
-    padding: 80px 0;
+.section-title, .hero-text h1, .newsletter-section h3 {
+    color: #fff !important;
+    text-shadow: 0 2px 8px #000 !important;
+}
+.cta-button, .newsletter-form button, .view-all {
+    background: #e50914 !important;
+    color: #fff !important;
+    border-radius: 25px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.13) !important;
+    border: none !important;
+    transition: background 0.3s, color 0.3s, transform 0.2s !important;
+}
+.cta-button:hover, .newsletter-form button:hover, .view-all:hover {
+    background: #b0060f !important;
+    color: #fff !important;
+    transform: translateY(-2px) scale(1.04) !important;
+}
+.card-badge {
+    background: #e50914 !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+}
+.quote {
+    background: #232323 !important;
+    border-left: 4px solid #e50914 !important;
+    color: #b3b3b3 !important;
+    border-radius: 18px !important;
 }
 
 .hero-content {
@@ -61,34 +88,13 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
     border-left: 4px solid #e50914;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    border-radius: 8px;
+    border-radius: 18px;
 }
 
 .quote p {
     font-style: italic;
     color: #b3b3b3;
     margin: 0;
-}
-
-.cta-button {
-    display: inline-block;
-    background: #e50914;
-    color: #fff;
-    padding: 16px 32px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.1rem;
-    transition: background 0.3s, color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.13);
-    border: none;
-}
-
-.cta-button:hover {
-    background: #b0060f;
-    color: #fff;
-    transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.18);
 }
 
 .hero-images {
@@ -137,7 +143,12 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
 
 /* SECTIONS */
 .section {
-    padding: 80px 0;
+    border-radius: 36px;
+    background: #181818;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .section-header {
@@ -151,10 +162,11 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
     font-size: 2.2rem;
     font-weight: 900;
     color: #fff;
+    text-shadow: 0 2px 8px #000;
 }
 
 .view-all {
-    color: #b3b3b3;
+    color: #e50914;
     text-decoration: none;
     font-weight: 500;
     display: flex;
@@ -178,7 +190,7 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
     aspect-ratio: 16/9;
     min-height: 180px;
     max-height: 260px;
-    background: #232323;
+    background: #222;
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 2px 16px rgba(0,0,0,0.18);
@@ -263,7 +275,7 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
     position: absolute;
     top: 16px;
     left: 16px;
-    background: rgba(255, 255, 255, 0.18);
+    background: #e50914;
     color: #fff;
     font-size: 0.85rem;
     font-weight: 600;
@@ -390,13 +402,14 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
 }
 
 .testimonial-content {
+    border-radius: 36px;
+    background: #181818;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 2rem;
     align-items: center;
-    background: #f8f9fa;
     padding: 3rem;
-    border-radius: 20px;
 }
 
 .testimonial-avatar {
@@ -426,9 +439,9 @@ body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .news
 }
 
 .testimonial-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
+    background: #222;
+    border-radius: 18px;
+    color: #fff;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     width: 250px;
 }
@@ -581,13 +594,13 @@ footer {
 }
 
 .footer-links a {
-    color: #999;
+    color: #b3b3b3 !important;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .footer-links a:hover {
-    color: #ff6b35;
+    color: #e50914 !important;
 }
 
 .footer-social {
@@ -709,13 +722,12 @@ footer {
 
 /* Newsletter premium */
 .newsletter-section {
-    background: linear-gradient(135deg, #ff6b35 0%, #fbbf24 100%);
-    color: white;
+    border-radius: 36px;
+    background: linear-gradient(135deg, #181818 60%, #232323 100%);
+    box-shadow: 0 8px 40px #18181833;
+    color: #fff;
     padding: 60px 0 50px 0;
     margin-top: 3rem;
-    border-radius: 24px;
-    box-shadow: 0 4px 32px #ff6b3522;
-    text-align: center;
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;

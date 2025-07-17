@@ -209,6 +209,17 @@ footer {
     padding: 0 24px;
 }
 
+body.cinema .container {
+    max-width: 98vw;
+    border-radius: 36px;
+    background: #181818;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
 /* === CINEMA PAGE STYLES === */
 .cinema-hero {
     position: relative;
