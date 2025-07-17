@@ -76,7 +76,7 @@ def cinema_chatbot_api(request):
             "5. Quelle période de films préfères-tu ? (années récentes, classiques, etc.) (optionnel)\n"
             "6. Quelle note minimale souhaites-tu ? (optionnel)\n"
             "7. Quelle langue préfères-tu ? (optionnel)\n\n"
-            "Quand tu as suffisamment d'informations (au moins 2-3 critères), affiche un résumé en JSON avec seulement les informations fournies :\n"
+            "Quand tu as suffisamment d'informations (au moins 3-4 critères), affiche un résumé en JSON avec seulement les informations fournies :\n"
             '{\n'
             '  "films_aimes": ["titre1", "titre2"], // seulement si fourni\n'
             '  "genres": ["action", "thriller"], // seulement si fourni\n'
@@ -104,6 +104,7 @@ def cinema_chatbot_api(request):
         user_data = None
         qloo_url = None
         urn_not_found = []
+        recommendations = None
         try:
             start = bot_message.index("{")
             end = bot_message.rindex("}") + 1
@@ -185,8 +186,7 @@ def cinema_chatbot_api(request):
             # Langue (seulement si fournie)
             if user_data.get("langue"):
                 extra_params['filter.language'] = user_data["langue"]
-            
-            # Activer l'explicabilité seulement si on a des paramètres
+
             if extra_params:
                 extra_params['feature.explainability'] = True
             
@@ -200,6 +200,45 @@ def cinema_chatbot_api(request):
                     extra_params=extra_params
                 )
                 print("[Qloo URL]", qloo_url)
+                # Appeler l'API Qloo/ClooAI pour obtenir les recommandations
+                try:
+                    qloo_headers = {
+                        "x-api-key": settings.CLOOAI_API_KEY,
+                        "Accept": "application/json"
+                    }
+                    qloo_response = requests.get(qloo_url, headers=qloo_headers)
+
+                    if qloo_response.status_code == 200:
+                        print("code 200")
+                        qloo_data = qloo_response.json()
+                        print("ok1")
+                        # Extraire les titres recommandés (adapter selon la structure de la réponse)
+                        titles = []
+                        for element in qloo_data["results"]["entities"]:
+                            film = {
+                                "name": element.get("name"),
+                                "release_year": element.get("properties", {}).get("release_year"),
+                                "description": element.get("properties", {}).get("description"),
+                                "image": element.get("properties", {}).get("image", {}).get("url"),
+                                "genres": [tag.get("name") for tag in element.get("tags", [])],
+                                "release_country": element.get("properties", {}).get("release_country"),
+                                "imdb_id": None,
+                                "imdb_user_rating": None,
+                                "imdb_user_rating_count": None
+                
+                            }
+                            imdb = element.get("external", {}).get("imdb", [])
+                            if imdb and isinstance(imdb, list):
+                                imdb_info = imdb[0]
+                                film["imdb_id"] = imdb_info.get("id")
+                                film["imdb_user_rating"] = imdb_info.get("user_rating")
+                                film["imdb_user_rating_count"] = imdb_info.get("user_rating_count")
+                            titles.append(film)
+                        recommendations = titles
+                    else:
+                        recommendations = [f"Erreur API Qloo: {qloo_response.status_code}"]
+                except Exception as api_exc:
+                    recommendations = [f"Erreur lors de l'appel API Qloo: {api_exc}"]
             else:
                 print("Pas assez d'informations pour générer une URL de recommandation")
                 
@@ -208,16 +247,25 @@ def cinema_chatbot_api(request):
             pass
 
         # Message d'avertissement si certains titres n'ont pas d'URN
-        warning = None
+        warning = None  
         if urn_not_found:
             warning = f"Aucun identifiant ClooAI trouvé pour : {', '.join(urn_not_found)}. Les recommandations seront moins précises."
+
+        # Si recommandations prêtes, stocke-les dans la session
+        if recommendations and (user_data is not None and (entity_ids or extra_params)):
+            request.session['cinema_recommendations'] = recommendations
+            request.session['cinema_qloo_url'] = qloo_url
+
+        # Affiche les recommandations Charbel
+        print(recommendations)
 
         return JsonResponse({
             "message": bot_message,
             "user_data": user_data,
             "qloo_url": qloo_url,
             "done": user_data is not None and (entity_ids or extra_params),
-            "warning": warning
+            "warning": warning,
+            "recommendations": recommendations
         })
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
@@ -329,3 +377,12 @@ def build_qloo_url(
                 params[key] = value
     
     return base_url + "?" + urlencode(params)
+
+def cinema_recommendations_result(request):
+    """Affiche la page de résultats détaillés des recommandations cinéma"""
+    recommendations = request.session.get('cinema_recommendations', [])
+    qloo_url = request.session.get('cinema_qloo_url', None)
+    return render(request, 'users/cinema_recommendations_result.html', {
+        'recommendations': recommendations,
+        'qloo_url': qloo_url
+    })

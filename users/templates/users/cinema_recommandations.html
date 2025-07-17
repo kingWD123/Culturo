@@ -140,6 +140,19 @@
             </div>
         </div>
     </section>
+
+    <!-- Dynamic Recommendations Section -->
+    <section class="cinema-section" id="cinema-recommendations-section" style="display:none;">
+        <h2 class="section-title">🎬 Your Movie Recommendations</h2>
+        <div id="cinema-recommendations-loading"
+            style="display:none;justify-content:center;align-items:center;height:60px;">
+            <div class="spinner"
+                style="width:38px;height:38px;border:4px solid #ff6b35;border-top:4px solid #fff;border-radius:50%;animation:spin 1s linear infinite;">
+            </div>
+        </div>
+        <ul id="cinema-recommendations" style="font-size:1.1rem; margin-top:1rem;"></ul>
+        <div id="cinema-qloo-link" style="margin-top:1.5rem;"></div>
+    </section>
 </div>
 
 <!-- Floating Chatbot Icon and Chat Window -->
@@ -175,6 +188,7 @@
 {% block extra_js %}
 <script src="{% static 'js/culturo.js' %}"></script>
 <script>
+    console.log('JS chatbot chargé');
     document.addEventListener('DOMContentLoaded', function () {
         var toggle = document.getElementById('chatbot-toggle');
         var chatbot = document.getElementById('cinema-chatbot');
@@ -189,6 +203,79 @@
                 chatbot.style.display = 'none';
             });
         }
+
+        // --- Affichage dynamique des recommandations cinéma ---
+        // On suppose que le chatbot JS envoie les requêtes à /cinema_chatbot_api et reçoit la réponse JSON
+        // On intercepte la soumission du formulaire du chatbot pour gérer l'affichage
+        var chatbotForm = document.getElementById('chatbot-form');
+        var chatbotInput = document.getElementById('chatbot-input');
+        var chatbotMessages = document.getElementById('chatbot-messages');
+        var recSection = document.getElementById('cinema-recommendations-section');
+        var recList = document.getElementById('cinema-recommendations');
+        var recLoading = document.getElementById('cinema-recommendations-loading');
+        var chatHistory = [];
+        if (chatbotForm && chatbotInput && chatbotMessages) {
+            chatbotForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var userMsg = chatbotInput.value.trim();
+                if (!userMsg) return;
+                // Affiche le message utilisateur
+                var userDiv = document.createElement('div');
+                userDiv.style.alignSelf = 'flex-end';
+                userDiv.style.background = '#ffecd2';
+                userDiv.style.borderRadius = '12px';
+                userDiv.style.padding = '0.7rem 1rem';
+                userDiv.style.margin = '0.2rem 0';
+                userDiv.style.maxWidth = '85%';
+                userDiv.textContent = userMsg;
+                chatbotMessages.appendChild(userDiv);
+                chatbotInput.value = '';
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                // Ajoute au chatHistory
+                chatHistory.push({ role: 'user', content: userMsg });
+                // Affiche le spinner de chargement
+                if (recLoading) recLoading.style.display = 'flex';
+                // Appel API
+                var response = await fetch('/cinema_chatbot_api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+                var data = await response.json();
+                console.log('Réponse backend:', data);
+                // Masque le spinner de chargement
+                if (recLoading) recLoading.style.display = 'none';
+                // Affiche la réponse du bot
+                var botDiv = document.createElement('div');
+                botDiv.style.alignSelf = 'flex-start';
+                botDiv.style.background = '#fff';
+                botDiv.style.borderRadius = '12px';
+                botDiv.style.padding = '0.7rem 1rem';
+                botDiv.style.margin = '0.2rem 0';
+                botDiv.style.maxWidth = '85%';
+                botDiv.textContent = data.message;
+                chatbotMessages.appendChild(botDiv);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                // Ajoute au chatHistory
+                chatHistory.push({ role: 'model', content: data.message });
+                // Si recommandations présentes et done=true, redirige vers la page de résultats
+                if (data.recommendations && data.recommendations.length && data.done) {
+                    console.log('Redirection vers la page de résultats');
+                    window.location.href = '/cinema_recommendations_result/';
+                }
+            });
+        }
     });
 </script>
+<style>
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 {% endblock %}
