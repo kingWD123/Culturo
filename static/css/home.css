@@ -8,8 +8,13 @@
 /* Spécificité accrue pour éviter d'impacter la navbar/footer globaux */
 body.home {
     line-height: 1.6;
-    background: #fafafa;
-    color: #1a1a1a;
+    background: #141414;
+    color: #fff;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
+body.home, .hero, .section, .univers-card, .decouverte-card, .testimonial, .newsletter, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
+    background: #181818 !important;
 }
 
 .home .container {
@@ -20,7 +25,7 @@ body.home {
 
 /* HERO SECTION */
 .hero {
-    background: white;
+    background: #181818;
     padding: 80px 0;
 }
 
@@ -33,26 +38,27 @@ body.home {
 
 .hero-text h1 {
     font-size: 3.5rem;
-    font-weight: 800;
-    color: #1a1a1a;
+    font-weight: 900;
+    color: #fff;
     line-height: 1.1;
     margin-bottom: 1.5rem;
+    text-shadow: 0 2px 8px #000;
 }
 
 .hero-text .highlight {
-    color: #ff6b35;
+    color: #e50914;
 }
 
 .hero-text p {
     font-size: 1.2rem;
-    color: #666;
+    color: #b3b3b3;
     margin-bottom: 2rem;
     line-height: 1.6;
 }
 
 .quote {
-    background: #f8f9fa;
-    border-left: 4px solid #ff6b35;
+    background: #232323;
+    border-left: 4px solid #e50914;
     padding: 1.5rem;
     margin-bottom: 2rem;
     border-radius: 8px;
@@ -60,27 +66,29 @@ body.home {
 
 .quote p {
     font-style: italic;
-    color: #555;
+    color: #b3b3b3;
     margin: 0;
 }
 
 .cta-button {
     display: inline-block;
-    background: #ff6b35;
-    color: white;
+    background: #e50914;
+    color: #fff;
     padding: 16px 32px;
     border-radius: 25px;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.13);
+    border: none;
 }
 
 .cta-button:hover {
-    background: #e55a2b;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    background: #b0060f;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.18);
 }
 
 .hero-images {
@@ -96,7 +104,7 @@ body.home {
     will-change: transform;
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(40, 40, 80, 0.10);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
 }
 
 .hero-image img {
@@ -119,8 +127,8 @@ body.home {
     position: absolute;
     top: 16px;
     left: 16px;
-    background: #ff6b35;
-    color: white;
+    background: #e50914;
+    color: #fff;
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -141,12 +149,12 @@ body.home {
 
 .section-title {
     font-size: 2.2rem;
-    font-weight: 700;
-    color: #1a1a1a;
+    font-weight: 900;
+    color: #fff;
 }
 
 .view-all {
-    color: #666;
+    color: #b3b3b3;
     text-decoration: none;
     font-weight: 500;
     display: flex;
@@ -155,7 +163,7 @@ body.home {
 }
 
 .view-all:hover {
-    color: #ff6b35;
+    color: #e50914;
 }
 
 /* UNIVERS GRID */
@@ -170,10 +178,10 @@ body.home {
     aspect-ratio: 16/9;
     min-height: 180px;
     max-height: 260px;
-    background: #222;
+    background: #232323;
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 2px 16px rgba(40, 40, 80, 0.10);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
     position: relative;
     display: flex;
     align-items: flex-end;
@@ -182,8 +190,9 @@ body.home {
 
 .univers-card:hover,
 .decouverte-card:hover {
-    box-shadow: 0 8px 32px rgba(40, 40, 80, 0.18);
+    box-shadow: 0 8px 32px rgba(229,9,20,0.18);
     transform: translateY(-4px) scale(1.025);
+    border: 2px solid #e50914;
 }
 
 .univers-card img,
@@ -248,7 +257,6 @@ body.home {
 .card-desc {
     font-size: 0.97rem;
     color: #e5e5e5;
-    text-shadow: 0 1px 4px #111a;
 }
 
 .card-badge {

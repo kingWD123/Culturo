@@ -495,16 +495,18 @@ document.addEventListener('DOMContentLoaded', () => {
 const styles = `
     .culturo-tooltip {
         position: absolute;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 14px;
+        background: rgba(20, 20, 20, 0.98); /* Netflix dark */
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 15px;
         z-index: 1000;
         opacity: 0;
         transform: translateY(10px);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
         pointer-events: none;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+        font-family: 'Roboto', Arial, sans-serif;
     }
 
     .culturo-tooltip.show {
@@ -518,36 +520,39 @@ const styles = `
         top: 100%;
         left: 50%;
         transform: translateX(-50%);
-        border: 5px solid transparent;
-        border-top-color: rgba(0, 0, 0, 0.8);
+        border: 6px solid transparent;
+        border-top-color: rgba(20, 20, 20, 0.98);
     }
 
     .form-error-message {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        color: #dc2626;
-        padding: 12px;
+        background: #2d2d2d;
+        border: 1px solid #e50914;
+        color: #fff;
+        padding: 14px;
         border-radius: 8px;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        font-family: 'Roboto', Arial, sans-serif;
     }
 
     .culturo-message {
         position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        top: 24px;
+        right: 24px;
+        background: #181818;
+        border-radius: 10px;
+        padding: 18px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.5);
         z-index: 1000;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         transform: translateX(100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+        color: #fff;
+        font-family: 'Roboto', Arial, sans-serif;
     }
 
     .culturo-message.show {
@@ -555,44 +560,121 @@ const styles = `
     }
 
     .culturo-message-success {
-        border-left: 4px solid #10b981;
+        border-left: 5px solid #46d369;
     }
 
     .culturo-message-error {
-        border-left: 4px solid #ef4444;
+        border-left: 5px solid #e50914;
     }
 
     .culturo-message-warning {
-        border-left: 4px solid #f59e0b;
+        border-left: 5px solid #f59e0b;
     }
 
     .culturo-message-info {
-        border-left: 4px solid #3b82f6;
+        border-left: 5px solid #3b82f6;
     }
 
     .culturo-message button {
         background: none;
         border: none;
         cursor: pointer;
-        color: #6b7280;
+        color: #fff;
         padding: 4px;
         border-radius: 4px;
         transition: background-color 0.2s;
     }
 
     .culturo-message button:hover {
-        background-color: #f3f4f6;
+        background-color: #e50914;
+        color: #fff;
     }
 
     .error {
-        border-color: #ef4444 !important;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        border-color: #e50914 !important;
+        box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15) !important;
     }
 
     .checkbox-group.error {
-        border: 2px solid #ef4444;
+        border: 2px solid #e50914;
         border-radius: 8px;
         padding: 8px;
+        background: #181818;
+    }
+
+    /* Netflix-style movie cards */
+    .cinema-movie-card {
+        background: #181818;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.7);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        color: #fff;
+        font-family: 'Roboto', Arial, sans-serif;
+    }
+    .cinema-movie-card:hover {
+        transform: scale(1.04) translateY(-6px);
+        box-shadow: 0 8px 32px rgba(229,9,20,0.25);
+        border: 2px solid #e50914;
+    }
+    .cinema-movie-img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        background: #222;
+    }
+    .cinema-movie-info {
+        padding: 18px 14px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .cinema-movie-info h4 {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin: 0;
+        color: #fff;
+    }
+    .cinema-movie-date {
+        font-size: 0.95rem;
+        color: #b3b3b3;
+    }
+    .discover-btn {
+        background: #e50914;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 18px;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 8px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        box-shadow: 0 2px 8px rgba(229,9,20,0.08);
+    }
+    .discover-btn:hover {
+        background: #b0060f;
+        color: #fff;
+    }
+    /* Pagination */
+    #now-showing-pagination button {
+        background: #232323;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 18px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        margin: 0 4px;
+    }
+    #now-showing-pagination button:hover {
+        background: #e50914;
+        color: #fff;
     }
 `;
 
@@ -654,9 +736,9 @@ function renderNowShowing(movies) {
             card.className = 'cinema-movie-card';
             card.innerHTML = `
                 <img src="${imgSrc}" alt="${movie.name || ''}" class="cinema-movie-img">
-                <div class="cinema-movie-info">
-                    <h4>${movie.name ? '"' + movie.name + '"' : ''}</h4>
-                    <span class="cinema-movie-date">${movie.release_year || ''}</span>
+                <div class="cinema-movie-info" style="align-items: center;">
+                    <h4 style="width: 100%; text-align: center; margin-bottom: 0.3em;">${movie.name || ''}</h4>
+                    <span class="cinema-movie-date" style="width: 100%; text-align: center;">${movie.release_year || ''}</span>
                     <a href="#" class="btn btn-secondary discover-btn" data-entity-id="${movie.entity_id || ''}">Discover</a>
                 </div>
             `;

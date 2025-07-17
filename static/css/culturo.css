@@ -1,30 +1,33 @@
 /* Culturo main stylesheet: extracted from base.html */
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
+    background: #141414;
+    color: #fff;
 }
 
-.gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.gradient-bg, .gradient-text {
+    background: none !important;
+    color: inherit !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
 }
 
 .card-hover {
-    transition: all 0.3s ease;
+    background: #181818;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.7);
+    color: #fff;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
 }
-
 .card-hover:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 8px 32px rgba(229,9,20,0.25);
+    border: 2px solid #e50914;
 }
 
 .fade-in {
-    animation: fadeIn 0.6s ease-in-out;
+    animation: fadeIn 0.6s cubic-bezier(.4,0,.2,1);
 }
 
 @keyframes fadeIn {
@@ -40,7 +43,7 @@ body {
 }
 
 .slide-in {
-    animation: slideIn 0.8s ease-out;
+    animation: slideIn 0.8s cubic-bezier(.4,0,.2,1);
 }
 
 @keyframes slideIn {
@@ -54,26 +57,14 @@ body {
 }
 
 .pulse-glow {
-    animation: pulseGlow 2s infinite;
-}
-
-@keyframes pulseGlow {
-
-    0%,
-    100% {
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
-    }
-
-    50% {
-        box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
-    }
+    animation: none;
 }
 
 /* Navbar styles déplacés depuis home.css */
 .header {
-    background: white;
+    background: #141414;
     padding: 20px 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -86,9 +77,11 @@ body {
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #1a1a1a;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #e50914;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .nav-links {
@@ -98,35 +91,39 @@ body {
 }
 
 .nav-links a {
-    color: #666;
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
+    font-size: 1.1rem;
 }
 
 .nav-links a:hover {
-    color: #1a1a1a;
+    color: #e50914;
 }
 
 .header-cta {
-    background: #1a1a1a;
-    color: white;
-    padding: 12px 24px;
+    background: #e50914;
+    color: #fff;
+    padding: 12px 28px;
     border-radius: 25px;
     text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-weight: 700;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    border: none;
+    font-size: 1.1rem;
 }
 
 .header-cta:hover {
-    background: #333;
-    transform: translateY(-1px);
+    background: #b0060f;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Footer styles */
 footer {
-    background: #1a1a1a;
-    color: #ccc;
+    background: #181818;
+    color: #b3b3b3;
     padding: 60px 0 40px;
 }
 
@@ -145,25 +142,25 @@ footer {
 .footer-logo {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1a1a1a;
+    color: #e50914;
     margin-bottom: 0.5rem;
 }
 
 .footer-tagline {
-    color: #666;
+    color: #b3b3b3;
     margin-bottom: 1rem;
 }
 
 .footer-social a {
     font-size: 1.3rem;
     margin-right: 0.7rem;
-    color: #666;
+    color: #fff;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .footer-social a:hover {
-    color: #ff6b35;
+    color: #e50914;
 }
 
 .footer-links {
@@ -176,7 +173,7 @@ footer {
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 0.7rem;
-    color: #1a1a1a;
+    color: #fff;
 }
 
 .footer-links ul {
@@ -189,19 +186,19 @@ footer {
 }
 
 .footer-links a {
-    color: #666;
+    color: #b3b3b3;
     text-decoration: none;
     font-size: 1rem;
     transition: color 0.2s;
 }
 
 .footer-links a:hover {
-    color: #ff6b35;
+    color: #e50914;
 }
 
 .footer-bottom {
     text-align: center;
-    color: #999;
+    color: #666;
     font-size: 0.95rem;
     padding: 1.2rem 0 0.5rem 0;
 }
@@ -216,17 +213,18 @@ footer {
 .cinema-hero {
     position: relative;
     min-height: 320px;
+    background: #181818 !important;
     background-size: cover;
     background-position: center;
     display: flex;
     align-items: flex-end;
     border-radius: 0 0 32px 32px;
     margin-bottom: 2.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
 }
 
 .cinema-hero-overlay {
-    background: rgba(30, 30, 40, 0.45);
+    background: rgba(20, 20, 20, 0.85);
     width: 100%;
     padding: 2.5rem 2rem 2rem 2rem;
     border-radius: 0 0 32px 32px;
@@ -235,13 +233,14 @@ footer {
 .cinema-title {
     color: #fff;
     font-size: 2.8rem;
-    font-weight: 800;
+    font-weight: 900;
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
+    text-shadow: 0 2px 8px #000;
 }
 
 .cinema-subtitle {
-    color: #f3f3f3;
+    color: #b3b3b3;
     font-size: 1.3rem;
     font-weight: 400;
 }
@@ -254,7 +253,7 @@ footer {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    color: #1a1a1a;
+    color: #fff;
 }
 
 /* Actualités cinéma */
@@ -265,14 +264,15 @@ footer {
 }
 
 .cinema-news-item {
-    background: #fff;
+    background: #181818;
     border-radius: 18px;
-    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.07);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
     display: flex;
     max-width: 540px;
     min-width: 320px;
     overflow: hidden;
     flex: 1 1 320px;
+    color: #fff;
 }
 
 .cinema-news-img {
@@ -289,7 +289,7 @@ footer {
 }
 
 .cinema-news-date {
-    color: #764ba2;
+    color: #e50914;
     font-size: 0.95rem;
     margin-bottom: 0.3rem;
     font-weight: 600;
@@ -303,20 +303,22 @@ footer {
 }
 
 .cinema-movie-card {
-    background: #fff;
+    background: #181818;
     border-radius: 18px;
-    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.07);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 1.2rem;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: #fff;
 }
 
 .cinema-movie-card:hover {
     transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13);
+    box-shadow: 0 8px 32px rgba(229,9,20,0.25);
+    border: 2px solid #e50914;
 }
 
 .cinema-movie-img {
@@ -324,6 +326,7 @@ footer {
     height: 320px;
     object-fit: cover;
     border-radius: 18px 18px 0 0;
+    background: #222;
 }
 
 .cinema-movie-info {
@@ -332,7 +335,7 @@ footer {
 }
 
 .cinema-movie-date {
-    color: #667eea;
+    color: #e50914;
     font-size: 0.98rem;
     margin-bottom: 0.7rem;
     display: block;
@@ -346,14 +349,15 @@ footer {
 }
 
 .cinema-agenda-item {
-    background: #f7f7fa;
+    background: #232323;
     border-radius: 14px;
     padding: 1.2rem 1.5rem;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    color: #fff;
 }
 
 .cinema-agenda-date {
-    color: #764ba2;
+    color: #e50914;
     font-size: 1.05rem;
     font-weight: 600;
     margin-bottom: 0.3rem;
@@ -372,7 +376,7 @@ footer {
     width: 320px;
     max-width: 100%;
     border-radius: 18px;
-    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.09);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
 }
 
 .cinema-local-text {
@@ -385,33 +389,34 @@ footer {
     display: inline-block;
     padding: 0.7em 1.5em;
     border-radius: 25px;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.07);
+    box-shadow: 0 2px 8px rgba(229,9,20,0.08);
     font-size: 1rem;
     margin-top: 0.7em;
+    border: none;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #e50914;
     color: #fff;
     border: none;
 }
 
 .btn-primary:hover {
-    background: #764ba2;
+    background: #b0060f;
     color: #fff;
 }
 
 .btn-secondary {
-    background: #fff;
-    color: #764ba2;
-    border: 2px solid #764ba2;
+    background: #232323;
+    color: #fff;
+    border: 2px solid #e50914;
 }
 
 .btn-secondary:hover {
-    background: #764ba2;
+    background: #e50914;
     color: #fff;
 }
 
@@ -437,4 +442,8 @@ footer {
         flex-direction: column;
         gap: 1.5rem;
     }
+}
+
+body, .container, .section, .footer, .header, .cinema-hero, .cinema-section, .cinema-movie-card, .cinema-news-item, .cinema-agenda-item, .cinema-local-info, .cinema-local-img, .form-error-message, .culturo-message, .card-hover, .univers-card, .decouverte-card, .newsletter, .testimonial-card {
+    background: #181818 !important;
 }
