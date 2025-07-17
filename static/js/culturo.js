@@ -763,7 +763,7 @@ function renderNowShowing(movies) {
             controls.id = 'now-showing-pagination';
             controls.style.display = 'flex';
             controls.style.justifyContent = 'center';
-            controls.style.gap = '1rem';
+            controls.style.gap = '2.5rem';
             controls.style.margin = '1.5rem 0 0 0';
             grid.parentElement.appendChild(controls);
         }

@@ -13,12 +13,33 @@ body.home {
     font-family: 'Roboto', Arial, sans-serif;
 }
 
-body.home, .home .container, .section, .hero, .univers-card, .decouverte-card, .testimonial-content, .newsletter-section, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
+body.home, .home .container, .section, .hero, .testimonial-content, .newsletter-section, .footer, .footer-content, .footer-logo, .footer-tagline, .footer-links, .footer-bottom {
     background: #181818 !important;
     color: #fff !important;
-    border-radius: 36px !important;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.18) !important;
-    padding: 2.5rem 2.5rem !important;
+}
+.univers-card, .decouverte-card, .testimonial-card {
+    background: #222 !important;
+    color: #fff !important;
+}
+.card-badge, .cta-button, .newsletter-form button, .view-all {
+    background: #e50914 !important;
+    color: #fff !important;
+}
+.quote {
+    background: #232323 !important;
+    color: #b3b3b3 !important;
+    border-left: 4px solid #e50914 !important;
+}
+.newsletter-form {
+    background: #232323 !important;
+}
+.newsletter-form input, .newsletter-form input[type="email"] {
+    background: #181818 !important;
+    color: #fff !important;
+    border-radius: 40px !important;
+}
+.testimonial-text h4, .testimonial-card h5, .section-title, .hero-text h1, .newsletter-section h3 {
+    color: #fff !important;
 }
 .univers-card, .decouverte-card, .testimonial-card {
     border-radius: 18px !important;
@@ -30,19 +51,16 @@ body.home, .home .container, .section, .hero, .univers-card, .decouverte-card, .
     color: #fff !important;
     text-shadow: 0 2px 8px #000 !important;
 }
-.cta-button, .newsletter-form button, .view-all {
-    background: #e50914 !important;
-    color: #fff !important;
-    border-radius: 25px !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.13) !important;
-    border: none !important;
-    transition: background 0.3s, color 0.3s, transform 0.2s !important;
-}
 .cta-button:hover, .newsletter-form button:hover, .view-all:hover {
     background: #b0060f !important;
     color: #fff !important;
     transform: translateY(-2px) scale(1.04) !important;
+    
+}
+.cta-button,.view-all {
+    padding:3px;
+    border-radius: 10px;
+
 }
 .card-badge {
     background: #e50914 !important;

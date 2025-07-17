@@ -306,8 +306,8 @@ body.cinema {
 /* Chatbot message bubbles */
 .user-message {
     align-self: flex-end;
-    background: #ff6b35;
-    color: #fff;
+    background: #e50914 !important;
+    color: #111 !important;
     border-radius: 16px 16px 4px 16px;
     padding: 0.7rem 1.1rem;
     margin: 2px 0;
@@ -319,8 +319,8 @@ body.cinema {
 
 .bot-message {
     align-self: flex-start;
-    background: #fff;
-    color: #222;
+    background: #232323 !important;
+    color: #111 !important;
     border-radius: 16px 16px 16px 4px;
     padding: 0.7rem 1.1rem;
     margin: 2px 0;
@@ -328,6 +328,11 @@ body.cinema {
     box-shadow: 0 2px 8px rgba(40, 40, 80, 0.07);
     font-size: 1rem;
     animation: fadeInLeft 0.3s;
+}
+
+.bot-message {
+    background: #e5e5e5 !important;
+    color: #111 !important;
 }
 
 /* Typing animation (three dots) */
@@ -436,4 +441,28 @@ body.cinema .container {
     padding: 2.5rem 2.5rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
+}
+#cinema-chatbot {
+    background: #181818 !important;
+    color: #fff !important;
+}
+#chatbot-messages {
+    background: #181818 !important;
+    color: #fff !important;
+}
+#cinema-chatbot > div:first-child {
+    background: #e50914 !important;
+    color: #fff !important;
+}
+#chatbot-send {
+    background: #e50914 !important;
+    color: #fff !important;
+}
+#chatbot-send:hover {
+    background: #b0060f !important;
+}
+#chatbot-input {
+    background: #fff !important;
+    color: #111 !important;
+    border-radius: 20px !important;
 }
