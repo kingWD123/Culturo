@@ -453,10 +453,8 @@ class CulturoApp {
                 })
                 .then(res => res.json())
                 .then(resData => {
-                    const grid = document.querySelector('.cinema-movies-grid');
-                    if (!grid) return;
-                    let allMovies = resData.movies || [];
-                    renderNowShowing(allMovies);
+                    const allMovies = resData.movies || [];
+                    updateNowShowing(allMovies);
                 })
                 .catch(() => {
                     const grid = document.querySelector('.cinema-movies-grid');
@@ -684,6 +682,7 @@ styleSheet.textContent = styles;
 document.head.appendChild(styleSheet);
 
 // Section Now Showing : affichage par défaut de films populaires si aucune recommandation
+/*
 const defaultMovies = [
     {
         name: "The Godfather",
@@ -711,6 +710,7 @@ const defaultMovies = [
         image_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfw8Ic__jQPSqabC3yvz0-CMMZ1_eZKN41DQ&s",
     },
 ];
+*/
 
 // Fonction pour afficher une liste de films dans Now Showing
 function renderNowShowing(movies) {
@@ -793,10 +793,136 @@ function renderNowShowing(movies) {
             controls.innerHTML = '';
         }
     }
+    // Désactivation de l'affichage par défaut
+    // renderPage(currentPage);
+}
+
+// Affichage par défaut au chargement (désactivé, rendu côté serveur)
+// window.addEventListener('DOMContentLoaded', function() {
+//     renderNowShowing(defaultMovies);
+// });
+
+// Fonction pour afficher dynamiquement une liste de films dans Now Showing
+function updateNowShowing(movies) {
+    const grid = document.querySelector('.cinema-movies-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    // Pagination
+    const pageSize = 5;
+    let currentPage = 0;
+    function renderPage(page) {
+        grid.innerHTML = '';
+        const start = page * pageSize;
+        const end = Math.min(start + pageSize, movies.length);
+        for (let i = start; i < end; i++) {
+            const film = movies[i];
+            let imgSrc = '';
+            if (film.image) {
+                if (typeof film.image === 'string') {
+                    imgSrc = film.image;
+                } else if (film.image.url) {
+                    imgSrc = film.image.url;
+                }
+            } else if (film.image_url) {
+                imgSrc = film.image_url;
+            } else if (film.properties && film.properties.image && film.properties.image.url) {
+                imgSrc = film.properties.image.url;
+            }
+            if (!imgSrc) {
+                imgSrc = '/static/images/film-placeholder.png';
+            }
+            // Stockage local pour fallback page détail (entity_id, imdb_id, slug)
+            if (film.entity_id) {
+                try { localStorage.setItem('movie_' + film.entity_id, JSON.stringify(film)); } catch (e) {}
+            }
+            if (film.imdb_id) {
+                try { localStorage.setItem('movie_' + film.imdb_id, JSON.stringify(film)); } catch (e) {}
+            }
+            if (film.name) {
+                const slug = film.name.replace(/\s+/g, '-').toLowerCase();
+                try { localStorage.setItem('movie_' + slug, JSON.stringify(film)); } catch (e) {}
+            }
+            // Choix de l'identifiant pour la page de détail
+            let detailId = film.entity_id || film.imdb_id || (film.name ? film.name.replace(/\s+/g, '-').toLowerCase() : '');
+            const card = document.createElement('div');
+            card.className = 'cinema-movie-card';
+            card.innerHTML = `
+                <img src="${imgSrc}" alt="${film.name || ''}" class="cinema-movie-img">
+                <div class="cinema-movie-info">
+                    <h4>${film.name || ''}</h4>
+                    ${film.release_year ? `<span class="cinema-movie-date">${film.release_year}</span>` : ''}
+                    <a href="/movie_detail/?id=${encodeURIComponent(detailId)}" class="btn btn-secondary">Discover</a>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+        // Pagination controls
+        let controls = document.getElementById('now-showing-pagination');
+        if (!controls) {
+            controls = document.createElement('div');
+            controls.id = 'now-showing-pagination';
+            controls.style.display = 'flex';
+            controls.style.justifyContent = 'center';
+            controls.style.gap = '2.5rem';
+            controls.style.margin = '1.5rem 0 0 0';
+            grid.parentElement.appendChild(controls);
+        }
+        controls.innerHTML = '';
+        if (page > 0) {
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Précédent';
+            prevBtn.className = 'btn btn-secondary';
+            prevBtn.onclick = () => {
+                currentPage--;
+                renderPage(currentPage);
+            };
+            controls.appendChild(prevBtn);
+        }
+        if (end < movies.length) {
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Suivant';
+            nextBtn.className = 'btn btn-secondary';
+            nextBtn.onclick = () => {
+                currentPage++;
+                renderPage(currentPage);
+            };
+            controls.appendChild(nextBtn);
+        }
+        if (movies.length === 0) {
+            grid.innerHTML = '<div style="color:#fff;">No recommendations found.</div>';
+            controls.innerHTML = '';
+        }
+    }
     renderPage(currentPage);
 }
 
-// Affichage par défaut au chargement
-window.addEventListener('DOMContentLoaded', function() {
-    renderNowShowing(defaultMovies);
+// --- Patch du chatbot pour affichage dynamique ---
+document.addEventListener('DOMContentLoaded', function () {
+    var chatbotForm = document.getElementById('chatbot-form');
+    var chatbotInput = document.getElementById('chatbot-input');
+    var chatbotMessages = document.getElementById('chatbot-messages');
+    var recSection = document.getElementById('cinema-recommendations-section');
+    var recList = document.getElementById('cinema-recommendations');
+    var recLoading = document.getElementById('cinema-recommendations-loading');
+    var chatHistory = [];
+    if (chatbotForm && chatbotInput && chatbotMessages) {
+        chatbotForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var userMsg = chatbotInput.value.trim();
+            if (!userMsg) return;
+            // ... code existant ...
+            var response = await fetch('/cinema_chatbot_api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: chatHistory })
+            });
+            var data = await response.json();
+            // ... code existant ...
+            // Mise à jour dynamique des recommandations dans Now Showing
+            if (data.recommendations && data.recommendations.length) {
+                updateNowShowing(data.recommendations);
+            }
+            // ... code existant ...
+        });
+    }
 }); 

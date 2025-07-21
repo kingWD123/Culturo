@@ -134,7 +134,7 @@
                     // Image
                     const img = document.createElement('img');
                     img.className = 'movie-detail-img';
-                    img.src = movie.image_url || (movie.image && movie.image.url) || movie.image || '';
+                    img.src = (movie.properties && movie.properties.image && movie.properties.image.url) ? movie.properties.image.url : (movie.image_url || (movie.image && movie.image.url) || movie.image || '');
                     img.alt = movie.name || '';
                     // Infos
                     const info = document.createElement('div');
@@ -142,7 +142,13 @@
                     // Description
                     const desc = document.createElement('div');
                     desc.className = 'movie-detail-desc';
-                    desc.innerHTML = movie.description ? movie.description : '<em>No description available.</em>';
+                    if (movie.properties && movie.properties.description) {
+                        desc.innerHTML = movie.properties.description;
+                    } else if (movie.description) {
+                        desc.innerHTML = movie.description;
+                    } else {
+                        desc.innerHTML = '<em>No description available.</em>';
+                    }
                     info.appendChild(desc);
                     // Alternative Titles (max 6)
                     const akasDiv = document.createElement('div');
@@ -150,15 +156,21 @@
                     akasDiv.innerHTML = '<strong>Alternative Titles:</strong> ';
                     const akasWrap = document.createElement('span');
                     akasWrap.className = 'movie-detail-tags movie-detail-tags-wrap';
-                    if (movie.akas && Array.isArray(movie.akas) && movie.akas.length) {
+                    let akas = [];
+                    if (movie.properties && Array.isArray(movie.properties.akas)) {
+                        akas = movie.properties.akas;
+                    } else if (Array.isArray(movie.akas)) {
+                        akas = movie.akas;
+                    }
+                    if (akas.length) {
                         const maxAkas = 6;
-                        movie.akas.slice(0, maxAkas).forEach(aka => {
+                        akas.slice(0, maxAkas).forEach(aka => {
                             const tag = document.createElement('span');
                             tag.className = 'movie-detail-tag';
                             tag.textContent = aka.value + (aka.languages ? ' (' + aka.languages.join(', ') + ')' : '');
                             akasWrap.appendChild(tag);
                         });
-                        if (movie.akas.length > maxAkas) {
+                        if (akas.length > maxAkas) {
                             const more = document.createElement('span');
                             more.className = 'movie-detail-tag';
                             more.textContent = '...';
@@ -204,13 +216,17 @@
                     // Release Country
                     const countryDiv = document.createElement('div');
                     countryDiv.innerHTML = '<strong>Release Country:</strong> ';
-                    if (movie.release_country) countryDiv.innerHTML += Array.isArray(movie.release_country) ? movie.release_country.join(', ') : movie.release_country;
+                    if (movie.properties && movie.properties.release_country) countryDiv.innerHTML += Array.isArray(movie.properties.release_country) ? movie.properties.release_country.join(', ') : movie.properties.release_country;
+                    else if (movie.release_country) countryDiv.innerHTML += Array.isArray(movie.release_country) ? movie.release_country.join(', ') : movie.release_country;
                     else countryDiv.innerHTML += '<em>Unknown</em>';
                     info.appendChild(countryDiv);
                     // Production Companies (max 3)
                     const prodDiv = document.createElement('div');
                     prodDiv.innerHTML = '<strong>Production Companies:</strong> ';
-                    if (movie.production_companies && movie.production_companies.length) {
+                    if (movie.properties && movie.properties.production_companies && movie.properties.production_companies.length) {
+                        prodDiv.innerHTML += movie.properties.production_companies.slice(0,3).join(', ');
+                        if (movie.properties.production_companies.length > 3) prodDiv.innerHTML += ', ...';
+                    } else if (movie.production_companies && movie.production_companies.length) {
                         prodDiv.innerHTML += movie.production_companies.slice(0,3).join(', ');
                         if (movie.production_companies.length > 3) prodDiv.innerHTML += ', ...';
                     } else prodDiv.innerHTML += '<em>Unknown</em>';
@@ -218,12 +234,12 @@
                     // Content Rating
                     const ratingDiv = document.createElement('div');
                     ratingDiv.innerHTML = '<strong>Content Rating:</strong> ';
-                    ratingDiv.innerHTML += movie.content_rating ? movie.content_rating : '<em>Unknown</em>';
+                    ratingDiv.innerHTML += (movie.properties && movie.properties.content_rating) ? movie.properties.content_rating : (movie.content_rating ? movie.content_rating : '<em>Unknown</em>');
                     info.appendChild(ratingDiv);
                     // Duration
                     const durationDiv = document.createElement('div');
                     durationDiv.innerHTML = '<strong>Duration:</strong> ';
-                    durationDiv.innerHTML += movie.duration ? movie.duration + ' min' : '<em>Unknown</em>';
+                    durationDiv.innerHTML += (movie.properties && movie.properties.duration) ? movie.properties.duration + ' min' : (movie.duration ? movie.duration + ' min' : '<em>Unknown</em>');
                     info.appendChild(durationDiv);
                     // External Links
                     const linksDiv = document.createElement('div');
@@ -281,19 +297,21 @@
     <div class="movie-detail-hero">
         <h1 class="movie-detail-title">{{ movie.name }}</h1>
         <div class="movie-detail-meta">
-            {% if movie.properties.release_year %}{{ movie.properties.release_year }}{% endif %}
-            {% if movie.properties.release_date %} ({{ movie.properties.release_date }}){% endif %}
-            {% if movie.properties.content_rating %} &middot; {{ movie.properties.content_rating }}{% endif %}
-            {% if movie.properties.duration %} &middot; {{ movie.properties.duration }} min{% endif %}
-            {% if movie.properties.release_country %} &middot; {{ movie.properties.release_country|join:', ' }}{% endif %}
+            {% if movie.properties.release_year %}{{ movie.properties.release_year }}{% elif movie.release_year %}{{ movie.release_year }}{% endif %}
+            {% if movie.properties.release_date %} ({{ movie.properties.release_date }}){% elif movie.release_date %} ({{ movie.release_date }}){% endif %}
+            {% if movie.properties.content_rating %} &middot; {{ movie.properties.content_rating }}{% elif movie.content_rating %} &middot; {{ movie.content_rating }}{% endif %}
+            {% if movie.properties.duration %} &middot; {{ movie.properties.duration }} min{% elif movie.duration %} &middot; {{ movie.duration }} min{% endif %}
+            {% if movie.properties.release_country %} &middot; {{ movie.properties.release_country|join:', ' }}{% elif movie.release_country %} &middot; {{ movie.release_country|join:', ' }}{% endif %}
         </div>
     </div>
     <div class="movie-detail-card">
-        <img class="movie-detail-img" src="{{ movie.properties.image.url }}" alt="{{ movie.name }}">
+        <img class="movie-detail-img" src="{{ movie.properties.image.url|default:movie.image_url }}" alt="{{ movie.name }}">
         <div class="movie-detail-info">
             <div class="movie-detail-desc">
                 {% if movie.properties.description %}
                     {{ movie.properties.description }}
+                {% elif movie.description %}
+                    {{ movie.description }}
                 {% elif movie.properties.short_descriptions %}
                     {% for desc in movie.properties.short_descriptions %}
                         <div>{{ desc.value }}</div>
@@ -305,6 +323,10 @@
             <div><strong>Alternative Titles:</strong>
                 {% if movie.properties.akas %}
                     {% for aka in movie.properties.akas %}
+                        <span class="movie-detail-tag">{{ aka.value }} ({{ aka.languages|join:', ' }})</span>
+                    {% endfor %}
+                {% elif movie.akas %}
+                    {% for aka in movie.akas %}
                         <span class="movie-detail-tag">{{ aka.value }} ({{ aka.languages|join:', ' }})</span>
                     {% endfor %}
                 {% else %}
@@ -319,6 +341,10 @@
                 {% endif %}
                 {% if movie.properties.production_companies %}
                     {% for company in movie.properties.production_companies %}
+                        <span class="movie-detail-tag">{{ company }}</span>
+                    {% endfor %}
+                {% elif movie.production_companies %}
+                    {% for company in movie.production_companies %}
                         <span class="movie-detail-tag">{{ company }}</span>
                     {% endfor %}
                 {% endif %}
@@ -337,6 +363,8 @@
                 <strong>Release Country:</strong>
                 {% if movie.properties.release_country %}
                     {{ movie.properties.release_country|join:', ' }}
+                {% elif movie.release_country %}
+                    {{ movie.release_country|join:', ' }}
                 {% else %}
                     <em>Unknown</em>
                 {% endif %}
@@ -345,6 +373,8 @@
                 <strong>Production Companies:</strong>
                 {% if movie.properties.production_companies %}
                     {{ movie.properties.production_companies|join:', ' }}
+                {% elif movie.production_companies %}
+                    {{ movie.production_companies|join:', ' }}
                 {% else %}
                     <em>Unknown</em>
                 {% endif %}
@@ -353,6 +383,8 @@
                 <strong>Content Rating:</strong>
                 {% if movie.properties.content_rating %}
                     {{ movie.properties.content_rating }}
+                {% elif movie.content_rating %}
+                    {{ movie.content_rating }}
                 {% else %}
                     <em>Unknown</em>
                 {% endif %}
@@ -361,6 +393,8 @@
                 <strong>Duration:</strong>
                 {% if movie.properties.duration %}
                     {{ movie.properties.duration }} min
+                {% elif movie.duration %}
+                    {{ movie.duration }} min
                 {% else %}
                     <em>Unknown</em>
                 {% endif %}

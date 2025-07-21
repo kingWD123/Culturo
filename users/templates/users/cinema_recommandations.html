@@ -6,13 +6,24 @@
 {% endblock %}
 
 {% block content %}
-<div class="cinema-hero"
-    style="background-image: url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80');">
-    <div class="cinema-hero-overlay">
-        <h1 class="cinema-title">Culturo Cinema</h1>
-        <p class="cinema-subtitle">Discover, share, and experience cinema differently: recommendations, events, and
-            local discoveries.</p>
+<div style="position: relative; width: 100%; height: 400px; overflow: hidden;">
+  <video autoplay loop muted playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; left: 0; top: 0; z-index: 1;">
+    <source src="{% static 'video/video_for_interface.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+    <div style="backdrop-filter: blur(6px); background: rgba(20,20,20,0.45); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.35); padding: 2.5rem 2.5rem 2rem 2.5rem; max-width: 600px; margin-top: 30px;">
+      <h1 style="font-family: 'Montserrat', 'Roboto', Arial, sans-serif; font-size: 3.2rem; font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 4px 24px #000, 0 2px 8px #e50914; margin-bottom: 1.1rem; background: linear-gradient(90deg, #e50914 30%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        Culturo Cinema
+      </h1>
+      <p style="font-size: 1.25rem; color: #fff; font-weight: 500; text-shadow: 0 2px 8px #000; margin-bottom: 1.7rem; animation: fadeInUp 1.2s;">
+        Discover, share, and experience cinema differently: recommendations, events, and local discoveries.
+      </p>
+      <a href="#now-showing" style="display: inline-block; padding: 0.7rem 2.2rem; font-size: 1.1rem; font-weight: 700; color: #fff; background: linear-gradient(90deg, #e50914 60%, #ff6b35 100%); border: none; border-radius: 32px; box-shadow: 0 2px 12px #e5091444; text-decoration: none; transition: background 0.2s, transform 0.18s;">
+        Explore Now
+      </a>
     </div>
+  </div>
 </div>
 
 <div class="container">
@@ -102,27 +113,16 @@
     <!-- Now Showing Section -->
     <section class="cinema-section" id="now-showing">
         <h2 class="section-title">Now Showing</h2>
-        <div class="cinema-movies-grid">
-            <div class="cinema-movie-card">
-                <img src="https://images.unsplash.com/photo-1465101178521-c1a9136a3b43?auto=format&fit=crop&w=400&q=80"
-                    alt="Movie 1" class="cinema-movie-img">
-                <div class="cinema-movie-info">
-                    <h4>"Lights Beyond"</h4>
-                    <span class="cinema-movie-date">May 10–16</span>
-                    <a href="#" class="btn btn-secondary">Discover</a>
-                </div>
-            </div>
-            <div class="cinema-movie-card">
-                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
-                    alt="Movie 2" class="cinema-movie-img">
-                <div class="cinema-movie-info">
-                    <h4>"Crossed Perspectives"</h4>
-                    <span class="cinema-movie-date">May 10–16</span>
-                    <a href="#" class="btn btn-secondary">Discover</a>
-                </div>
-            </div>
-            <!-- Add more movie cards as needed -->
-        </div>
+        <div class="cinema-movies-grid"></div>
+        {{ recommendations|json_script:"initial-recommendations" }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var initialRecommendations = JSON.parse(document.getElementById('initial-recommendations').textContent);
+                if (initialRecommendations && Array.isArray(initialRecommendations)) {
+                    updateNowShowing(initialRecommendations);
+                }
+            });
+        </script>
     </section>
 
     <!-- Nearby Cinemas Section -->
@@ -261,7 +261,7 @@
                 // Si recommandations présentes et done=true, redirige vers la page de résultats
                 if (data.recommendations && data.recommendations.length && data.done) {
                     console.log('Redirection vers la page de résultats');
-                    window.location.href = '/cinema_recommendations_result/';
+                    // window.location.href = '/cinema_recommendations_result/';
                 }
             });
         }
@@ -277,5 +277,9 @@
             transform: rotate(360deg);
         }
     }
+    @keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>
 {% endblock %}

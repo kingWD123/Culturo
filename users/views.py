@@ -22,7 +22,43 @@ def home(request):
 
 def CinemaRecommandations(request):
     """Page of cinema recommendations"""
-    return render(request, 'users/cinema_recommandations.html')
+    # Critères par défaut adaptés à l'API Qloo
+    params = {
+        "filter.type": "urn:entity:movie",
+        "feature.explainability": "true",
+        "filter.genres": "slice of life",
+        "filter.release_country": "Japan"
+    }
+    from urllib.parse import urlencode
+    base_url = "https://hackathon.api.qloo.com/v2/insights/"
+    qloo_url = base_url + "?" + urlencode(params)
+    import requests
+    headers = {
+        "x-api-key": settings.CLOOAI_API_KEY,
+        "Accept": "application/json"
+    }
+    recommendations = []
+    try:
+        response = requests.get(qloo_url, headers=headers)
+        print("DEBUG Qloo URL:", qloo_url)
+        if response.status_code == 200:
+            data = response.json()
+            for element in data.get("results", {}).get("entities", []):
+                film = {
+                    "name": element.get("name"),
+                    "entity_id": element.get("entity_id"),
+                    "properties": element.get("properties", {}),
+                    "tags": element.get("tags", []),
+                    "external": element.get("external", {}),
+                }
+                recommendations.append(film)
+        else:
+            print("DEBUG Qloo status code:", response.status_code)
+            print("DEBUG Qloo response:", response.text)
+    except Exception as e:
+        print(f"Erreur lors de l'appel à l'API Qloo: {e}")
+    print("DEBUG Qloo recommendations:", recommendations)
+    return render(request, 'users/cinema_recommandations.html', {"recommendations": recommendations})
 
 def ArtistsRecommandations(request):
     """Page of artists recommendations"""
@@ -313,6 +349,48 @@ def movie_detail(request):
     entity_id = request.GET.get('id')
     if not entity_id:
         return render(request, 'users/movie_detail.html', {'error': "Aucun identifiant de film fourni."})
+    if entity_id == 'the-godfather':
+        godfather_data = {
+            'name': 'The Godfather',
+            'description': "A chronic war between New York’s five mafia families — and the rising power of the Corleones — transforms Michael Corleone from reluctant family outsider into ruthless mob boss. What begins as a hopeful offer instead spins into a violent empire that reshapes the American crime landscape forever.",
+            'akas': [
+                {'value': 'Kumbari', 'languages': ['sq']},
+                {'value': 'Կնքահայրը', 'languages': ['hy']},
+                {'value': 'Xaç Atası', 'languages': ['az']},
+                {'value': '教父Ⅰ / 教父1', 'languages': ['zh']},
+                {'value': 'The Godfather Part I', 'languages': ['da']},
+                {'value': 'ნათლიმამა', 'languages': ['ka']},
+                {'value': 'پدرخوانده', 'languages': ['fa']},
+                {'value': 'Il Padrino', 'languages': ['it']},
+                {'value': 'ゴッドファーザー', 'languages': ['ja']},
+                {'value': 'De Peetvader', 'languages': ['nl']},
+                {'value': 'Gudfaren', 'languages': ['no']},
+                {'value': 'Ojciec chrzestny', 'languages': ['pl']},
+                {'value': 'O Padrinho', 'languages': ['pt']},
+                {'value': 'Крёстный отец / Крестный отец', 'languages': ['ru']},
+                {'value': 'Кум', 'languages': ['sr']},
+                {'value': '教父', 'languages': ['tw']},
+                {'value': 'Baba', 'languages': ['tr']},
+                {'value': 'Krusttēvs', 'languages': ['lv']},
+            ],
+            'external': {
+                'imdb': [{'id': 'tt0068646'}],
+                'wikidata': [{'id': 'Q47703'}],
+                'letterboxd': [{'id': 'the-godfather'}],
+                'apple_tv': [{'id': 'umc.cmc.3ew9fykdnpfaq9t2jq5da011c'}],
+            },
+            'tags': [
+                {'name': 'Drama'},
+                {'name': 'Crime'},
+            ],
+            'release_country': ['United States'],
+            'production_companies': ['Paramount Pictures', 'Alfran Productions'],
+            'content_rating': 'R (Violence, language, some sexuality/nudity)',
+            'duration': 175,
+            'image_url': 'https://upload.wikimedia.org/wikipedia/en/1/1c/Godfather_ver1.jpg',
+        }
+        return render(request, 'users/movie_detail.html', {'movie': godfather_data})
+    # comportement existant pour les autres films
     api_key = "ELT40OrStBysskCLRvuxrB9-h6ZakP_jZ2O0j9TMHZI"
     url = f"https://hackathon.api.qloo.com/v2/entities/{entity_id}"
     headers = {
