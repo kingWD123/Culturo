@@ -82,7 +82,6 @@ def destination_chatbot_api(request):
                 qloo_params = json.loads(bot_message[start:end])
             
             qloo_url = build_qloo_url(extra_params=qloo_params)
-            print("qloo_url: ", qloo_url)
             
             qloo_headers = {
                 "x-api-key": settings.CLOOAI_API_KEY,
@@ -93,18 +92,20 @@ def destination_chatbot_api(request):
             if qloo_response.status_code == 200:
                 qloo_data = qloo_response.json()
                 print("qloo_data: ", qloo_data)
-                for entity in qloo_data.get("results", {}).get("entities", []):
-                    properties = entity.get("properties", {})
-                    dest = {
-                        "name": entity.get("name"),
-                        "location": properties.get("location_name"),
-                        "latitude": properties.get("latitude"),
-                        "longitude": properties.get("longitude"),
-                        "img": properties.get("image", {}).get("url"),
-                        "desc": properties.get("description")
-                    }
-                    if dest["latitude"] and dest["longitude"]:
-                        destinations.append(dest)
+                destinations = []
+                for entity in qloo_data["results"]["entities"]:
+                    destination = {}
+                    destination["name"] = entity["name"]
+                    destination["location1"] = entity["properties"]["geocode"]["admin1_region"]
+                    destination["location2"] = entity["properties"]["geocode"]["admin2_region"]
+                    destination["latitude"] = entity["location"]["lat"]
+                    destination["longitude"] = entity["location"]["lon"]
+                    destination["geohash"] = entity["location"]["geohash"]
+                    destination["popularity"] = entity["popularity"]
+                    destinations.append(destination)
+                
+                print(destination)
+   
             else:
                 print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")
 

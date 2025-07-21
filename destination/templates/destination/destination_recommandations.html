@@ -637,6 +637,46 @@
                 chatbot.style.display = 'none'; // Close chatbot on success
             }
         });
+
+        // Données de démo pour le carrousel au chargement
+        const demoResults = [
+            {
+                name: "Modern Loft",
+                location: "San Francisco, CA",
+                latitude: 37.76,
+                longitude: -122.44,
+                img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+                desc: "Open house • 100 West Street, United States"
+            },
+            {
+                name: "Downtown Apartment",
+                location: "San Francisco, CA",
+                latitude: 37.77,
+                longitude: -122.45,
+                img: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=400&q=80",
+                desc: "For rent • 200 Main Ave, United States"
+            },
+            {
+                name: "Sunny Villa",
+                location: "San Francisco, CA",
+                latitude: 37.75,
+                longitude: -122.43,
+                img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80",
+                desc: "For sale • 300 Ocean Drive, United States"
+            },
+            {
+                name: "Cozy Studio",
+                location: "San Francisco, CA",
+                latitude: 37.78,
+                longitude: -122.42,
+                img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80",
+                desc: "For rent • 400 Pine St, United States"
+            }
+        ];
+
+        // Affiche le carrousel et les marqueurs de démo au chargement
+        updateMap(demoResults);
+        updateCarousel(demoResults);
     });
 </script>
 {% endblock %}
