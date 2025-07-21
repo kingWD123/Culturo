@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     "books",
+    'destination',
 ]
 
 MIDDLEWARE = [

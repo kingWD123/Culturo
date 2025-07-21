@@ -1,0 +1,664 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+    /* Use a variable for the navbar height to make it easily adjustable */
+    :root {
+        --navbar-height: 80px;
+        /* Adjust this value based on your actual navbar height */
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #f4f7fb;
+        overflow: hidden;
+        /* Prevent scrollbars from the main layout */
+    }
+
+    #map {
+        position: fixed;
+        top: var(--navbar-height);
+        /* Start below the navbar */
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - var(--navbar-height));
+        /* Fill remaining height */
+        z-index: 1;
+    }
+
+    .sidebar-float {
+        position: fixed;
+        top: var(--navbar-height);
+        /* Start below the navbar */
+        left: 0;
+        height: calc(100vh - var(--navbar-height));
+        /* Fill remaining height */
+        width: 340px;
+        background: #22304a;
+        color: #fff;
+        box-shadow: 2px 0 24px rgba(40, 40, 80, 0.13);
+        z-index: 1002;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(.4, 2, .6, 1);
+        display: flex;
+        flex-direction: column;
+        padding: 2.5rem 2rem 2rem 2rem;
+    }
+
+    .sidebar-float.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-float h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .sidebar-float .close-btn {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.7rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .sidebar-float .close-btn:hover {
+        opacity: 1;
+    }
+
+    .sidebar-float .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .sidebar-float .sidebar-footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.95rem;
+        opacity: 0.7;
+    }
+
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: calc(var(--navbar-height) + 2rem);
+        /* Position below navbar */
+        left: 2rem;
+        z-index: 1100;
+        background: #22304a;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 54px;
+        height: 54px;
+        box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+        font-size: 1.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #2a365d;
+    }
+
+    .sidebar-toggle-btn.shifted {
+        transform: translateX(340px);
+        /* Move button with sidebar */
+    }
+
+    /* Carousel Styles */
+    .bottom-carousel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+        padding: 0 0 1.5rem 1.5rem;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .bottom-carousel.hidden {
+        transform: translateY(110%);
+    }
+
+    /* Animation for carousel entry */
+    @keyframes slideInUp {
+        from {
+            transform: translateY(110%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    .carousel-entry {
+        animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .carousel-track {
+        display: flex;
+        gap: 0.8rem;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        pointer-events: all;
+    }
+
+    .carousel-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .carousel-card {
+        flex: 0 0 220px;
+        background: rgba(34, 48, 74, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: #fff;
+        border-radius: 1rem;
+        padding: 0.7rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .carousel-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .carousel-card img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 0.7rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .carousel-card h3 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin: 0 0 0.2rem 0;
+    }
+
+    .carousel-card p {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    .carousel-card .price {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #ff914d;
+        margin-top: 0.4rem;
+    }
+
+    .carousel-hide-btn {
+        position: absolute;
+        top: -10px;
+        right: 2rem;
+        background: rgba(34, 48, 74, 0.9);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 1.5rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1002;
+        pointer-events: all;
+        transition: background 0.2s, opacity 0.3s;
+    }
+
+    .carousel-hide-btn.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Button to show the carousel */
+    .show-carousel-btn {
+        position: fixed;
+        bottom: 108px;
+        /* Positioned above the chatbot button */
+        right: 32px;
+        /* Aligned with the chatbot button */
+        z-index: 1000;
+        background: #22304a;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 54px;
+        height: 54px;
+        box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+        font-size: 1.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: background 0.2s, opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+    }
+
+    .show-carousel-btn.visible {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: all;
+    }
+
+    .show-carousel-btn:hover {
+        background: #a8122b;
+    }
+
+    @media (max-width: 600px) {
+        .sidebar-float {
+            width: 90vw;
+            padding: 1.2rem 1rem;
+        }
+
+        .sidebar-toggle-btn {
+            left: 1rem;
+            top: calc(var(--navbar-height) + 1rem);
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+        }
+
+        .sidebar-toggle-btn.shifted {
+            opacity: 0;
+            pointer-events: none;
+            /* Hide button on mobile when open */
+        }
+
+        .bottom-carousel {
+            padding: 0 0 1rem 1rem;
+        }
+
+        .carousel-card {
+            flex: 0 0 180px;
+        }
+
+        .show-carousel-btn {
+            bottom: 92px;
+            /* Adjusted for mobile */
+            right: 22px;
+            width: 48px;
+            height: 48px;
+        }
+    }
+
+    /* Chatbot Styles inspired by the new design */
+    #chatbot-toggle {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        z-index: 9999;
+        background: #eb3452;
+        /* Orange icon like in the image */
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        box-shadow: 0 4px 16px rgba(40, 40, 80, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    #chatbot-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    #cinema-chatbot {
+        display: none;
+        position: fixed;
+        bottom: 110px;
+        /* Positioned right above the icon */
+        right: 32px;
+        width: 360px;
+        max-width: 90vw;
+        background: #1E1E1E;
+        /* Dark background */
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 450px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .chatbot-header {
+        background: #D90429;
+        /* Red header */
+        color: #fff;
+        padding: 0.8rem 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    #chatbot-close {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    #chatbot-messages {
+        flex: 1 1 auto;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .chat-bubble {
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+
+    .bot-message {
+        align-self: flex-start;
+        background: #000;
+        color: #fff;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background: #333;
+        color: #fff;
+    }
+
+    #chatbot-form {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #1E1E1E;
+    }
+
+    #chatbot-input {
+        flex: 1 1 auto;
+        border: none;
+        background: #fff;
+        border-radius: 20px;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        margin-right: 0.8rem;
+        outline: none;
+        color: #000;
+    }
+
+    #chatbot-send {
+        background: #D90429;
+        /* Red send button */
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    /* Hide the previous modal implementation */
+    .chatbot-toggle-btn,
+    .chatbot-modal {
+        display: none;
+    }
+</style>
+
+<!-- Bouton flottant pour ouvrir la sidebar -->
+<button class="sidebar-toggle-btn" id="openSidebarBtn" title="Ouvrir les filtres ou résultats">
+    <span>&#9776;</span>
+</button>
+
+<!-- Sidebar latérale masquée par défaut -->
+<div class="sidebar-float" id="sidebarFloat">
+    <button class="close-btn" id="closeSidebarBtn" title="Fermer">&times;</button>
+    <h2>Filtres & Résultats</h2>
+    <div class="sidebar-content">
+        <p>Ici tu pourras mettre tes filtres, résultats, ou toute autre information utile.</p>
+        <ul style="margin-top:1.5rem;opacity:0.8;">
+            <li>• Filtres de recherche</li>
+            <li>• Liste des destinations</li>
+            <li>• Détails d'un lieu</li>
+            <li>• ...</li>
+        </ul>
+    </div>
+    <div class="sidebar-footer">Culturo &copy; 2024</div>
+</div>
+
+<div id="map"></div>
+
+<!-- Carousel flottant en bas de page -->
+<div class="bottom-carousel" id="bottomCarousel">
+    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Masquer le carrousel">&times;</button>
+    <div class="carousel-track" id="carouselTrack">
+        <!-- Les cartes de destination seront injectées ici par JS -->
+    </div>
+</div>
+
+<!-- Bouton pour réafficher le carrousel -->
+<button class="show-carousel-btn" id="showCarouselBtn" title="Afficher les destinations">
+    <i class="fa-solid fa-layer-group"></i>
+</button>
+
+<!-- Floating Chatbot Icon and Chat Window -->
+<button id="chatbot-toggle" aria-label="Open Chatbot">
+    <i class="fas fa-comments"></i>
+</button>
+<div id="cinema-chatbot">
+    <div class="chatbot-header">
+        <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
+        <button id="chatbot-close" aria-label="Close Chatbot">&times;</button>
+    </div>
+    <div id="chatbot-messages">
+        <div class="chat-bubble bot-message">
+            Bonjour ! Comment puis-je vous aider à trouver votre prochaine destination ?
+        </div>
+    </div>
+    <form id="chatbot-form">
+        <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off">
+        <button id="chatbot-send" type="submit"><i class="fas fa-paper-plane"></i></button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    // Dummy data for demo (à remplacer par tes vraies données)
+    const demoResults = [
+        {
+            name: "Modern Loft",
+            desc: "Open house • 100 West Street, United States",
+            location: "San Francisco, CA",
+            price: "$1,500,000",
+            badge: "FOR SALE",
+            badgeColor: "",
+            img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "Downtown Apartment",
+            desc: "For rent • 200 Main Ave, United States",
+            location: "San Francisco, CA",
+            price: "$48,000",
+            badge: "FOR RENT",
+            badgeColor: "orange",
+            img: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "Sunny Villa",
+            desc: "For sale • 300 Ocean Drive, United States",
+            location: "San Francisco, CA",
+            price: "$840,000",
+            badge: "FOR SALE",
+            badgeColor: "",
+            img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80"
+        },
+        {
+            name: "Cozy Studio",
+            desc: "For rent • 400 Pine St, United States",
+            location: "San Francisco, CA",
+            price: "$35,000",
+            badge: "FOR RENT",
+            badgeColor: "orange",
+            img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80"
+        }
+    ];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Carte plein écran
+        var map = L.map('map').setView([37.76, -122.44], 13); // San Francisco
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Marqueurs avatars
+        demoResults.forEach((result, idx) => {
+            const marker = L.marker([37.76 + 0.01 * idx, -122.44 + 0.01 * idx]).addTo(map);
+            marker.bindPopup(`
+                <div style='min-width:180px'>
+                    <img src='${result.img}' alt='' style='width:100%;height:80px;object-fit:cover;border-radius:0.7rem;margin-bottom:0.5rem;'>
+                    <b>${result.name}</b><br>
+                    <span style='color:#4fd1c5;font-weight:600;'>${result.location}</span><br>
+                    <span style='color:#ff914d;font-weight:700;'>${result.price}</span><br>
+                    <span style='font-size:0.95em;color:#555;'>${result.desc}</span>
+                </div>
+            `);
+        });
+
+        // Sidebar logic
+        const sidebar = document.getElementById('sidebarFloat');
+        const openBtn = document.getElementById('openSidebarBtn');
+        const closeBtn = document.getElementById('closeSidebarBtn');
+
+        openBtn.addEventListener('click', function () {
+            sidebar.classList.add('open');
+            openBtn.classList.add('shifted');
+        });
+        closeBtn.addEventListener('click', function () {
+            sidebar.classList.remove('open');
+            openBtn.classList.remove('shifted');
+        });
+
+        // Carousel logic
+        const carouselContainer = document.getElementById('bottomCarousel');
+        const carouselTrack = document.getElementById('carouselTrack');
+        const hideCarouselBtn = document.getElementById('hideCarouselBtn');
+        const showCarouselBtn = document.getElementById('showCarouselBtn');
+
+        // Initial load animation
+        carouselContainer.classList.add('carousel-entry');
+
+        carouselTrack.innerHTML = demoResults.map(r => `
+            <div class="carousel-card">
+                <img src="${r.img}" alt="${r.name}">
+                <h3>${r.name}</h3>
+                <p>${r.location}</p>
+                <div class="price">${r.price}</div>
+            </div>
+        `).join('');
+
+        hideCarouselBtn.addEventListener('click', function () {
+            carouselContainer.classList.add('hidden');
+            showCarouselBtn.classList.add('visible');
+        });
+
+        showCarouselBtn.addEventListener('click', function () {
+            carouselContainer.classList.remove('hidden');
+            showCarouselBtn.classList.remove('visible');
+        });
+
+        // Chatbot Logic
+        const toggle = document.getElementById('chatbot-toggle');
+        const chatbot = document.getElementById('cinema-chatbot');
+        const closeBtnChatbot = document.getElementById('chatbot-close');
+        const chatForm = document.getElementById('chatbot-form');
+        const chatInput = document.getElementById('chatbot-input');
+        const chatBox = document.getElementById('chatbot-messages');
+        let chatHistory = [];
+
+        toggle.addEventListener('click', () => {
+            chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
+        });
+
+        closeBtnChatbot.addEventListener('click', () => {
+            chatbot.style.display = 'none';
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMsg = chatInput.value.trim();
+            if (!userMsg) return;
+
+            // Display user message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'chat-bubble user-message';
+            userDiv.textContent = userMsg;
+            chatBox.appendChild(userDiv);
+            chatInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatHistory.push({ role: 'user', content: userMsg });
+
+            // Call destination API
+            const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: chatHistory })
+            });
+            const data = await response.json();
+
+            // Display bot response
+            const botDiv = document.createElement('div');
+            botDiv.className = 'chat-bubble bot-message';
+            botDiv.textContent = data.message;
+            chatBox.appendChild(botDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatHistory.push({ role: 'model', content: data.message });
+
+            if (data.destinations) {
+                console.log("Destinations received:", data.destinations);
+            }
+        });
+    });
+</script>
+{% endblock %}
