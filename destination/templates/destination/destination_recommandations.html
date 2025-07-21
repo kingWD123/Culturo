@@ -505,105 +505,76 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    // Dummy data for demo (à remplacer par tes vraies données)
-    const demoResults = [
-        {
-            name: "Modern Loft",
-            desc: "Open house • 100 West Street, United States",
-            location: "San Francisco, CA",
-            price: "$1,500,000",
-            badge: "FOR SALE",
-            badgeColor: "",
-            img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            name: "Downtown Apartment",
-            desc: "For rent • 200 Main Ave, United States",
-            location: "San Francisco, CA",
-            price: "$48,000",
-            badge: "FOR RENT",
-            badgeColor: "orange",
-            img: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            name: "Sunny Villa",
-            desc: "For sale • 300 Ocean Drive, United States",
-            location: "San Francisco, CA",
-            price: "$840,000",
-            badge: "FOR SALE",
-            badgeColor: "",
-            img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80"
-        },
-        {
-            name: "Cozy Studio",
-            desc: "For rent • 400 Pine St, United States",
-            location: "San Francisco, CA",
-            price: "$35,000",
-            badge: "FOR RENT",
-            badgeColor: "orange",
-            img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80"
-        }
-    ];
-
     document.addEventListener('DOMContentLoaded', function () {
-        // Carte plein écran
-        var map = L.map('map').setView([37.76, -122.44], 13); // San Francisco
+        // Map Initialization
+        const map = L.map('map').setView([48.85, 2.35], 5); // Default view
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+        let markers = [];
 
-        // Marqueurs avatars
-        demoResults.forEach((result, idx) => {
-            const marker = L.marker([37.76 + 0.01 * idx, -122.44 + 0.01 * idx]).addTo(map);
-            marker.bindPopup(`
-                <div style='min-width:180px'>
-                    <img src='${result.img}' alt='' style='width:100%;height:80px;object-fit:cover;border-radius:0.7rem;margin-bottom:0.5rem;'>
-                    <b>${result.name}</b><br>
-                    <span style='color:#4fd1c5;font-weight:600;'>${result.location}</span><br>
-                    <span style='color:#ff914d;font-weight:700;'>${result.price}</span><br>
-                    <span style='font-size:0.95em;color:#555;'>${result.desc}</span>
+        // Function to update the map with new destinations
+        function updateMap(destinations) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            if (!destinations || destinations.length === 0) return;
+
+            destinations.forEach(dest => {
+                const marker = L.marker([dest.latitude, dest.longitude]).addTo(map);
+                marker.bindPopup(`
+                    <div style='min-width:180px'>
+                        <img src='${dest.img}' alt='' style='width:100%;height:80px;object-fit:cover;border-radius:0.7rem;margin-bottom:0.5rem;'>
+                        <b>${dest.name}</b><br>
+                        <span style='color:#4fd1c5;font-weight:600;'>${dest.location}</span><br>
+                        <span style='font-size:0.95em;color:#555;'>${dest.desc}</span>
+                    </div>
+                `);
+                markers.push(marker);
+            });
+
+            // Center map on the first result
+            map.setView([destinations[0].latitude, destinations[0].longitude], 8);
+        }
+
+        // Function to update the carousel with new destinations
+        function updateCarousel(destinations) {
+            const carouselTrack = document.getElementById('carouselTrack');
+            if (!destinations || destinations.length === 0) {
+                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucune destination trouvée.</p>";
+                return;
+            }
+
+            carouselTrack.innerHTML = destinations.map(d => `
+                <div class="carousel-card">
+                    <img src="${d.img}" alt="${d.name}">
+                    <h3>${d.name}</h3>
+                    <p>${d.location}</p>
+                    <div class="price">${d.price || ''}</div>
                 </div>
-            `);
-        });
+            `).join('');
+        }
 
         // Sidebar logic
         const sidebar = document.getElementById('sidebarFloat');
-        const openBtn = document.getElementById('openSidebarBtn');
-        const closeBtn = document.getElementById('closeSidebarBtn');
+        const openSidebarBtn = document.getElementById('openSidebarBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
-        openBtn.addEventListener('click', function () {
-            sidebar.classList.add('open');
-            openBtn.classList.add('shifted');
-        });
-        closeBtn.addEventListener('click', function () {
-            sidebar.classList.remove('open');
-            openBtn.classList.remove('shifted');
-        });
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.add('open'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('open'));
 
-        // Carousel logic
+        // Carousel hide/show logic
         const carouselContainer = document.getElementById('bottomCarousel');
-        const carouselTrack = document.getElementById('carouselTrack');
-        const hideCarouselBtn = document.getElementById('hideCarouselBtn');
         const showCarouselBtn = document.getElementById('showCarouselBtn');
+        const hideCarouselBtn = document.getElementById('hideCarouselBtn');
 
-        // Initial load animation
-        carouselContainer.classList.add('carousel-entry');
-
-        carouselTrack.innerHTML = demoResults.map(r => `
-            <div class="carousel-card">
-                <img src="${r.img}" alt="${r.name}">
-                <h3>${r.name}</h3>
-                <p>${r.location}</p>
-                <div class="price">${r.price}</div>
-            </div>
-        `).join('');
-
-        hideCarouselBtn.addEventListener('click', function () {
+        carouselContainer.classList.add('carousel-entry'); // Initial animation
+        hideCarouselBtn.addEventListener('click', () => {
             carouselContainer.classList.add('hidden');
             showCarouselBtn.classList.add('visible');
         });
-
-        showCarouselBtn.addEventListener('click', function () {
+        showCarouselBtn.addEventListener('click', () => {
             carouselContainer.classList.remove('hidden');
             showCarouselBtn.classList.remove('visible');
         });
@@ -647,16 +618,23 @@
             });
             const data = await response.json();
 
+            // Filtre le JSON technique de la réponse
+            let botMsg = data.message;
+            botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+
             // Display bot response
             const botDiv = document.createElement('div');
             botDiv.className = 'chat-bubble bot-message';
-            botDiv.textContent = data.message;
+            botDiv.textContent = botMsg.trim();
             chatBox.appendChild(botDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
             chatHistory.push({ role: 'model', content: data.message });
 
-            if (data.destinations) {
-                console.log("Destinations received:", data.destinations);
+            // Update map and carousel if destinations are received
+            if (data.destinations && data.destinations.length > 0) {
+                updateMap(data.destinations);
+                updateCarousel(data.destinations);
+                chatbot.style.display = 'none'; // Close chatbot on success
             }
         });
     });
