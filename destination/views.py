@@ -7,6 +7,7 @@ from django.conf import settings
 import requests
 from urllib.parse import urlencode
 import re
+import ast
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
@@ -64,7 +65,9 @@ def destination_chatbot_api(request):
             "- Les centres d'intérêt (plage, montagne, culture, etc.)\n"
             "- Le niveau de popularité ou d'animation recherché (ex : lieux populaires, lieux actifs)\n"
             "- Les choses à éviter (ex : pas de lieux détente)\n"
-            "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ```, sans jamais l'afficher à l'utilisateur dans la partie visible/conversationnelle. Ce JSON est uniquement destiné à l'API.\n"
+            "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
+            "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
+            "Exemple strictement valide :\n"
             '{\n'
             '  "filter.type": "urn:entity:destination",\n'
             '  "filter.geocode.country_code": "FR",\n'
@@ -91,16 +94,49 @@ def destination_chatbot_api(request):
         qloo_params = None
         
         try:
-            # Cherche le JSON entre balises ```json ... ```
-            match = re.search(r'```json\s*([\s\S]+?)\s*```', bot_message)
-            if match:
-                qloo_params = json.loads(match.group(1))
+            # Cherche le DERNIER bloc ```json ... ```
+            matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
+            json_str = None
+            if matches:
+                json_str = matches[-1].group(1)
             else:
-                # Fallback: essaie de parser le premier JSON trouvé
-                start = bot_message.index("{")
-                end = bot_message.rindex("}") + 1
-                qloo_params = json.loads(bot_message[start:end])
-            
+                # Fallback: essaie d'extraire le dernier objet JSON de la réponse
+                try:
+                    start = bot_message.rindex("{")
+                    # Remonte pour trouver le début du dernier objet JSON
+                    while start > 0 and bot_message[start-1] != '\n':
+                        start -= 1
+                    end = bot_message.rindex("}") + 1
+                    json_str = bot_message[start:end]
+                except Exception:
+                    json_str = None
+
+            print("JSON extrait du chatbot :")
+            print(json_str)
+
+            if json_str:
+                # Nettoyage basique : remplace les guillemets simples par des doubles si besoin
+                if json_str.count('"') < 2 and json_str.count("'") > 1:
+                    json_str = json_str.replace("'", '"')
+                json_str = json_str.strip()
+                try:
+                    qloo_params = json.loads(json_str)
+                except json.JSONDecodeError:
+                    try:
+                        qloo_params = ast.literal_eval(json_str)
+                    except Exception as e:
+                        print(f"Impossible de parser le JSON Gemini: {e}")
+                        qloo_params = None
+            else:
+                print("Aucun JSON détecté dans la réponse du chatbot.")
+
+            if not qloo_params:
+                return JsonResponse({
+                    "message": bot_message,  # On renvoie la réponse conversationnelle du bot
+                    "destinations": [],
+                    "debug_json": json_str
+                })
+
             qloo_url = build_qloo_url(extra_params=qloo_params)
             
             qloo_headers = {
@@ -115,7 +151,6 @@ def destination_chatbot_api(request):
                 for entity in qloo_data.get("results", {}).get("entities", []):
                     destination = {}
                     destination["name"] = entity.get("name")
-                    # Utiliser .get() pour éviter les KeyError
                     properties = entity.get("properties", {})
                     geocode = properties.get("geocode", {})
                     location = entity.get("location", {})
@@ -147,4 +182,17 @@ def destination_chatbot_api(request):
         })
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
+def destination_detail(request, name):
+    access_key = getattr(settings, 'UNSPLASH_ACCESS_KEY', None)
+    images = []
+    if access_key:
+        url = f"https://api.unsplash.com/search/photos?query={name}&client_id={access_key}&per_page=8&orientation=landscape"
+        try:
+            resp = requests.get(url, timeout=5)
+            data = resp.json()
+            images = [img['urls']['regular'] for img in data.get('results', [])]
+        except Exception as e:
+            print(f"Unsplash error: {e}")
+    return render(request, "destination/destination_detail.html", {"name": name, "images": images})
 

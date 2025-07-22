@@ -549,7 +549,7 @@
             carouselTrack.innerHTML = destinations.map(d => {
                 const locationString = `${d.location1 || ''}${d.location2 ? ', ' + d.location2 : ''}`;
                 return `
-                <div class="carousel-card" onclick="map.setView([${d.latitude}, ${d.longitude}], 12)">
+                <div class="carousel-card" onclick="window.open('/destination/detail/${encodeURIComponent(d.name)}/', '_blank')">
                     <img src="${d.img}" alt="Image de ${d.name}">
                     <h3>${d.name}</h3>
                     <p>${locationString}</p>
@@ -623,20 +623,21 @@
             let botMsg = data.message;
             botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
 
-            // Display bot response
-            const botDiv = document.createElement('div');
-            botDiv.className = 'chat-bubble bot-message';
-            botDiv.textContent = botMsg.trim();
-            chatBox.appendChild(botDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Affiche toujours la réponse conversationnelle du bot
+            if (botMsg.trim()) {
+                const botDiv = document.createElement('div');
+                botDiv.className = 'chat-bubble bot-message';
+                botDiv.textContent = botMsg.trim();
+                chatBox.appendChild(botDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
             chatHistory.push({ role: 'model', content: data.message });
 
-            // Update map and carousel if destinations are received
+            // Affiche les recommandations seulement si elles existent
             if (data.destinations && data.destinations.length > 0) {
                 updateMap(data.destinations);
                 updateCarousel(data.destinations);
-                // Optionnel: masquer le chatbot si on a des résultats
-                // chatbot.style.display = 'none'; 
+                // chatbot.style.display = 'none';
             }
         });
 
