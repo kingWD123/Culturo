@@ -399,6 +399,13 @@ class CulturoApp {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
     function appendBotMessageAnimated(message) {
+        console.log('TEST FILTRAGE CULTURO.JS', message);
+        console.log('MESSAGE BRUT DU BOT:', JSON.stringify(message));
+        var trimmed = message && message.trim();
+        console.log('MESSAGE FILTRÉ TRIMMED:', trimmed);
+        if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
+            return;
+        }
         const botDiv = document.createElement('div');
         botDiv.className = 'bot-message';
         messagesDiv.appendChild(botDiv);
