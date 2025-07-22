@@ -3,26 +3,102 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/cinema.css' %}">
+<style>
+.cinema-hero-video-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.cinema-hero-video-container video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+.cinema-hero-text-block {
+  position: relative;
+  z-index: 2;
+  margin-left: 3vw;
+  margin-right: auto;
+  background: rgba(24,24,24,0.65);
+  border-radius: 18px;
+  padding: 2rem 2.5rem 2rem 2.5rem;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.cinema-hero-text-block h1 {
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  text-shadow: none;
+}
+.cinema-hero-text-block p {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  font-weight: 400;
+  margin-bottom: 1.3rem;
+  text-shadow: none;
+  animation: fadeInUp 1.2s;
+}
+.cinema-hero-text-block a {
+  display: inline-block;
+  padding: 0.6rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #e50914;
+  border: none;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px #e5091444;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.18s;
+}
+.cinema-hero-text-block a:hover {
+  background: #b0060f;
+  color: #fff;
+}
+@media (max-width: 900px) {
+  .cinema-hero-video-container {
+    height: 220px;
+  }
+  .cinema-hero-text-block {
+    max-width: 98vw;
+    margin: 0 auto;
+    padding: 1.2rem 1rem;
+    align-items: center;
+  }
+  .cinema-hero-text-block h1 {
+    font-size: 1.5rem;
+  }
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div style="position: relative; width: 100%; height: 400px; overflow: hidden;">
-  <video autoplay loop muted playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; left: 0; top: 0; z-index: 1;">
+<div class="cinema-hero-video-container">
+  <video autoplay loop muted playsinline>
     <source src="{% static 'video/video_for_interface.mp4' %}" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-  <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-    <div style="backdrop-filter: blur(6px); background: rgba(20,20,20,0.45); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.35); padding: 2.5rem 2.5rem 2rem 2.5rem; max-width: 600px; margin-top: 30px;">
-      <h1 style="font-family: 'Montserrat', 'Roboto', Arial, sans-serif; font-size: 3.2rem; font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 4px 24px #000, 0 2px 8px #e50914; margin-bottom: 1.1rem; background: linear-gradient(90deg, #e50914 30%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-        Culturo Cinema
-      </h1>
-      <p style="font-size: 1.25rem; color: #fff; font-weight: 500; text-shadow: 0 2px 8px #000; margin-bottom: 1.7rem; animation: fadeInUp 1.2s;">
-        Discover, share, and experience cinema differently: recommendations, events, and local discoveries.
-      </p>
-      <a href="#now-showing" style="display: inline-block; padding: 0.7rem 2.2rem; font-size: 1.1rem; font-weight: 700; color: #fff; background: linear-gradient(90deg, #e50914 60%, #ff6b35 100%); border: none; border-radius: 32px; box-shadow: 0 2px 12px #e5091444; text-decoration: none; transition: background 0.2s, transform 0.18s;">
-        Explore Now
-      </a>
-    </div>
+  <div class="cinema-hero-text-block">
+    <h1>Culturo Cinema</h1>
+    <p>Discover, share, and experience cinema differently: recommendations, events, and local discoveries.</p>
+    <a href="#now-showing">Explore Now</a>
   </div>
 </div>
 
@@ -308,15 +384,21 @@
                 // Masque le spinner de chargement
                 if (recLoading) recLoading.style.display = 'none';
                 // Affiche la réponse du bot
+                console.log('SCRIPT INLINE TEMPLATE - MESSAGE BOT:', data.message);
                 var botDiv = document.createElement('div');
                 botDiv.style.alignSelf = 'flex-start';
-                botDiv.style.background = '#fff';
-                botDiv.style.borderRadius = '12px';
-                botDiv.style.padding = '0.7rem 1rem';
-                botDiv.style.margin = '0.2rem 0';
-                botDiv.style.maxWidth = '85%';
-                botDiv.textContent = data.message;
-                chatbotMessages.appendChild(botDiv);
+                var message = data.message;
+                var trimmed = message && message.trim();
+                if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
+                  // Ne rien afficher du tout
+                } else {
+                  botDiv.textContent = message;
+                  botDiv.style.borderRadius = '12px';
+                  botDiv.style.padding = '0.7rem 1rem';
+                  botDiv.style.margin = '0.2rem 0';
+                  botDiv.style.maxWidth = '85%';
+                  chatbotMessages.appendChild(botDiv);
+                }
                 chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
                 // Ajoute au chatHistory
                 chatHistory.push({ role: 'model', content: data.message });
