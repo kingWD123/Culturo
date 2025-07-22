@@ -125,7 +125,7 @@ def cinema_chatbot_api(request):
             '  "langue": "français" // seulement si fourni\n'
             '}\n\n'
             "Ne propose le résumé JSON que quand tu as au moins quelques informations utiles. "
-            # "Ne propose pas de résumé JSON"
+            "Fais un petit resume des informations fournis par le user a la fin de son dernier message"
             "Adapte tes questions selon les réponses précédentes."
             "Adapte toi à la langue de l'utilisateur, et garde à l'esprit que l'utilisateur est là pour découvrir"
         )
