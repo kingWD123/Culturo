@@ -1,11 +1,316 @@
 {% extends "users/base.html" %}
 {% block content %}
-<h2>Images pour {{ name }}</h2>
-<div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    {% for img in images %}
-    <img src="{{ img }}" alt="Image de {{ name }}" style="width: 300px; border-radius: 8px;">
+<style>
+    /* Navbar harmonisée (déjà présent) */
+    .navbar,
+    .navbar-container {
+        background: #101018 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100%;
+        margin: 0;
+        padding: 0.7rem 0 0.7rem 0;
+    }
+
+    .navbar a,
+    .navbar .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .navbar a:hover,
+    .navbar .nav-link:hover {
+        color: #eb3452 !important;
+    }
+
+    .navbar .brand,
+    .navbar .logo {
+        color: #eb3452 !important;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    .navbar .btn-signup {
+        background: #eb3452 !important;
+        color: #fff !important;
+        border-radius: 2rem;
+        font-weight: 700;
+        padding: 0.5rem 1.5rem;
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .navbar .btn-signup:hover {
+        background: #c81c3a !important;
+    }
+
+    /* Hero moderne inspiré Pinterest/portfolio */
+    .hero-modern {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 2.5rem auto;
+        height: 420px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 8px 48px #eb3452cc, 0 2px 16px #000a;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .hero-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        filter: brightness(0.7) contrast(1.08) blur(0.5px);
+        transition: filter 0.3s;
+    }
+
+    .hero-modern-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #101018 60%, rgba(235, 52, 82, 0.18) 100%);
+        opacity: 0.92;
+        z-index: 2;
+    }
+
+    .hero-modern-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        padding-left: 4vw;
+    }
+
+    .hero-modern-card {
+        background: rgba(16, 16, 24, 0.92);
+        border-radius: 24px;
+        padding: 2.2rem 2.5rem 2.2rem 2.5rem;
+        max-width: 480px;
+        box-shadow: 0 4px 32px #eb3452cc;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        animation: fadeInUp 0.8s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    .hero-modern-card h1 {
+        font-size: 2.3rem;
+        font-weight: 900;
+        margin-bottom: 1.1rem;
+        line-height: 1.1;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+    .hero-main {
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .hero-dest {
+        color: #eb3452;
+        background: linear-gradient(90deg, #eb3452 60%, #fff 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        font-size: 2.7rem;
+        letter-spacing: 2px;
+    }
+
+    .hero-sub {
+        color: #fff;
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.92;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        background: #eb3452;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 2rem;
+        padding: 0.7rem 2.2rem;
+        font-size: 1.1rem;
+        text-decoration: none;
+        box-shadow: 0 2px 12px #eb3452aa;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .hero-btn:hover {
+        background: #c81c3a;
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 900px) {
+        .hero-modern {
+            height: 320px;
+        }
+
+        .hero-modern-card {
+            padding: 1.2rem 1.2rem;
+        }
+
+        .hero-modern-content {
+            padding-left: 2vw;
+        }
+
+        .hero-modern-card h1 {
+            font-size: 1.5rem;
+        }
+
+        .hero-dest {
+            font-size: 1.7rem;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .hero-modern {
+            height: 220px;
+            border-radius: 16px;
+        }
+
+        .hero-modern-content {
+            padding-left: 0;
+            justify-content: center;
+        }
+
+        .hero-modern-card {
+            max-width: 95vw;
+            border-radius: 14px;
+        }
+    }
+
+    /* Portfolio styles (déjà présents) */
+    body,
+    .content,
+    .container,
+    .destination-header {
+        background: #101018 !important;
+        color: #fff;
+    }
+
+    .destination-header {
+        text-align: center;
+        margin: 2.5rem 0 2rem 0;
+    }
+
+    .destination-header p {
+        font-size: 1.18rem;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        opacity: 0.85;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .masonry {
+        column-count: 3;
+        column-gap: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem 2rem 1rem;
+    }
+
+    @media (max-width: 900px) {
+        .masonry {
+            column-count: 2;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .masonry {
+            column-count: 1;
+        }
+    }
+
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #181824;
+        box-shadow: 0 4px 32px rgba(235, 52, 82, 0.10), 0 1.5px 8px #000a;
+        position: relative;
+        animation: fadeInUp 0.7s cubic-bezier(.16, 1, .3, 1) both;
+        transition: box-shadow 0.2s, transform 0.2s, border 0.2s;
+        border: 2.5px solid transparent;
+        cursor: pointer;
+    }
+
+    .masonry-item img {
+        width: 100%;
+        display: block;
+        border-radius: 18px;
+        object-fit: cover;
+        min-height: 180px;
+        max-height: 420px;
+        filter: brightness(0.98) contrast(1.08);
+        transition: transform 0.25s, filter 0.2s;
+    }
+
+    .masonry-item:hover {
+        box-shadow: 0 8px 40px #eb3452cc, 0 2px 16px #000a;
+        border: 2.5px solid #eb3452;
+        transform: translateY(-8px) scale(1.035);
+    }
+
+    .masonry-item:hover img {
+        filter: brightness(1.08) contrast(1.13) saturate(1.1);
+        transform: scale(1.04) rotate(-1deg);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
+
+{% if images %}
+<div class="hero-modern">
+    <img src="{{ images.0 }}" alt="Image principale de {{ name }}" class="hero-bg-img">
+    <div class="hero-modern-overlay"></div>
+    <div class="hero-modern-content">
+        <div class="hero-modern-card">
+            <h1>
+                <span class="hero-main">Partez à la découverte de</span><br>
+                <span class="hero-dest">{{ name|title }}</span>
+            </h1>
+            <p class="hero-sub">
+                Laissez-vous inspirer par la beauté et la culture de cette destination unique.
+            </p>
+            <a href="#portfolio" class="hero-btn">Explorer la galerie</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div id="portfolio" class="masonry">
+    {% for img in images|slice:'1:' %}
+    <div class="masonry-item">
+        <img src="{{ img }}" alt="Image de {{ name }}">
+    </div>
     {% empty %}
-    <p>Aucune image trouvée.</p>
+    <p style="color:#fff;">Aucune image trouvée.</p>
     {% endfor %}
 </div>
 {% endblock %}

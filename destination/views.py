@@ -187,7 +187,7 @@ def destination_detail(request, name):
     access_key = getattr(settings, 'UNSPLASH_ACCESS_KEY', None)
     images = []
     if access_key:
-        url = f"https://api.unsplash.com/search/photos?query={name}&client_id={access_key}&per_page=8&orientation=landscape"
+        url = f"https://api.unsplash.com/search/photos?query={name}&client_id={access_key}&per_page=30&orientation=landscape"
         try:
             resp = requests.get(url, timeout=5)
             data = resp.json()
