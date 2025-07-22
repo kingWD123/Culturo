@@ -10,6 +10,26 @@ import re
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
+def get_unsplash_image(query):
+    """Récupère une image depuis Unsplash."""
+    access_key = getattr(settings, 'UNSPLASH_ACCESS_KEY', None)
+    if not access_key:
+        return "/static/images/default.jpg" # Fallback if key is not set
+
+    url = f"https://api.unsplash.com/search/photos?query={query}&client_id={access_key}&per_page=1&orientation=landscape"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status() # Raise an exception for bad status codes
+        data = response.json()
+        if data.get("results"):
+            return data["results"][0]["urls"]["regular"]
+    except requests.RequestException as e:
+        print(f"Unsplash API request error: {e}")
+    except (KeyError, IndexError) as e:
+        print(f"Error parsing Unsplash response: {e}")
+    
+    return "/static/images/default.jpg" # Default image if search fails
+
 def build_qloo_url(entity_type="urn:entity:destination", extra_params=None):
     """Génère une URL Qloo pour les recommandations de destinations."""
     base_url = "https://hackathon.api.qloo.com/v2/insights/"
@@ -91,20 +111,28 @@ def destination_chatbot_api(request):
 
             if qloo_response.status_code == 200:
                 qloo_data = qloo_response.json()
-                print("qloo_data: ", qloo_data)
                 destinations = []
-                for entity in qloo_data["results"]["entities"]:
+                for entity in qloo_data.get("results", {}).get("entities", []):
                     destination = {}
-                    destination["name"] = entity["name"]
-                    destination["location1"] = entity["properties"]["geocode"]["admin1_region"]
-                    destination["location2"] = entity["properties"]["geocode"]["admin2_region"]
-                    destination["latitude"] = entity["location"]["lat"]
-                    destination["longitude"] = entity["location"]["lon"]
-                    destination["geohash"] = entity["location"]["geohash"]
-                    destination["popularity"] = entity["popularity"]
+                    destination["name"] = entity.get("name")
+                    # Utiliser .get() pour éviter les KeyError
+                    properties = entity.get("properties", {})
+                    geocode = properties.get("geocode", {})
+                    location = entity.get("location", {})
+
+                    destination["location1"] = geocode.get("admin1_region")
+                    destination["location2"] = geocode.get("admin2_region")
+                    destination["latitude"] = location.get("lat")
+                    destination["longitude"] = location.get("lon")
+                    destination["geohash"] = location.get("geohash")
+                    destination["popularity"] = entity.get("popularity")
+
+                    # Enrichir avec une image Unsplash
+                    search_query = f"{destination['name']} {destination.get('location1', '')}"
+                    destination["img"] = get_unsplash_image(search_query.strip())
+                    
                     destinations.append(destination)
                 
-                print(destination)
    
             else:
                 print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")

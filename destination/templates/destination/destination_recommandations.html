@@ -522,13 +522,13 @@
             if (!destinations || destinations.length === 0) return;
 
             destinations.forEach(dest => {
+                const locationString = `${dest.location1 || ''}${dest.location2 ? ', ' + dest.location2 : ''}`;
                 const marker = L.marker([dest.latitude, dest.longitude]).addTo(map);
                 marker.bindPopup(`
-                    <div style='min-width:180px'>
-                        <img src='${dest.img}' alt='' style='width:100%;height:80px;object-fit:cover;border-radius:0.7rem;margin-bottom:0.5rem;'>
-                        <b>${dest.name}</b><br>
-                        <span style='color:#4fd1c5;font-weight:600;'>${dest.location}</span><br>
-                        <span style='font-size:0.95em;color:#555;'>${dest.desc}</span>
+                    <div style='min-width:180px; font-family: sans-serif;'>
+                        <img src='${dest.img}' alt='Image de ${dest.name}' style='width:100%;height:90px;object-fit:cover;border-radius:0.5rem;margin-bottom:0.5rem;'>
+                        <b style='font-size:1.1em;'>${dest.name}</b><br>
+                        <span style='color:#4a5568;font-size:0.9em;'>${locationString}</span>
                     </div>
                 `);
                 markers.push(marker);
@@ -542,18 +542,19 @@
         function updateCarousel(destinations) {
             const carouselTrack = document.getElementById('carouselTrack');
             if (!destinations || destinations.length === 0) {
-                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucune destination trouvée.</p>";
+                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucune destination trouvée pour le moment.</p>";
                 return;
             }
 
-            carouselTrack.innerHTML = destinations.map(d => `
-                <div class="carousel-card">
-                    <img src="${d.img}" alt="${d.name}">
+            carouselTrack.innerHTML = destinations.map(d => {
+                const locationString = `${d.location1 || ''}${d.location2 ? ', ' + d.location2 : ''}`;
+                return `
+                <div class="carousel-card" onclick="map.setView([${d.latitude}, ${d.longitude}], 12)">
+                    <img src="${d.img}" alt="Image de ${d.name}">
                     <h3>${d.name}</h3>
-                    <p>${d.location}</p>
-                    <div class="price">${d.price || ''}</div>
+                    <p>${locationString}</p>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         // Sidebar logic
@@ -634,49 +635,42 @@
             if (data.destinations && data.destinations.length > 0) {
                 updateMap(data.destinations);
                 updateCarousel(data.destinations);
-                chatbot.style.display = 'none'; // Close chatbot on success
+                // Optionnel: masquer le chatbot si on a des résultats
+                // chatbot.style.display = 'none'; 
             }
         });
 
-        // Données de démo pour le carrousel au chargement
-        const demoResults = [
-            {
-                name: "Modern Loft",
-                location: "San Francisco, CA",
-                latitude: 37.76,
-                longitude: -122.44,
-                img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
-                desc: "Open house • 100 West Street, United States"
-            },
-            {
-                name: "Downtown Apartment",
-                location: "San Francisco, CA",
-                latitude: 37.77,
-                longitude: -122.45,
-                img: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=400&q=80",
-                desc: "For rent • 200 Main Ave, United States"
-            },
-            {
-                name: "Sunny Villa",
-                location: "San Francisco, CA",
-                latitude: 37.75,
-                longitude: -122.43,
-                img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80",
-                desc: "For sale • 300 Ocean Drive, United States"
-            },
-            {
-                name: "Cozy Studio",
-                location: "San Francisco, CA",
-                latitude: 37.78,
-                longitude: -122.42,
-                img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80",
-                desc: "For rent • 400 Pine St, United States"
-            }
-        ];
+        // --- Initial Load ---
+        async function fetchInitialDestinations() {
+            // Affiche un état de chargement
+            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Recherche de recommandations...</p>";
 
-        // Affiche le carrousel et les marqueurs de démo au chargement
-        updateMap(demoResults);
-        updateCarousel(demoResults);
+            // On peut envoyer un historique initial vide ou avec un message générique
+            const initialHistory = [{ role: 'user', content: 'Donne-moi des recommandations de destinations populaires en ce moment.' }];
+
+            try {
+                const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: initialHistory })
+                });
+                const data = await response.json();
+
+                if (data.destinations && data.destinations.length > 0) {
+                    updateMap(data.destinations);
+                    updateCarousel(data.destinations);
+                } else {
+                    // Gère le cas où aucune destination n'est retournée au départ
+                    updateCarousel([]); // Affiche le message "Aucune destination trouvée"
+                }
+            } catch (error) {
+                console.error("Error fetching initial destinations:", error);
+                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Erreur de chargement des destinations.</p>";
+            }
+        }
+
+        // Lance la récupération automatique au chargement de la page
+        fetchInitialDestinations();
     });
 </script>
 {% endblock %}

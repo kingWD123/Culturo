@@ -245,9 +245,7 @@ def cinema_chatbot_api(request):
                     qloo_response = requests.get(qloo_url, headers=qloo_headers)
 
                     if qloo_response.status_code == 200:
-                        print("code 200")
                         qloo_data = qloo_response.json()
-                        print("ok1")
                         # Extraire les titres recommandés (adapter selon la structure de la réponse)
                         titles = []
                         for element in qloo_data["results"]["entities"]:
