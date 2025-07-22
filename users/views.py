@@ -57,15 +57,8 @@ def CinemaRecommandations(request):
             print("DEBUG Qloo response:", response.text)
     except Exception as e:
         print(f"Erreur lors de l'appel à l'API Qloo: {e}")
-    print("DEBUG Qloo recommendations:", recommendations)
     return render(request, 'users/cinema_recommandations.html', {"recommendations": recommendations})
 
-def ArtistsRecommandations(request):
-    """Page of artists recommendations"""
-    return render(request, 'users/artists_recommandations.html')
-
-def EventsRecommandations(request):
-    """Page of events recommendations"""
 
 def get_movie_urns_from_titles(titles):
     """Recherche les URNs ClooAI pour une liste de titres de films."""
@@ -75,7 +68,7 @@ def get_movie_urns_from_titles(titles):
         try:
             url = f"https://hackathon.api.qloo.com/v2/entities/search?query={title}&type=movie"
             headers = {
-                "x-api-key": settings.GEMINI_API_KEY,  # ou la clé API ClooAI si différente
+                "x-api-key": settings.GEMINI_API_KEY, 
                 "Accept": "application/json"
             }
             response = requests.get(url, headers=headers)
@@ -103,30 +96,30 @@ def cinema_chatbot_api(request):
 
         system_prompt = (
             "Tu es un assistant spécialisé dans les recommandations de films via ClooAI. "
-            "Pose des questions adaptatives pour recueillir les informations disponibles. "
-            "L'utilisateur n'est pas obligé de fournir toutes les informations.\n\n"
+            "Ton objectif est de comprendre les préférences du visiteur pour lui proposer des films adaptés. "
+            "Pose des questions naturelles et adapte-toi à la langue de l'utilisateur.\n\n"
             "Questions à poser (une par une, selon les réponses) :\n"
-            "2. Quels genres préfères-tu ? (action, thriller, comédie, etc.) (optionnel)\n"
-            "3. Dans quelle ville/pays te trouves-tu ? (optionnel)\n"
-            "4. Quel est ton âge approximatif ? (optionnel)\n"
-            "5. Quelle période de films préfères-tu ? (années récentes, classiques, etc.) (optionnel)\n"
-            "6. Quelle note minimale souhaites-tu ? (optionnel)\n"
-            "7. Quelle langue préfères-tu ? (optionnel)\n\n"
-            "Quand tu as suffisamment d'informations (au moins 3-4 critères), affiche un résumé en JSON avec seulement les informations fournies :\n"
+            "1. Quels sont tes films préférés ? (pour comprendre ses goûts)\n"
+            "2. Quels genres de films apprécies-tu ?\n"
+            "3. Préfères-tu des films récents ou des classiques ?\n"
+            "4. Quelle note minimale souhaites-tu pour les films recommandés ?\n"
+            "5. Y a-t-il une langue de préférence ?\n"
+            "6. As-tu une préférence pour une période particulière ?\n\n"
+            "Ne propose les recommandations que quand tu as au moins 3-4 critères pertinents. "
+            "Pour chaque question, adapte ta réponse selon les réponses précédentes. "
+            "Si l'utilisateur ne répond pas à une question, passe à la suivante. "
+            "Quand tu as assez d'informations, affiche un résumé en JSON avec seulement les informations fournies :\n"
             '{\n'
-            '  "films_aimes": ["titre1", "titre2"], // seulement si fourni\n'
-            '  "genres": ["action", "thriller"], // seulement si fourni\n'
-            '  "localisation": "Paris", // seulement si fourni\n'
-            '  "age": "18_to_35", // seulement si fourni\n'
-            '  "genre": "male", // seulement si fourni\n'
-            '  "annee_min": 2000, // seulement si fourni\n'
-            '  "annee_max": 2024, // seulement si fourni\n'
-            '  "note_min": 3.5, // seulement si fourni\n'
-            '  "langue": "français" // seulement si fourni\n'
+            '  "films_aimes": ["titre1", "titre2"], // films mentionnés ou préférés\n'
+            '  "genres": ["action", "drame"], // genres mentionnés\n'
+            '  "annee_min": 2000, // année minimum si mentionnée\n'
+            '  "annee_max": 2024, // année maximum si mentionnée\n'
+            '  "note_min": 3.5, // note minimale si mentionnée\n'
+            '  "langue": "français" // langue de préférence si mentionnée\n'
             '}\n\n'
-            "Ne propose le résumé JSON que quand tu as au moins quelques informations utiles. "
-            "Adapte tes questions selon les réponses précédentes."
-            "Adapte toi à la langue de l'utilisateur, et garde à l'esprit que l'utilisateur est là pour découvrir"
+            "Avant de proposer les recommandations, demande confirmation des critères retenus. "
+            "Si l'utilisateur valide, affiche les recommandations. "
+            "Si l'utilisateur souhaite modifier, reprends les questions."
         )
 
         messages = [{"role": "user", "parts": [system_prompt]}]
@@ -199,7 +192,7 @@ def cinema_chatbot_api(request):
                 }
                 mapped_age = None
                 for key, val in age_map.items():
-                    if key in age_value:
+                    if key in age_value: 
                         mapped_age = val
                         break
                 if mapped_age:
@@ -289,9 +282,6 @@ def cinema_chatbot_api(request):
         if recommendations and (user_data is not None and (entity_ids or extra_params)):
             request.session['cinema_recommendations'] = recommendations
             request.session['cinema_qloo_url'] = qloo_url
-
-        # Affiche les recommandations Charbel
-        print(recommendations)
 
         return JsonResponse({
             "message": bot_message,

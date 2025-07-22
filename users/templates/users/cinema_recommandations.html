@@ -147,7 +147,7 @@
         <div id="cinema-recommendations-loading"
             style="display:none;justify-content:center;align-items:center;height:60px;">
             <div class="spinner"
-                style="width:38px;height:38px;border:4px solid #ff6b35;border-top:4px solid #fff;border-radius:50%;animation:spin 1s linear infinite;">
+                style="width:38px;height:38px;border:4px solid #b61b23;border-top:4px solid #fff;border-radius:50%;animation:spin 1s linear infinite;">
             </div>
         </div>
         <ul id="cinema-recommendations" style="font-size:1.1rem; margin-top:1rem;"></ul>
@@ -157,13 +157,75 @@
 
 <!-- Floating Chatbot Icon and Chat Window -->
 <button id="chatbot-toggle" aria-label="Open Chatbot"
-    style="position: fixed; bottom: 32px; right: 32px; z-index: 9999; background: #ff6b35; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 16px rgba(40,40,80,0.13); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;">
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 9999; background: #b61b23; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 16px rgba(40,40,80,0.13); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;">
     <i class="fas fa-comments"></i>
 </button>
+
+<!-- Chatbot Styles -->
+<style>
+    .chatbot-container {
+        background: #fff;
+        color: #212529;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    #chatbot-input {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 0.8rem 1.2rem;
+        color: #212529 !important;
+        font-size: 1rem;
+        caret-color: #b61b23;
+    }
+    #chatbot-input::placeholder {
+        color: #6c757d !important;
+    }
+    .chat-message {
+        color: #212529 !important;
+    }
+    .chatbot-header {
+        background: #b61b23;
+        color: #fff;
+    }
+    .chat-message.user {
+        background: #f8f9fa;
+        color: #212529;
+    }
+    .chat-message.bot {
+        background: #b61b23;
+        color: #fff;
+    }
+</style>
+
+<div class="chatbot-container"
+    style="position: fixed; bottom: 100px; right: 32px; z-index: 9998; width: 340px; max-width: 90vw; height: 420px; display: none; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); overflow: hidden; display: flex; flex-direction: column;">
+    <div
+        style="background: #b61b23; color: #fff; padding: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
+        <button id="chatbot-close" aria-label="Close Chatbot"
+            style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">&times;</button>
+    </div>
+    <div id="chatbot-messages"
+        style="flex: 1 1 auto; padding: 1rem; background: #f8f9fa; overflow-y: auto; font-size: 1rem; display: flex; flex-direction: column; gap: 0.7rem;">
+        <div class="chat-message bot"
+            style="align-self: flex-start; background: #b61b23; border-radius: 12px; padding: 0.7rem 1rem; box-shadow: 0 2px 8px rgba(40,40,80,0.07); max-width: 85%;">
+            Hello! How can I help you with cinema recommendations or events?
+        </div>
+    </div>
+    <form id="chatbot-form"
+        style="display: flex; align-items: center; padding: 0.7rem 1rem; background: #fff; border-top: 1px solid #eee;">
+        <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off"
+            style="flex: 1 1 auto; border: none; background: #fff; border-radius: 20px; padding: 0.6rem 1rem; font-size: 1rem; margin-right: 0.7rem; outline: none;">
+        <button id="chatbot-send" type="submit"
+            style="background: #b61b23; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;"><i
+                class="fas fa-paper-plane"></i></button>
+    </form>
+</div>
 <div id="cinema-chatbot"
     style="display: none; position: fixed; bottom: 100px; right: 32px; width: 340px; max-width: 90vw; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); z-index: 10000; overflow: hidden; display: flex; flex-direction: column; height: 420px;">
     <div
-        style="background: #ff6b35; color: #fff; padding: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+        style="background: #b61b23; color: #fff; padding: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
         <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
         <button id="chatbot-close" aria-label="Close Chatbot"
             style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">&times;</button>
@@ -179,7 +241,7 @@
         <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off"
             style="flex: 1 1 auto; border: none; background: #f8f9fa; border-radius: 20px; padding: 0.6rem 1rem; font-size: 1rem; margin-right: 0.7rem; outline: none;">
         <button id="chatbot-send" type="submit"
-            style="background: #ff6b35; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;"><i
+            style="background: #b61b23; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;"><i
                 class="fas fa-paper-plane"></i></button>
     </form>
 </div>
@@ -258,10 +320,99 @@
                 chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
                 // Ajoute au chatHistory
                 chatHistory.push({ role: 'model', content: data.message });
-                // Si recommandations présentes et done=true, redirige vers la page de résultats
+                // Gérer l'interaction avec le chatbot
                 if (data.recommendations && data.recommendations.length && data.done) {
-                    console.log('Redirection vers la page de résultats');
-                    // window.location.href = '/cinema_recommendations_result/';
+                    // Créer ou mettre à jour le résumé des critères
+                    let criteriaSummary = document.getElementById('criteria-summary');
+                    if (!criteriaSummary) {
+                        criteriaSummary = document.createElement('div');
+                        criteriaSummary.id = 'criteria-summary';
+                        criteriaSummary.style.display = 'block';
+                        criteriaSummary.style.margin = '1rem 0';
+                        criteriaSummary.style.padding = '0.8rem';
+                        criteriaSummary.style.borderRadius = '8px';
+                        criteriaSummary.style.backgroundColor = '#f8f9fa';
+                        criteriaSummary.style.fontWeight = '500';
+                        criteriaSummary.style.fontSize = '0.95rem';
+                        
+                        // Créer le bouton de validation
+                        let validateBtn = document.createElement('button');
+                        validateBtn.textContent = 'Valider et voir les recommandations';
+                        validateBtn.style.display = 'block';
+                        validateBtn.style.margin = '1rem 0';
+                        validateBtn.style.padding = '0.5rem 1rem';
+                        validateBtn.style.borderRadius = '4px';
+                        validateBtn.style.backgroundColor = '#b61b23';
+                        validateBtn.style.color = '#fff';
+                        validateBtn.style.border = 'none';
+                        validateBtn.style.cursor = 'pointer';
+                        validateBtn.style.transition = 'opacity 0.2s';
+                        validateBtn.style.opacity = '0.9';
+                        validateBtn.addEventListener('mouseover', function() {
+                            this.style.opacity = '1';
+                        });
+                        validateBtn.addEventListener('mouseout', function() {
+                            this.style.opacity = '0.9';
+                        });
+                        validateBtn.addEventListener('click', function() {
+                            // Rediriger vers la page de résultats avec les recommandations
+                            window.location.href = '/cinema_recommendations_result/';
+                        });
+                        
+                        // Créer le bouton de modification
+                        let modifyBtn = document.createElement('button');
+                        modifyBtn.textContent = 'Modifier mes critères';
+                        modifyBtn.style.display = 'block';
+                        modifyBtn.style.margin = '0.5rem 0';
+                        modifyBtn.style.padding = '0.5rem 1rem';
+                        modifyBtn.style.borderRadius = '4px';
+                        modifyBtn.style.backgroundColor = '#f8f9fa';
+                        modifyBtn.style.color = '#333';
+                        modifyBtn.style.border = '1px solid #dee2e6';
+                        modifyBtn.style.cursor = 'pointer';
+                        modifyBtn.style.transition = 'opacity 0.2s';
+                        modifyBtn.style.opacity = '0.9';
+                        modifyBtn.addEventListener('mouseover', function() {
+                            this.style.opacity = '1';
+                        });
+                        modifyBtn.addEventListener('mouseout', function() {
+                            this.style.opacity = '0.9';
+                        });
+                        modifyBtn.addEventListener('click', function() {
+                            // Réinitialiser l'interaction
+                            chatHistory = [];
+                            chatbotMessages.innerHTML = '';
+                            // Afficher le message initial
+                            var botDiv = document.createElement('div');
+                            botDiv.style.alignSelf = 'flex-start';
+                            botDiv.style.background = '#b61b23';
+                            botDiv.style.color = '#fff';
+                            botDiv.style.borderRadius = '12px';
+                            botDiv.style.padding = '0.7rem 1rem';
+                            botDiv.style.margin = '0.2rem 0';
+                            botDiv.style.maxWidth = '85%';
+                            botDiv.textContent = "Bonjour ! Je suis là pour vous aider à trouver des films qui vous plairont. Quels sont vos films préférés ?";
+                            chatbotMessages.appendChild(botDiv);
+                            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                            // Cacher les boutons
+                            criteriaSummary.style.display = 'none';
+                            validateBtn.style.display = 'none';
+                            modifyBtn.style.display = 'none';
+                        });
+                        
+                        // Ajouter les éléments au chat
+                        criteriaSummary.appendChild(validateBtn);
+                        criteriaSummary.appendChild(modifyBtn);
+                        chatbotMessages.appendChild(criteriaSummary);
+                    } else {
+                        criteriaSummary.style.display = 'block';
+                    }
+                } else {
+                    // Cacher le résumé si les recommandations ne sont pas prêtes
+                    let criteriaSummary = document.getElementById('criteria-summary');
+                    if (criteriaSummary) {
+                        criteriaSummary.style.display = 'none';
+                    }
                 }
             });
         }
