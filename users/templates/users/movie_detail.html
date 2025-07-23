@@ -3,426 +3,219 @@
 
 {% block extra_css %}
 <style>
-.movie-detail-hero {
-    background: linear-gradient(120deg, #ff6b35 0%, #ffd6a5 100%);
-    padding: 3rem 0 2rem 0;
-    color: #fff;
-    text-align: center;
-    position: relative;
+.movie-banner-center {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto 0 auto;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: #181414;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  min-height: 260px;
+  position: relative;
 }
-.movie-detail-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(40,40,80,0.13);
-    max-width: 900px;
-    margin: -80px auto 2rem auto;
-    padding: 2.5rem 2rem 2rem 2rem;
-    display: flex;
-    gap: 2.5rem;
-    flex-wrap: wrap;
+.movie-banner-img-center {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  filter: brightness(0.88);
+  border-radius: 0;
+  margin: 0;
+  display: block;
+  background: #222;
 }
-.movie-detail-img {
-    width: 260px;
-    height: 390px;
-    object-fit: cover;
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(40,40,80,0.10);
-    background: #f8f9fa;
+.movie-banner-title-center {
+  position: absolute;
+  left: 50%;
+  bottom: 1.2rem;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 2.1rem;
+  font-weight: 700;
+  text-shadow: 0 2px 8px #000;
+  letter-spacing: 0.5px;
+  background: rgba(24,20,20,0.7);
+  border-radius: 10px;
+  padding: 0.5rem 1.5rem;
 }
-.movie-detail-info {
-    flex: 1 1 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+.movie-detail-main {
+  background: #181414;
+  color: #fff;
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  border-radius: 0 0 16px 16px;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
 }
-.movie-detail-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #ff6b35;
-    margin-bottom: 0.2rem;
+.movie-links-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 2.2rem 0 2.2rem 0;
 }
-.movie-detail-meta {
-    color: #888;
-    font-size: 1.1rem;
-    margin-bottom: 0.7rem;
+.movie-link-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px #e74c3c44;
+  text-decoration: none;
+  display: inline-block;
+  opacity: 1;
 }
-.movie-detail-desc {
-    font-size: 1.13rem;
-    color: #333;
-    margin-bottom: 1.2rem;
+.movie-link-btn:disabled, .movie-link-btn[aria-disabled="true"] {
+  background: #444;
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
-.movie-detail-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+.movie-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.7rem;
+  color: #fff;
 }
-.movie-detail-tag {
-    background: #ffe5d0;
-    color: #ff6b35;
-    border-radius: 8px;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.98rem;
-    font-weight: 500;
+.movie-about {
+  font-size: 1.08rem;
+  color: #e0e0e0;
+  margin-bottom: 2.2rem;
 }
-.movie-detail-links {
-    margin-top: 1.2rem;
-    display: flex;
-    gap: 1.2rem;
-    flex-wrap: wrap;
+.movie-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2.2rem;
 }
-.movie-detail-link {
-    color: #fff;
-    background: #ff6b35;
-    border-radius: 6px;
-    padding: 0.5rem 1.1rem;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s;
+.movie-info-table th, .movie-info-table td {
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+  font-size: 1.08rem;
 }
-.movie-detail-link:hover {
-    background: #ff944d;
+.movie-info-table th {
+  color: #b3b3b3;
+  font-weight: 500;
+  width: 180px;
+  letter-spacing: 0.2px;
+}
+.movie-info-table td {
+  color: #fff;
+  font-weight: 600;
+}
+.movie-info-table tr {
+  border-bottom: 1px solid #292929;
+}
+.movie-info-table tr:last-child {
+  border-bottom: none;
+}
+.movie-similar {
+  color: #fff;
+  font-size: 1.08rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+.movie-similar span {
+  color: #e0e0e0;
+  margin-right: 1.2rem;
+}
+@media (max-width: 900px) {
+  .movie-banner-img-center { height: 140px; }
+  .movie-banner-title-center { font-size: 1.1rem; padding: 0.3rem 0.7rem; }
+  .movie-detail-main { padding: 1.2rem 0.7rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-{% if error %}
-    <div id="movie-detail-error" class="container" style="margin-top: 3rem;">
-        <div class="culturo-message culturo-message-error">{{ error }}</div>
+<div class="movie-banner-center">
+  {% if movie.properties and movie.properties.image and movie.properties.image.url %}
+    <img class="movie-banner-img-center" src="{{ movie.properties.image.url }}" alt="{{ movie.name|default:'Unknown Title' }}">
+  {% elif movie.image_url %}
+    <img class="movie-banner-img-center" src="{{ movie.image_url }}" alt="{{ movie.name|default:'Unknown Title' }}">
+  {% else %}
+    <img class="movie-banner-img-center" src="{% static 'images/cinema.jpg' %}" alt="Default Cinema">
+  {% endif %}
+  <div class="movie-banner-title-center">{{ movie.name|default:'Unknown Title' }}</div>
+</div>
+<div class="movie-detail-main">
+  <div class="movie-links-row">
+    <a href="{% if movie.external and movie.external.imdb and movie.external.imdb.0.id %}https://www.imdb.com/title/{{ movie.external.imdb.0.id }}/{% else %}#{% endif %}" target="_blank" class="movie-link-btn" {% if not movie.external or not movie.external.imdb or not movie.external.imdb.0.id %}aria-disabled="true" tabindex="-1"{% endif %}>IMDB</a>
+    <a href="{% if movie.external and movie.external.wikidata and movie.external.wikidata.0.id %}https://www.wikidata.org/wiki/{{ movie.external.wikidata.0.id }}{% else %}#{% endif %}" target="_blank" class="movie-link-btn" {% if not movie.external or not movie.external.wikidata or not movie.external.wikidata.0.id %}aria-disabled="true" tabindex="-1"{% endif %}>Wikidata</a>
+    <a href="{% if movie.external and movie.external.letterboxd and movie.external.letterboxd.0.id %}https://letterboxd.com/film/{{ movie.external.letterboxd.0.id }}/{% else %}#{% endif %}" target="_blank" class="movie-link-btn" {% if not movie.external or not movie.external.letterboxd or not movie.external.letterboxd.0.id %}aria-disabled="true" tabindex="-1"{% endif %}>Letterboxd</a>
+  </div>
+  <div class="movie-section-title">Synopsis</div>
+  <div class="movie-about">
+    {% if movie.properties and movie.properties.description %}
+      {{ movie.properties.description }}
+    {% elif movie.description %}
+      {{ movie.description }}
+    {% else %}
+      No description available.
+    {% endif %}
+  </div>
+  <table class="movie-info-table">
+    <tr>
+      <th>Genres</th>
+      <td>
+        {% if movie.tags %}
+          {% with genre_list="" %}
+            {% for tag in movie.tags %}
+              {% if 'genre' in tag.type %}
+                {{ tag.name }}{% if not forloop.last %}, {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        {% elif movie.properties and movie.properties.genres %}
+          {{ movie.properties.genres|join:", " }}
+        {% else %}<em>Unknown</em>{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Release Year</th>
+      <td>{% if movie.properties and movie.properties.release_year %}{{ movie.properties.release_year }}{% elif movie.release_year %}{{ movie.release_year }}{% else %}<em>Unknown</em>{% endif %}</td>
+    </tr>
+    <tr>
+      <th>Duration</th>
+      <td>{% if movie.properties and movie.properties.duration %}{{ movie.properties.duration }} min{% elif movie.duration %}{{ movie.duration }} min{% else %}<em>Unknown</em>{% endif %}</td>
+    </tr>
+    <tr>
+      <th>Content Rating</th>
+      <td>{% if movie.properties and movie.properties.content_rating %}{{ movie.properties.content_rating }}{% elif movie.content_rating %}{{ movie.content_rating }}{% else %}<em>Unknown</em>{% endif %}</td>
+    </tr>
+    <tr>
+      <th>Production Companies</th>
+      <td>{% if movie.properties and movie.properties.production_companies %}{{ movie.properties.production_companies|join:", " }}{% elif movie.production_companies %}{{ movie.production_companies|join:", " }}{% else %}<em>Unknown</em>{% endif %}</td>
+    </tr>
+    <tr>
+      <th>Release Country</th>
+      <td>{% if movie.properties and movie.properties.release_country %}{{ movie.properties.release_country|join:", " }}{% elif movie.release_country %}{{ movie.release_country|join:", " }}{% else %}<em>Unknown</em>{% endif %}</td>
+    </tr>
+  </table>
+  {% if movie.similar_movies %}
+    <div class="movie-section-title">Similar Movies</div>
+    <div class="movie-similar">
+      {% for similar in movie.similar_movies %}
+        <span>{{ similar }}</span>
+      {% endfor %}
     </div>
-    <div id="movie-detail-js"></div>
-    <script>
-    (function() {
-        function getParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
-        }
-        const entityId = getParam('id');
-        if (entityId) {
-            const movieStr = localStorage.getItem('movie_' + entityId);
-            if (movieStr) {
-                try {
-                    const movie = JSON.parse(movieStr);
-                    document.getElementById('movie-detail-error').style.display = 'none';
-                    const container = document.getElementById('movie-detail-js');
-                    container.innerHTML = '';
-                    // HERO (en dehors du container)
-                    const hero = document.createElement('div');
-                    hero.className = 'movie-detail-hero';
-                    hero.innerHTML = `<h1 class='movie-detail-title'>${movie.name || ''}</h1>` +
-                        `<div class='movie-detail-meta'>` +
-                        (movie.release_year ? movie.release_year : '') +
-                        (movie.release_date ? ` (${movie.release_date})` : '') +
-                        (movie.duration ? ` &middot; ${movie.duration} min` : '') +
-                        (movie.content_rating ? ` &middot; ${movie.content_rating}` : '') +
-                        (movie.release_country ? ` &middot; ${Array.isArray(movie.release_country) ? movie.release_country.join(', ') : movie.release_country}` : '') +
-                        `</div>`;
-                    // CONTAINER centré pour la carte
-                    const mainContainer = document.createElement('div');
-                    mainContainer.className = 'container';
-                    mainContainer.style.maxWidth = '900px';
-                    mainContainer.style.margin = '0 auto';
-                    mainContainer.style.marginTop = '2.5rem'; // Ajoute un espace entre la bannière et la carte
-                    // CARTE
-                    const card = document.createElement('div');
-                    card.className = 'movie-detail-card';
-                    card.style.margin = '0 auto 2rem auto'; // Enlève la marge négative
-                    card.style.display = 'flex';
-                    card.style.gap = '2.5rem';
-                    card.style.flexWrap = 'wrap';
-                    // Image
-                    const img = document.createElement('img');
-                    img.className = 'movie-detail-img';
-                    img.src = (movie.properties && movie.properties.image && movie.properties.image.url) ? movie.properties.image.url : (movie.image_url || (movie.image && movie.image.url) || movie.image || '');
-                    img.alt = movie.name || '';
-                    // Infos
-                    const info = document.createElement('div');
-                    info.className = 'movie-detail-info';
-                    // Description
-                    const desc = document.createElement('div');
-                    desc.className = 'movie-detail-desc';
-                    if (movie.properties && movie.properties.description) {
-                        desc.innerHTML = movie.properties.description;
-                    } else if (movie.description) {
-                        desc.innerHTML = movie.description;
-                    } else {
-                        desc.innerHTML = '<em>No description available.</em>';
-                    }
-                    info.appendChild(desc);
-                    // Alternative Titles (max 6)
-                    const akasDiv = document.createElement('div');
-                    akasDiv.style.marginBottom = '0.7rem';
-                    akasDiv.innerHTML = '<strong>Alternative Titles:</strong> ';
-                    const akasWrap = document.createElement('span');
-                    akasWrap.className = 'movie-detail-tags movie-detail-tags-wrap';
-                    let akas = [];
-                    if (movie.properties && Array.isArray(movie.properties.akas)) {
-                        akas = movie.properties.akas;
-                    } else if (Array.isArray(movie.akas)) {
-                        akas = movie.akas;
-                    }
-                    if (akas.length) {
-                        const maxAkas = 6;
-                        akas.slice(0, maxAkas).forEach(aka => {
-                            const tag = document.createElement('span');
-                            tag.className = 'movie-detail-tag';
-                            tag.textContent = aka.value + (aka.languages ? ' (' + aka.languages.join(', ') + ')' : '');
-                            akasWrap.appendChild(tag);
-                        });
-                        if (akas.length > maxAkas) {
-                            const more = document.createElement('span');
-                            more.className = 'movie-detail-tag';
-                            more.textContent = '...';
-                            akasWrap.appendChild(more);
-                        }
-                    } else {
-                        akasWrap.innerHTML = '<em>None</em>';
-                    }
-                    akasDiv.appendChild(akasWrap);
-                    info.appendChild(akasDiv);
-                    // Tags/Genres (max 8)
-                    const tagsDiv = document.createElement('div');
-                    tagsDiv.className = 'movie-detail-tags movie-detail-tags-wrap';
-                    tagsDiv.style.marginBottom = '0.7rem';
-                    let tagCount = 0;
-                    if (movie.tags && Array.isArray(movie.tags)) {
-                        for (const tagObj of movie.tags) {
-                            if (tagCount >= 8) break;
-                            const tag = document.createElement('span');
-                            tag.className = 'movie-detail-tag';
-                            tag.textContent = tagObj.name || tagObj;
-                            tagsDiv.appendChild(tag);
-                            tagCount++;
-                        }
-                        if (movie.tags.length > 8) {
-                            const more = document.createElement('span');
-                            more.className = 'movie-detail-tag';
-                            more.textContent = '...';
-                            tagsDiv.appendChild(more);
-                        }
-                    }
-                    info.appendChild(tagsDiv);
-                    // Genres (2 principaux)
-                    const genresDiv = document.createElement('div');
-                    genresDiv.innerHTML = '<strong>Genres:</strong> ';
-                    if (movie.tags && Array.isArray(movie.tags) && movie.tags.length) {
-                        genresDiv.innerHTML += movie.tags.slice(0,2).map(t => t.name || t).join(', ');
-                        if (movie.tags.length > 2) genresDiv.innerHTML += ', ...';
-                    } else {
-                        genresDiv.innerHTML += '<em>Unknown</em>';
-                    }
-                    info.appendChild(genresDiv);
-                    // Release Country
-                    const countryDiv = document.createElement('div');
-                    countryDiv.innerHTML = '<strong>Release Country:</strong> ';
-                    if (movie.properties && movie.properties.release_country) countryDiv.innerHTML += Array.isArray(movie.properties.release_country) ? movie.properties.release_country.join(', ') : movie.properties.release_country;
-                    else if (movie.release_country) countryDiv.innerHTML += Array.isArray(movie.release_country) ? movie.release_country.join(', ') : movie.release_country;
-                    else countryDiv.innerHTML += '<em>Unknown</em>';
-                    info.appendChild(countryDiv);
-                    // Production Companies (max 3)
-                    const prodDiv = document.createElement('div');
-                    prodDiv.innerHTML = '<strong>Production Companies:</strong> ';
-                    if (movie.properties && movie.properties.production_companies && movie.properties.production_companies.length) {
-                        prodDiv.innerHTML += movie.properties.production_companies.slice(0,3).join(', ');
-                        if (movie.properties.production_companies.length > 3) prodDiv.innerHTML += ', ...';
-                    } else if (movie.production_companies && movie.production_companies.length) {
-                        prodDiv.innerHTML += movie.production_companies.slice(0,3).join(', ');
-                        if (movie.production_companies.length > 3) prodDiv.innerHTML += ', ...';
-                    } else prodDiv.innerHTML += '<em>Unknown</em>';
-                    info.appendChild(prodDiv);
-                    // Content Rating
-                    const ratingDiv = document.createElement('div');
-                    ratingDiv.innerHTML = '<strong>Content Rating:</strong> ';
-                    ratingDiv.innerHTML += (movie.properties && movie.properties.content_rating) ? movie.properties.content_rating : (movie.content_rating ? movie.content_rating : '<em>Unknown</em>');
-                    info.appendChild(ratingDiv);
-                    // Duration
-                    const durationDiv = document.createElement('div');
-                    durationDiv.innerHTML = '<strong>Duration:</strong> ';
-                    durationDiv.innerHTML += (movie.properties && movie.properties.duration) ? movie.properties.duration + ' min' : (movie.duration ? movie.duration + ' min' : '<em>Unknown</em>');
-                    info.appendChild(durationDiv);
-                    // External Links
-                    const linksDiv = document.createElement('div');
-                    linksDiv.innerHTML = '<strong>External Links:</strong>';
-                    const linksWrap = document.createElement('div');
-                    linksWrap.className = 'movie-detail-links';
-                    if (movie.external && movie.external.imdb && movie.external.imdb[0] && movie.external.imdb[0].id) {
-                        const a = document.createElement('a');
-                        a.className = 'movie-detail-link';
-                        a.href = 'https://www.imdb.com/title/' + movie.external.imdb[0].id + '/';
-                        a.target = '_blank';
-                        a.textContent = 'IMDB';
-                        linksWrap.appendChild(a);
-                    }
-                    if (movie.external && movie.external.wikidata && movie.external.wikidata[0] && movie.external.wikidata[0].id) {
-                        const a = document.createElement('a');
-                        a.className = 'movie-detail-link';
-                        a.href = 'https://www.wikidata.org/wiki/' + movie.external.wikidata[0].id;
-                        a.target = '_blank';
-                        a.textContent = 'Wikidata';
-                        linksWrap.appendChild(a);
-                    }
-                    if (movie.external && movie.external.letterboxd && movie.external.letterboxd[0] && movie.external.letterboxd[0].id) {
-                        const a = document.createElement('a');
-                        a.className = 'movie-detail-link';
-                        a.href = 'https://letterboxd.com/film/' + movie.external.letterboxd[0].id + '/';
-                        a.target = '_blank';
-                        a.textContent = 'Letterboxd';
-                        linksWrap.appendChild(a);
-                    }
-                    linksDiv.appendChild(linksWrap);
-                    info.appendChild(linksDiv);
-                    // Ajout image et infos à la carte
-                    card.appendChild(img);
-                    card.appendChild(info);
-                    // Ajout au DOM
-                    container.appendChild(hero);
-                    mainContainer.appendChild(card);
-                    container.appendChild(mainContainer);
-                    // Ajout d'un style pour le wrapping des tags si besoin
-                    if (!document.getElementById('movie-detail-tags-wrap-style')) {
-                        const style = document.createElement('style');
-                        style.id = 'movie-detail-tags-wrap-style';
-                        style.innerHTML = `.movie-detail-tags-wrap { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }`;
-                        document.head.appendChild(style);
-                    }
-                    // Scroll en haut
-                    window.scrollTo(0,0);
-                } catch (e) {}
-            }
-        }
-    })();
-    </script>
-{% else %}
-    <div class="movie-detail-hero">
-        <h1 class="movie-detail-title">{{ movie.name }}</h1>
-        <div class="movie-detail-meta">
-            {% if movie.properties.release_year %}{{ movie.properties.release_year }}{% elif movie.release_year %}{{ movie.release_year }}{% endif %}
-            {% if movie.properties.release_date %} ({{ movie.properties.release_date }}){% elif movie.release_date %} ({{ movie.release_date }}){% endif %}
-            {% if movie.properties.content_rating %} &middot; {{ movie.properties.content_rating }}{% elif movie.content_rating %} &middot; {{ movie.content_rating }}{% endif %}
-            {% if movie.properties.duration %} &middot; {{ movie.properties.duration }} min{% elif movie.duration %} &middot; {{ movie.duration }} min{% endif %}
-            {% if movie.properties.release_country %} &middot; {{ movie.properties.release_country|join:', ' }}{% elif movie.release_country %} &middot; {{ movie.release_country|join:', ' }}{% endif %}
-        </div>
+  {% endif %}
+  {% if movie.actors %}
+    <div class="movie-section-title">Main Actors</div>
+    <div class="movie-similar">
+      {% for actor in movie.actors %}
+        <span>{{ actor }}</span>
+      {% endfor %}
     </div>
-    <div class="movie-detail-card">
-        <img class="movie-detail-img" src="{{ movie.properties.image.url|default:movie.image_url }}" alt="{{ movie.name }}">
-        <div class="movie-detail-info">
-            <div class="movie-detail-desc">
-                {% if movie.properties.description %}
-                    {{ movie.properties.description }}
-                {% elif movie.description %}
-                    {{ movie.description }}
-                {% elif movie.properties.short_descriptions %}
-                    {% for desc in movie.properties.short_descriptions %}
-                        <div>{{ desc.value }}</div>
-                    {% endfor %}
-                {% else %}
-                    <em>No description available.</em>
-                {% endif %}
-            </div>
-            <div><strong>Alternative Titles:</strong>
-                {% if movie.properties.akas %}
-                    {% for aka in movie.properties.akas %}
-                        <span class="movie-detail-tag">{{ aka.value }} ({{ aka.languages|join:', ' }})</span>
-                    {% endfor %}
-                {% elif movie.akas %}
-                    {% for aka in movie.akas %}
-                        <span class="movie-detail-tag">{{ aka.value }} ({{ aka.languages|join:', ' }})</span>
-                    {% endfor %}
-                {% else %}
-                    <em>None</em>
-                {% endif %}
-            </div>
-            <div class="movie-detail-tags">
-                {% if movie.tags %}
-                    {% for tag in movie.tags %}
-                        <span class="movie-detail-tag">{{ tag.name }}</span>
-                    {% endfor %}
-                {% endif %}
-                {% if movie.properties.production_companies %}
-                    {% for company in movie.properties.production_companies %}
-                        <span class="movie-detail-tag">{{ company }}</span>
-                    {% endfor %}
-                {% elif movie.production_companies %}
-                    {% for company in movie.production_companies %}
-                        <span class="movie-detail-tag">{{ company }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div>
-                <strong>Genres:</strong>
-                {% if movie.tags %}
-                    {% for tag in movie.tags %}
-                        {{ tag.name }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <em>Unknown</em>
-                {% endif %}
-            </div>
-            <div>
-                <strong>Release Country:</strong>
-                {% if movie.properties.release_country %}
-                    {{ movie.properties.release_country|join:', ' }}
-                {% elif movie.release_country %}
-                    {{ movie.release_country|join:', ' }}
-                {% else %}
-                    <em>Unknown</em>
-                {% endif %}
-            </div>
-            <div>
-                <strong>Production Companies:</strong>
-                {% if movie.properties.production_companies %}
-                    {{ movie.properties.production_companies|join:', ' }}
-                {% elif movie.production_companies %}
-                    {{ movie.production_companies|join:', ' }}
-                {% else %}
-                    <em>Unknown</em>
-                {% endif %}
-            </div>
-            <div>
-                <strong>Content Rating:</strong>
-                {% if movie.properties.content_rating %}
-                    {{ movie.properties.content_rating }}
-                {% elif movie.content_rating %}
-                    {{ movie.content_rating }}
-                {% else %}
-                    <em>Unknown</em>
-                {% endif %}
-            </div>
-            <div>
-                <strong>Duration:</strong>
-                {% if movie.properties.duration %}
-                    {{ movie.properties.duration }} min
-                {% elif movie.duration %}
-                    {{ movie.duration }} min
-                {% else %}
-                    <em>Unknown</em>
-                {% endif %}
-            </div>
-            <div>
-                <strong>External Links:</strong>
-                <div class="movie-detail-links">
-                    {% if movie.external.imdb.0.id %}
-                        <a class="movie-detail-link" href="https://www.imdb.com/title/{{ movie.external.imdb.0.id }}/" target="_blank">IMDB</a>
-                    {% endif %}
-                    {% if movie.external.wikidata.0.id %}
-                        <a class="movie-detail-link" href="https://www.wikidata.org/wiki/{{ movie.external.wikidata.0.id }}" target="_blank">Wikidata</a>
-                    {% endif %}
-                    {% if movie.external.letterboxd.0.id %}
-                        <a class="movie-detail-link" href="https://letterboxd.com/film/{{ movie.external.letterboxd.0.id }}/" target="_blank">Letterboxd</a>
-                    {% endif %}
-                </div>
-            </div>
-            <div>
-                <strong>Entity ID:</strong> {{ movie.entity_id }}
-            </div>
-        </div>
-    </div>
-    <div style="max-width:900px;margin:2rem auto 2rem auto;">
-        <details>
-            <summary style="cursor:pointer;font-size:1.1em;color:#ff6b35;">Aperçu JSON brut (debug)</summary>
-            <pre style="background:#f8f8f8;color:#333;font-size:0.95em;padding:1em;border-radius:8px;overflow-x:auto;">{{ movie|safe|json_script:"movie_json" }}</pre>
-        </details>
-    </div>
-{% endif %}
+  {% endif %}
+  {% if error %}
+    <div style="margin-top:2rem;color:#e74c3c;font-weight:600;">{{ error }}</div>
+  {% endif %}
+</div>
 {% endblock %} 

@@ -1,0 +1,106 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cinema.css' %}">
+<style>
+.artists-hero {
+  background: linear-gradient(120deg, #6b47dc 0%, #b892ff 100%);
+  padding: 3rem 0 2rem 0;
+  color: #fff;
+  text-align: center;
+  position: relative;
+}
+.artists-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.artist-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(40,40,80,0.13);
+  width: 320px;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #222;
+  transition: transform 0.15s;
+}
+.artist-card:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+.artist-photo {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1.2rem;
+  background: #f3f3f3;
+  box-shadow: 0 2px 8px rgba(107,71,220,0.09);
+}
+.artist-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #6b47dc;
+  margin-bottom: 0.5rem;
+}
+.artist-bio {
+  font-size: 1.05rem;
+  color: #444;
+  margin-bottom: 0.7rem;
+  text-align: center;
+}
+.artist-meta {
+  font-size: 0.98rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+.artist-link {
+  color: #fff;
+  background: #6b47dc;
+  border-radius: 6px;
+  padding: 0.4rem 1.1rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-top: 0.7rem;
+  display: inline-block;
+}
+.artist-link:hover {
+  background: #b892ff;
+  color: #222;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="artists-hero">
+  <h1 style="font-size:2.5rem;font-weight:800;">Culturo Artists</h1>
+  <p style="font-size:1.2rem;max-width:600px;margin:1.2rem auto 0 auto;">Discover, share, and experience local artists: musicians, directors, authors, chefs, and more!</p>
+</div>
+<div class="container">
+  <div class="artists-list">
+    {% for artiste in artistes %}
+      <div class="artist-card">
+        {% if artiste.photo %}
+          <img src="{{ artiste.photo }}" alt="{{ artiste.nom }}" class="artist-photo">
+        {% else %}
+          <div class="artist-photo" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:#eee;">🎨</div>
+        {% endif %}
+        <div class="artist-name">{{ artiste.nom }}</div>
+        <div class="artist-meta">{{ artiste.pays }}{% if artiste.region %}, {{ artiste.region }}{% endif %}</div>
+        <div class="artist-bio">{{ artiste.bio|truncatewords:30 }}</div>
+        {% if artiste.site_web %}
+          <a href="{{ artiste.site_web }}" class="artist-link" target="_blank">Visit Website</a>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div style="margin:2rem auto;font-size:1.2rem;">No artists found.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %} 

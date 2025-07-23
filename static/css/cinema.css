@@ -207,8 +207,8 @@ body.cinema {
 /* Now Showing Grid */
 .cinema-movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 2.2rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
 }
 
 .cinema-movie-card {
@@ -232,22 +232,53 @@ body.cinema {
 
 .cinema-movie-img {
     width: 100%;
-    height: 220px;
+    height: 180px;
     object-fit: cover;
     border-radius: 18px 18px 0 0;
     background: #222;
 }
 
 .cinema-movie-info {
-    padding: 1rem 1.2rem 0 1.2rem;
+    padding: 0.8rem 0.8rem 0.5rem 0.8rem;
     text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.cinema-movie-info h4 {
+    margin: 0.3rem 0;
+    padding: 0 0.5rem;
+    width: 100%;
+    text-align: center;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .cinema-movie-date {
     color: #e50914;
     font-size: 0.98rem;
-    margin-bottom: 0.7rem;
+    margin: 0.3rem 0 0.7rem 0;
     display: block;
+    width: 100%;
+    text-align: center;
+}
+
+/* Style pour le bouton Discover */
+.cinema-movie-info .btn {
+    display: block;
+    margin: 0 auto;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    min-width: 100px;
+    text-align: center;
 }
 
 /* Nearby Cinemas Section */

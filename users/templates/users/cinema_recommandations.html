@@ -190,12 +190,63 @@
     <section class="cinema-section" id="now-showing">
         <h2 class="section-title">Now Showing</h2>
         <div class="cinema-movies-grid"></div>
+        <!-- Debug: Afficher les données brutes -->
+        <div id="debug-recommendations" style="display:none; color: white; background: #1a1a1a; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <h4>Données brutes des recommandations:</h4>
+            <pre>{{ recommendations|safe }}</pre>
+        </div>
+        
         {{ recommendations|json_script:"initial-recommendations" }}
+        
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                var initialRecommendations = JSON.parse(document.getElementById('initial-recommendations').textContent);
-                if (initialRecommendations && Array.isArray(initialRecommendations)) {
-                    updateNowShowing(initialRecommendations);
+                console.log('=== DEBUG: Début du chargement des recommandations ===');
+                var initialElement = document.getElementById('initial-recommendations');
+                if (!initialElement) {
+                    console.error('❌ ERREUR: Élément avec l\'ID "initial-recommendations" introuvable');
+                    return;
+                }
+                
+                console.log('✅ Données brutes du script JSON:', initialElement.textContent);
+                
+                var recommendations = [];
+                try {
+                    recommendations = JSON.parse(initialElement.textContent);
+                    console.log('✅ Données parsées avec succès:', recommendations);
+                    
+                    // Afficher des informations détaillées sur chaque film
+                    if (recommendations && Array.isArray(recommendations)) {
+                        console.log(`📊 Nombre de recommandations: ${recommendations.length}`);
+                        recommendations.forEach((film, index) => {
+                            console.log(`\n🎬 Film #${index + 1}:`);
+                            console.log(`   Nom: ${film.name || 'Non spécifié'}`);
+                            console.log(`   ID: ${film.entity_id || 'Non spécifié'}`);
+                            console.log('   Propriétés image:', {
+                                'film.image': film.image,
+                                'film.image_url': film.image_url,
+                                'film.properties.image': film.properties?.image,
+                                'film.properties.poster_path': film.properties?.poster_path
+                            });
+                        });
+                    } else {
+                        console.warn('⚠️ Les recommandations ne sont pas un tableau:', recommendations);
+                    }
+                } catch (e) {
+                    console.error('❌ ERREUR lors de l\'analyse des recommandations:', e);
+                    console.error('Contenu brut des recommandations:', initialElement.textContent);
+                    return;
+                }
+                
+                if (recommendations && Array.isArray(recommendations)) {
+                    console.log('Calling updateNowShowing with', recommendations.length, 'recommendations');
+                    updateNowShowing(recommendations);
+                } else {
+                    console.error('Recommendations is not an array or is empty:', recommendations);
+                    // Afficher un message d'erreur à l'utilisateur
+                    const grid = document.querySelector('.cinema-movies-grid');
+                    if (grid) {
+                        grid.innerHTML = '<div class="error-message">Unable to load recommendations. Please try again later.</div>';
+                    }
                 }
             });
         </script>
