@@ -54,170 +54,191 @@ def restaurant_recommandations(request):
 # API du chatbot pour les restaurants
 @csrf_exempt
 def restaurant_chatbot_api(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        history = data.get("history", [])
+    try:
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError as e:
+                return JsonResponse({"error": "Invalid JSON in request body"}, status=400)
+            
+            history = data.get("history", [])
 
-        system_prompt = (
-            "Tu es un assistant spécialisé dans les recommandations de restaurants. "
-            "Pose des questions pour comprendre :\n"
-            "- La région ou ville en France où l'utilisateur souhaite manger\n"
-            "- Le type de cuisine recherché (ex : italienne, française, japonaise)\n"
-            "- Le budget (ex : économique, moyen, luxe)\n"
-            "- L'ambiance recherchée (ex : romantique, familial, branché)\n"
-            "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
-            "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
-            "Exemple strictement valide :\n"
-            '{\n'
-            '  "filter.type": "urn:entity:place",\n'
-            '  "filter.location.query": "Paris",\n'
-            '  "signal.interests.tags": ["restaurant", "italian"]\n'
-            '}\n'
-            "N'invente pas de tags ou de paramètres si l'utilisateur ne les a pas donnés.\n"
-            "L'utilisateur n'est pas obligé de répondre à toutes les questions.\n"
-            "Pose les questions les unes après les autres, pour ne pas submerger l'utilisateur.\n"
-            "N'évoque jamais les paramètres Qloo dans tes réponses.\n"
-            "Adapte tes questions pour obtenir ces informations de façon naturelle."
-        )
+            system_prompt = (
+                "Tu es un assistant spécialisé dans les recommandations de restaurants. "
+                "Pose des questions pour comprendre :\n"
+                "- La région ou ville en France où l'utilisateur souhaite manger\n"
+                "- Le type de cuisine recherché (ex : italienne, française, japonaise)\n"
+                "- Le budget (ex : économique, moyen, luxe)\n"
+                "- L'ambiance recherchée (ex : romantique, familial, branché)\n"
+                "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
+                "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
+                "Exemple strictement valide :\n"
+                '{\n'
+                '  "filter.type": "urn:entity:place",\n'
+                '  "filter.location.query": "Paris",\n'
+                '  "signal.interests.tags": ["restaurant", "italian"]\n'
+                '}\n'
+                "N'invente pas de tags ou de paramètres si l'utilisateur ne les a pas donnés.\n"
+                "L'utilisateur n'est pas obligé de répondre à toutes les questions.\n"
+                "Pose les questions les unes après les autres, pour ne pas submerger l'utilisateur.\n"
+                "N'évoque jamais les paramètres Qloo dans tes réponses.\n"
+                "Adapte tes questions pour obtenir ces informations de façon naturelle."
+            )
 
-        messages = [{"role": "user", "parts": [system_prompt]}]
-        for m in history:
-            messages.append({"role": m["role"], "parts": [m["content"]]})
+            try:
+                messages = [{"role": "user", "parts": [system_prompt]}]
+                for m in history:
+                    messages.append({"role": m["role"], "parts": [m["content"]]})
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(messages)
-        bot_message = response.text
-
-        restaurants = []
-        qloo_params = None
-        
-        try:
-            # Cherche le DERNIER bloc ```json ... ```
-            matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
-            json_str = None
-            if matches:
-                json_str = matches[-1].group(1)
-            else:
-                # Fallback: essaie d'extraire le dernier objet JSON de la réponse
-                try:
-                    start = bot_message.rindex("{")
-                    # Remonte pour trouver le début du dernier objet JSON
-                    while start > 0 and bot_message[start-1] != '\n':
-                        start -= 1
-                    end = bot_message.rindex("}") + 1
-                    json_str = bot_message[start:end]
-                except Exception:
-                    json_str = None
-
-            print("JSON extrait du chatbot :")
-            print(json_str)
-
-            if json_str:
-                # Nettoyage basique : remplace les guillemets simples par des doubles si besoin
-                if json_str.count('"') < 2 and json_str.count("'") > 1:
-                    json_str = json_str.replace("'", '"')
-                json_str = json_str.strip()
-                try:
-                    qloo_params = json.loads(json_str)
-                except json.JSONDecodeError:
-                    try:
-                        qloo_params = ast.literal_eval(json_str)
-                    except Exception as e:
-                        print(f"Impossible de parser le JSON Gemini: {e}")
-                        qloo_params = None
-            else:
-                print("Aucun JSON détecté dans la réponse du chatbot.")
-
-            if not qloo_params:
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                response = model.generate_content(messages)
+                bot_message = response.text
+                
+            except Exception as e:
+                print(f"Gemini API Error: {type(e).__name__}: {e}")
                 return JsonResponse({
-                    "message": bot_message,  # On renvoie la réponse conversationnelle du bot
-                    "restaurants": [],
-                    "debug_json": json_str
+                    "message": "Désolé, une erreur est survenue. Veuillez réessayer.",
+                    "restaurants": []
                 })
 
-            qloo_url = build_qloo_url(extra_params=qloo_params)
+            restaurants = []
+            qloo_params = None
             
-            qloo_headers = {
-                "x-api-key": settings.CLOOAI_API_KEY,
-                "Accept": "application/json"
-            }
-            qloo_response = requests.get(qloo_url, headers=qloo_headers)
+            try:
+                # Cherche le DERNIER bloc ```json ... ```
+                matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
+                json_str = None
+                if matches:
+                    json_str = matches[-1].group(1)
+                else:
+                    # Fallback: essaie d'extraire le dernier objet JSON de la réponse
+                    try:
+                        start = bot_message.rindex("{")
+                        # Remonte pour trouver le début du dernier objet JSON
+                        while start > 0 and bot_message[start-1] != '\n':
+                            start -= 1
+                        end = bot_message.rindex("}") + 1
+                        json_str = bot_message[start:end]
+                    except Exception:
+                        json_str = None
 
-            if qloo_response.status_code == 200:
-                qloo_data = qloo_response.json()
-                restaurants = []
-                for entity in qloo_data.get("results", {}).get("entities", []):
-                    restaurant = {}
-                    restaurant["name"] = entity.get("name")
-                    properties = entity.get("properties", {})
-                    
-                    # Extraction de la cuisine à partir des mots-clés
-                    cuisine = 'Non spécifiée'
-                    if 'keywords' in properties and len(properties['keywords']) > 0:
-                        # Parcourir les mots-clés pour trouver un type de cuisine
-                        cuisine_keywords = ['italian', 'french', 'japanese', 'chinese', 'indian', 'mexican', 'thai', 'spanish', 'greek', 'american', 'vietnamese', 'korean', 'lebanese', 'turkish']
-                        
-                        for keyword in properties['keywords']:
-                            if keyword['name'].lower() in cuisine_keywords:
-                                cuisine = keyword['name'].capitalize()
-                                break
-                        
-                        # Si aucun mot-clé de cuisine n'a été trouvé, utiliser le premier mot-clé
-                        if cuisine == 'Non spécifiée' and len(properties['keywords']) > 0:
-                            cuisine = properties['keywords'][0]['name'].capitalize()
-                    
-                    restaurant["cuisine"] = cuisine
-                    
-                    # Extraction de l'adresse
-                    restaurant["location"] = properties.get("address", "Adresse non disponible")
-                    
-                    # Extraction du prix
-                    price_level = properties.get("price_level", 2)
-                    restaurant["price_range"] = '€' * min(price_level, 4)
-                    
-                    # Extraction de la note
-                    restaurant["rating"] = properties.get("business_rating", 4.0)
-                    
-                    # Génération d'une description
-                    location_query = qloo_params.get("filter.location.query", "France")
-                    restaurant["description"] = f"Un excellent restaurant {cuisine.lower()} situé à {location_query}."
-                    
-                    # Coordonnées par défaut (à améliorer avec de vraies coordonnées)
-                    location_coords = {
-                        'paris': (48.8566, 2.3522),
-                        'lyon': (45.7578, 4.8320),
-                        'marseille': (43.2965, 5.3698),
-                        'bordeaux': (44.8378, -0.5792),
-                        'france': (48.8566, 2.3522)
-                    }
-                    
-                    location_key = location_query.lower()
-                    base_coords = location_coords.get(location_key, (48.8566, 2.3522))
-                    restaurant["latitude"] = base_coords[0] + random.uniform(-0.05, 0.05)
-                    restaurant["longitude"] = base_coords[1] + random.uniform(-0.05, 0.05)
+                print("JSON extrait du chatbot :")
+                print(json_str)
 
-                    # Enrichir avec une image Unsplash
-                    search_query = f"{restaurant['name']} {cuisine} restaurant"
-                    restaurant["img"] = get_unsplash_image(search_query.strip())
-                    
-                    restaurants.append(restaurant)
+                if json_str:
+                    # Nettoyage basique : remplace les guillemets simples par des doubles si besoin
+                    if json_str.count('"') < 2 and json_str.count("'") > 1:
+                        json_str = json_str.replace("'", '"')
+                    json_str = json_str.strip()
+                    try:
+                        qloo_params = json.loads(json_str)
+                    except json.JSONDecodeError:
+                        try:
+                            qloo_params = ast.literal_eval(json_str)
+                        except Exception as e:
+                            print(f"Impossible de parser le JSON Gemini: {e}")
+                            qloo_params = None
+                else:
+                    print("Aucun JSON détecté dans la réponse du chatbot.")
+
+                if not qloo_params:
+                    return JsonResponse({
+                        "message": bot_message,  # On renvoie la réponse conversationnelle du bot
+                        "restaurants": [],
+                        "debug_json": json_str
+                    })
+
+                qloo_url = build_qloo_url(extra_params=qloo_params)
                 
-            else:
-                print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")
+                qloo_headers = {
+                    "x-api-key": settings.CLOOAI_API_KEY,
+                    "Accept": "application/json"
+                }
+                qloo_response = requests.get(qloo_url, headers=qloo_headers)
+
+                if qloo_response.status_code == 200:
+                    qloo_data = qloo_response.json()
+                    restaurants = []
+                    for entity in qloo_data.get("results", {}).get("entities", []):
+                        restaurant = {}
+                        restaurant["name"] = entity.get("name")
+                        properties = entity.get("properties", {})
+                        
+                        # Extraction de la cuisine à partir des mots-clés
+                        cuisine = 'Non spécifiée'
+                        if 'keywords' in properties and len(properties['keywords']) > 0:
+                            # Parcourir les mots-clés pour trouver un type de cuisine
+                            cuisine_keywords = ['italian', 'french', 'japanese', 'chinese', 'indian', 'mexican', 'thai', 'spanish', 'greek', 'american', 'vietnamese', 'korean', 'lebanese', 'turkish']
+                            
+                            for keyword in properties['keywords']:
+                                if keyword['name'].lower() in cuisine_keywords:
+                                    cuisine = keyword['name'].capitalize()
+                                    break
+                            
+                            # Si aucun mot-clé de cuisine n'a été trouvé, utiliser le premier mot-clé
+                            if cuisine == 'Non spécifiée' and len(properties['keywords']) > 0:
+                                cuisine = properties['keywords'][0]['name'].capitalize()
+                        
+                        restaurant["cuisine"] = cuisine
+                        
+                        # Extraction de l'adresse
+                        restaurant["location"] = properties.get("address", "Adresse non disponible")
+                        
+                        # Extraction du prix
+                        price_level = properties.get("price_level", 2)
+                        restaurant["price_range"] = '€' * min(price_level, 4)
+                        
+                        # Extraction de la note
+                        restaurant["rating"] = properties.get("business_rating", 4.0)
+                        
+                        # Génération d'une description
+                        location_query = qloo_params.get("filter.location.query", "France")
+                        restaurant["description"] = f"Un excellent restaurant {cuisine.lower()} situé à {location_query}."
+                        
+                        # Coordonnées par défaut (à améliorer avec de vraies coordonnées)
+                        location_coords = {
+                            'paris': (48.8566, 2.3522),
+                            'lyon': (45.7578, 4.8320),
+                            'marseille': (43.2965, 5.3698),
+                            'bordeaux': (44.8378, -0.5792),
+                            'lille': (50.6292, 3.0573),
+                            'france': (48.8566, 2.3522)
+                        }
+                        
+                        location_key = location_query.lower()
+                        base_coords = location_coords.get(location_key, (48.8566, 2.3522))
+                        restaurant["latitude"] = base_coords[0] + random.uniform(-0.05, 0.05)
+                        restaurant["longitude"] = base_coords[1] + random.uniform(-0.05, 0.05)
+
+                        # Enrichir avec une image Unsplash
+                        search_query = f"{restaurant['name']} {cuisine} restaurant"
+                        restaurant["img"] = get_unsplash_image(search_query.strip())
+                        
+                        restaurants.append(restaurant)
+                    
+                else:
+                    print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")
+                    # Générer des données fictives en cas d'erreur
+                    restaurants = generate_mock_restaurants(3)
+
+            except (ValueError, KeyError, json.JSONDecodeError) as e:
+                print(f"Error processing chatbot response or Qloo API: {e}")
                 # Générer des données fictives en cas d'erreur
                 restaurants = generate_mock_restaurants(3)
 
-        except (ValueError, KeyError, json.JSONDecodeError) as e:
-            print(f"Error processing chatbot response or Qloo API: {e}")
-            # Générer des données fictives en cas d'erreur
-            restaurants = generate_mock_restaurants(3)
+            return JsonResponse({
+                "message": bot_message,
+                "restaurants": restaurants
+            })
 
+        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+    
+    except Exception as e:
+        print(f"Unexpected error in restaurant_chatbot_api: {type(e).__name__}: {e}")
         return JsonResponse({
-            "message": bot_message,
-            "restaurants": restaurants
-        })
-
-    return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+            "message": "Désolé, une erreur est survenue. Veuillez réessayer.",
+            "restaurants": []
+        }, status=500)
 
 # Fonction pour générer des données fictives de restaurants
 def generate_mock_restaurants(count=3):

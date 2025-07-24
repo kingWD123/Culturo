@@ -54,134 +54,175 @@ def destination_recommandations(request):
 
 @csrf_exempt
 def destination_chatbot_api(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        history = data.get("history", [])
-
-        system_prompt = (
-            "Tu es un assistant spécialisé dans les recommandations de destinations. "
-            "Pose des questions pour comprendre :\n"
-            "- Le pays ou la région souhaitée (ex : France)\n"
-            "- Les centres d'intérêt (plage, montagne, culture, etc.)\n"
-            "- Le niveau de popularité ou d'animation recherché (ex : lieux populaires, lieux actifs)\n"
-            "- Les choses à éviter (ex : pas de lieux détente)\n"
-            "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
-            "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
-            "Exemple strictement valide :\n"
-            '{\n'
-            '  "filter.type": "urn:entity:destination",\n'
-            '  "filter.geocode.country_code": "FR",\n'
-            '  "filter.popularity.min": 0.6,\n'
-            '  "signal.interests.tags": ["plage"],\n'
-            '  "filter.exclude.tags": ["détente"]\n'
-            '}\n'
-            "N'invente pas de tags ou de paramètres si l'utilisateur ne les a pas donnés.\n"
-            "L'utilisateur n'est pas obligé de répondre à toutes les questions.\n"
-            "Pose les question les unes après les autres, pour ne pas submerger l'utilisateur.\n"
-            "N'évoque jamais les paramètres Qloo dans tes réponses.\n"
-            "Adapte tes questions pour obtenir ces informations de façon naturelle."
-        )
-
-        messages = [{"role": "user", "parts": [system_prompt]}]
-        for m in history:
-            messages.append({"role": m["role"], "parts": [m["content"]]})
-
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(messages)
-        bot_message = response.text
-
-        destinations = []
-        qloo_params = None
+    try:
+        print(f"Request method: {request.method}")
+        print(f"Request body: {request.body}")
         
-        try:
-            # Cherche le DERNIER bloc ```json ... ```
-            matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
-            json_str = None
-            if matches:
-                json_str = matches[-1].group(1)
-            else:
-                # Fallback: essaie d'extraire le dernier objet JSON de la réponse
-                try:
-                    start = bot_message.rindex("{")
-                    # Remonte pour trouver le début du dernier objet JSON
-                    while start > 0 and bot_message[start-1] != '\n':
-                        start -= 1
-                    end = bot_message.rindex("}") + 1
-                    json_str = bot_message[start:end]
-                except Exception:
-                    json_str = None
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+                print(f"Parsed data: {data}")
+            except json.JSONDecodeError as e:
+                print(f"JSON decode error: {e}")
+                return JsonResponse({"error": "Invalid JSON in request body"}, status=400)
+            
+            history = data.get("history", [])
+            print(f"History: {history}")
 
-            print("JSON extrait du chatbot :")
-            print(json_str)
+            system_prompt = (
+                "Tu es un assistant spécialisé dans les recommandations de destinations. "
+                "Pose des questions pour comprendre :\n"
+                "- Le pays ou la région souhaitée (ex : France)\n"
+                "- Les centres d'intérêt (plage, montagne, culture, etc.)\n"
+                "- Le niveau de popularité ou d'animation recherché (ex : lieux populaires, lieux actifs)\n"
+                "- Les choses à éviter (ex : pas de lieux détente)\n"
+                "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
+                "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
+                "Exemple strictement valide :\n"
+                '{\n'
+                '  "filter.type": "urn:entity:destination",\n'
+                '  "filter.geocode.country_code": "FR",\n'
+                '  "filter.popularity.min": 0.6,\n'
+                '  "signal.interests.tags": ["plage"],\n'
+                '  "filter.exclude.tags": ["détente"]\n'
+                '}\n'
+                "N'invente pas de tags ou de paramètres si l'utilisateur ne les a pas donnés.\n"
+                "L'utilisateur n'est pas obligé de répondre à toutes les questions.\n"
+                "Pose les question les unes après les autres, pour ne pas submerger l'utilisateur.\n"
+                "N'évoque jamais les paramètres Qloo dans tes réponses.\n"
+                "Adapte tes questions pour obtenir ces informations de façon naturelle."
+            )
 
-            if json_str:
-                # Nettoyage basique : remplace les guillemets simples par des doubles si besoin
-                if json_str.count('"') < 2 and json_str.count("'") > 1:
-                    json_str = json_str.replace("'", '"')
-                json_str = json_str.strip()
-                try:
-                    qloo_params = json.loads(json_str)
-                except json.JSONDecodeError:
-                    try:
-                        qloo_params = ast.literal_eval(json_str)
-                    except Exception as e:
-                        print(f"Impossible de parser le JSON Gemini: {e}")
-                        qloo_params = None
-            else:
-                print("Aucun JSON détecté dans la réponse du chatbot.")
-
-            if not qloo_params:
+            try:
+                print("Configuring Gemini...")
+                print(f"Gemini API Key configured: {bool(settings.GEMINI_API_KEY)}")
+                
+                messages = [{"role": "user", "parts": [system_prompt]}]
+                for m in history:
+                    messages.append({"role": m["role"], "parts": [m["content"]]})
+                
+                print(f"Messages to send to Gemini: {messages}")
+                
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                print("Model created, generating content...")
+                
+                response = model.generate_content(messages)
+                print(f"Gemini response received: {response}")
+                
+                bot_message = response.text
+                print(f"Bot message: {bot_message}")
+                
+            except Exception as e:
+                print(f"Gemini API Error details: {type(e).__name__}: {e}")
+                import traceback
+                print(f"Full traceback: {traceback.format_exc()}")
                 return JsonResponse({
-                    "message": bot_message,  # On renvoie la réponse conversationnelle du bot
-                    "destinations": [],
-                    "debug_json": json_str
+                    "message": f"Erreur technique Gemini: {str(e)}",
+                    "destinations": []
                 })
 
-            qloo_url = build_qloo_url(extra_params=qloo_params)
+            destinations = []
+            qloo_params = None
             
-            qloo_headers = {
-                "x-api-key": settings.CLOOAI_API_KEY,
-                "Accept": "application/json"
-            }
-            qloo_response = requests.get(qloo_url, headers=qloo_headers)
+            try:
+                # Cherche le DERNIER bloc ```json ... ```
+                matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
+                json_str = None
+                if matches:
+                    json_str = matches[-1].group(1)
+                else:
+                    # Fallback: essaie d'extraire le dernier objet JSON de la réponse
+                    try:
+                        start = bot_message.rindex("{")
+                        # Remonte pour trouver le début du dernier objet JSON
+                        while start > 0 and bot_message[start-1] != '\n':
+                            start -= 1
+                        end = bot_message.rindex("}") + 1
+                        json_str = bot_message[start:end]
+                    except Exception:
+                        json_str = None
 
-            if qloo_response.status_code == 200:
-                qloo_data = qloo_response.json()
-                destinations = []
-                for entity in qloo_data.get("results", {}).get("entities", []):
-                    destination = {}
-                    destination["name"] = entity.get("name")
-                    properties = entity.get("properties", {})
-                    geocode = properties.get("geocode", {})
-                    location = entity.get("location", {})
+                print("JSON extrait du chatbot :")
+                print(json_str)
 
-                    destination["location1"] = geocode.get("admin1_region")
-                    destination["location2"] = geocode.get("admin2_region")
-                    destination["latitude"] = location.get("lat")
-                    destination["longitude"] = location.get("lon")
-                    destination["geohash"] = location.get("geohash")
-                    destination["popularity"] = entity.get("popularity")
+                if json_str:
+                    # Nettoyage basique : remplace les guillemets simples par des doubles si besoin
+                    if json_str.count('"') < 2 and json_str.count("'") > 1:
+                        json_str = json_str.replace("'", '"')
+                    json_str = json_str.strip()
+                    try:
+                        qloo_params = json.loads(json_str)
+                    except json.JSONDecodeError:
+                        try:
+                            qloo_params = ast.literal_eval(json_str)
+                        except Exception as e:
+                            print(f"Impossible de parser le JSON Gemini: {e}")
+                            qloo_params = None
+                else:
+                    print("Aucun JSON détecté dans la réponse du chatbot.")
 
-                    # Enrichir avec une image Unsplash
-                    search_query = f"{destination['name']} {destination.get('location1', '')}"
-                    destination["img"] = get_unsplash_image(search_query.strip())
-                    
-                    destinations.append(destination)
+                if not qloo_params:
+                    return JsonResponse({
+                        "message": bot_message,  # On renvoie la réponse conversationnelle du bot
+                        "destinations": [],
+                        "debug_json": json_str
+                    })
+
+                qloo_url = build_qloo_url(extra_params=qloo_params)
                 
-   
-            else:
-                print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")
+                qloo_headers = {
+                    "x-api-key": settings.CLOOAI_API_KEY,
+                    "Accept": "application/json"
+                }
+                qloo_response = requests.get(qloo_url, headers=qloo_headers)
 
-        except (ValueError, KeyError, json.JSONDecodeError) as e:
-            print(f"Error processing chatbot response or Qloo API: {e}")
-            pass
+                if qloo_response.status_code == 200:
+                    qloo_data = qloo_response.json()
+                    destinations = []
+                    for entity in qloo_data.get("results", {}).get("entities", []):
+                        destination = {}
+                        destination["name"] = entity.get("name")
+                        properties = entity.get("properties", {})
+                        geocode = properties.get("geocode", {})
+                        location = entity.get("location", {})
 
+                        destination["location1"] = geocode.get("admin1_region")
+                        destination["location2"] = geocode.get("admin2_region")
+                        destination["latitude"] = location.get("lat")
+                        destination["longitude"] = location.get("lon")
+                        destination["geohash"] = location.get("geohash")
+                        destination["popularity"] = entity.get("popularity")
+
+                        # Enrichir avec une image Unsplash
+                        search_query = f"{destination['name']} {destination.get('location1', '')}"
+                        destination["img"] = get_unsplash_image(search_query.strip())
+                        
+                        destinations.append(destination)
+                    
+       
+                else:
+                    print(f"Qloo API Error: {qloo_response.status_code} - {qloo_response.text}")
+
+            except (ValueError, KeyError, json.JSONDecodeError) as e:
+                print(f"Error processing chatbot response or Qloo API: {e}")
+                pass
+
+            return JsonResponse({
+                "message": bot_message,
+                "destinations": destinations
+            })
+
+        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+    
+    except Exception as e:
+        print(f"Unexpected error in destination_chatbot_api: {type(e).__name__}: {e}")
+        import traceback
+        print(f"Full traceback: {traceback.format_exc()}")
         return JsonResponse({
-            "message": bot_message,
-            "destinations": destinations
-        })
-
-    return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+            "error": "Une erreur inattendue s'est produite",
+            "message": f"Erreur détaillée: {str(e)}",
+            "destinations": []
+        }, status=500)
 
 def destination_detail(request, name):
     access_key = getattr(settings, 'UNSPLASH_ACCESS_KEY', None)
