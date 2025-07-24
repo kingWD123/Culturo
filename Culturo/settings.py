@@ -24,8 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
-    "books",
     'destination',
+    "Hotel_Restaurants",
 ]
 
 MIDDLEWARE = [

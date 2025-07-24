@@ -117,9 +117,10 @@ def cinema_chatbot_api(request):
             '  "note_min": 3.5, // note minimale si mentionnée\n'
             '  "langue": "français" // langue de préférence si mentionnée\n'
             '}\n\n'
-            "Avant de proposer les recommandations, demande confirmation des critères retenus. "
-            "Si l'utilisateur valide, affiche les recommandations. "
-            "Si l'utilisateur souhaite modifier, reprends les questions."
+            "Ne propose le résumé JSON que quand tu as au moins quelques informations utiles. "
+            "Fais un petit resume des informations fournis par le user a la fin de son dernier message"
+            "Adapte tes questions selon les réponses précédentes."
+            "Adapte toi à la langue de l'utilisateur, et garde à l'esprit que l'utilisateur est là pour découvrir"
         )
 
         messages = [{"role": "user", "parts": [system_prompt]}]
@@ -138,7 +139,6 @@ def cinema_chatbot_api(request):
             start = bot_message.index("{")
             end = bot_message.rindex("}") + 1
             user_data = json.loads(bot_message[start:end])
-            
             # Préparer les paramètres pour l'URL ClooAI (seulement les infos fournies)
             extra_params = {}
             
@@ -285,7 +285,7 @@ def cinema_chatbot_api(request):
 
         return JsonResponse({
             "message": bot_message,
-            "user_data": user_data,
+            # "user_data": user_data,
             "qloo_url": qloo_url,
             "done": user_data is not None and (entity_ids or extra_params),
             "warning": warning,
