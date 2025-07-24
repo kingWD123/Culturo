@@ -815,7 +815,7 @@ function updateNowShowing(movies) {
     if (!grid) return;
     grid.innerHTML = '';
     // Pagination
-    const pageSize = 5;
+    const pageSize = 14;
     let currentPage = 0;
     function renderPage(page) {
         grid.innerHTML = '';
@@ -823,20 +823,38 @@ function updateNowShowing(movies) {
         const end = Math.min(start + pageSize, movies.length);
         for (let i = start; i < end; i++) {
             const film = movies[i];
+            // Gestion des différents formats d'images possibles
             let imgSrc = '';
-            if (film.image) {
+            
+            // 1. Vérifier d'abord dans les propriétés (format de l'API Qloo)
+            if (film.properties && film.properties.image) {
+                if (typeof film.properties.image === 'string') {
+                    imgSrc = film.properties.image;
+                } else if (film.properties.image.url) {
+                    imgSrc = film.properties.image.url;
+                }
+            } 
+            // 2. Vérifier si l'image est directement dans film.image (objet ou chaîne)
+            else if (film.image) {
                 if (typeof film.image === 'string') {
                     imgSrc = film.image;
                 } else if (film.image.url) {
                     imgSrc = film.image.url;
                 }
-            } else if (film.image_url) {
+            } 
+            // 3. Vérifier image_url au niveau racine
+            else if (film.image_url) {
                 imgSrc = film.image_url;
-            } else if (film.properties && film.properties.image && film.properties.image.url) {
-                imgSrc = film.properties.image.url;
             }
+            // 4. Vérifier poster_path dans les propriétés (format TMDB)
+            else if (film.properties && film.properties.poster_path) {
+                imgSrc = `https://image.tmdb.org/t/p/w500${film.properties.poster_path}`;
+            }
+            
+            // 4. Image par défaut si aucune image n'est trouvée
             if (!imgSrc) {
-                imgSrc = '/static/images/film-placeholder.png';
+                imgSrc = 'https://via.placeholder.com/300x450?text=No+Image';
+                console.warn('Aucune image trouvée pour le film:', film.name || 'Inconnu');
             }
             // Stockage local pour fallback page détail (entity_id, imdb_id, slug)
             if (film.entity_id) {

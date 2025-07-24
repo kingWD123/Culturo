@@ -22,6 +22,8 @@ def home(request):
 
 def CinemaRecommandations(request):
     """Page of cinema recommendations"""
+    print("DEBUG: Début de la vue CinemaRecommandations")
+    
     # Critères par défaut adaptés à l'API Qloo
     params = {
         "filter.type": "urn:entity:movie",
@@ -29,20 +31,33 @@ def CinemaRecommandations(request):
         "filter.genres": "slice of life",
         "filter.release_country": "Japan"
     }
+    
     from urllib.parse import urlencode
     base_url = "https://hackathon.api.qloo.com/v2/insights/"
     qloo_url = base_url + "?" + urlencode(params)
+    
     import requests
     headers = {
         "x-api-key": settings.CLOOAI_API_KEY,
         "Accept": "application/json"
     }
+    
     recommendations = []
+    movie_details = {}
+    
     try:
+        print(f"DEBUG: Appel API vers {qloo_url}")
         response = requests.get(qloo_url, headers=headers)
-        print("DEBUG Qloo URL:", qloo_url)
+        print(f"DEBUG: Réponse API - Status: {response.status_code}")
+        
         if response.status_code == 200:
             data = response.json()
+            print(f"DEBUG: Données brutes de l'API: {data}")
+            
+            # Vérifier si nous avons des résultats
+            if not data.get("results", {}).get("entities"):
+                print("DEBUG: Aucun résultat trouvé dans la réponse de l'API")
+            
             for element in data.get("results", {}).get("entities", []):
                 film = {
                     "name": element.get("name"),
@@ -50,14 +65,83 @@ def CinemaRecommandations(request):
                     "properties": element.get("properties", {}),
                     "tags": element.get("tags", []),
                     "external": element.get("external", {}),
+                    # Ajout d'une image par défaut pour le débogage
+                    "image_url": element.get("image_url", "https://via.placeholder.com/300x450?text=No+Image")
                 }
                 recommendations.append(film)
+                if film["entity_id"]:
+                    movie_details[film["entity_id"]] = film
         else:
-            print("DEBUG Qloo status code:", response.status_code)
-            print("DEBUG Qloo response:", response.text)
+            print(f"DEBUG: Erreur API - Status: {response.status_code}")
+            print(f"DEBUG: Réponse API: {response.text}")
     except Exception as e:
+<<<<<<< HEAD
         print(f"Erreur lors de l'appel à l'API Qloo: {e}")
     return render(request, 'users/cinema_recommandations.html', {"recommendations": recommendations})
+=======
+        print(f"DEBUG: Exception lors de l'appel API: {str(e)}")
+    
+    print(f"DEBUG: Nombre de recommandations: {len(recommendations)}")
+    print(f"DEBUG: Détails des films: {movie_details}")
+    
+    # Stocke tous les détails en session
+    request.session['movie_details'] = movie_details
+    
+    # Ajout de données de test si aucune recommandation n'est trouvée
+    if not recommendations:
+        print("\n" + "="*80)
+        print("DEBUG: Aucune recommandation trouvée, utilisation des données de test")
+        print("="*80)
+        
+        # Log détaillé des en-têtes de la requête
+        print("\nEn-têtes de la requête:")
+        for header, value in request.META.items():
+            if header.startswith('HTTP_') or header in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
+                print(f"{header}: {value}")
+                
+        # Log de la session
+        print("\nContenu de la session:", dict(request.session))
+        
+        # Log des paramètres GET
+        print("\nParamètres GET:", dict(request.GET))
+        
+        # Log des paramètres POST
+        print("\nParamètres POST:", dict(request.POST))
+        recommendations = [
+            {
+                "name": "Film de test 1",
+                "entity_id": "test1",
+                "properties": {"release_year": "2023"},
+                # Formatage pour correspondre à ce qu'attend le JavaScript
+                "image": {
+                    "url": "https://via.placeholder.com/300x450?text=Film+1"
+                },
+                "release_year": "2023"  # Ajouté pour la compatibilité
+            },
+            {
+                "name": "Film de test 2",
+                "entity_id": "test2",
+                "properties": {"release_year": "2022"},
+                # Formatage pour correspondre à ce qu'attend le JavaScript
+                "image": {
+                    "url": "https://via.placeholder.com/300x450?text=Film+2"
+                },
+                "release_year": "2022"  # Ajouté pour la compatibilité
+            }
+        ]
+    
+    context = {
+        "recommendations": recommendations,
+        "debug_info": {
+            "api_url": qloo_url,
+            "recommendations_count": len(recommendations),
+            "has_movie_details": bool(movie_details)
+        }
+    }
+    
+    print(f"DEBUG: Contexte envoyé au template: {context}")
+    return render(request, 'users/cinema_recommandations.html', context)
+>>>>>>> 4f64e079cf9fc1c472f578c5a5f2e069ff2eb5bb
 
 
 def get_movie_urns_from_titles(titles):
@@ -241,9 +325,18 @@ def cinema_chatbot_api(request):
                         qloo_data = qloo_response.json()
                         # Extraire les titres recommandés (adapter selon la structure de la réponse)
                         titles = []
+                        # Initialiser le dictionnaire des détails des films dans la session s'il n'existe pas
+                        if 'movie_details' not in request.session:
+                            request.session['movie_details'] = {}
+                            
                         for element in qloo_data["results"]["entities"]:
+                            entity_id = element.get("entity_id")
                             film = {
                                 "name": element.get("name"),
+                                "entity_id": entity_id,
+                                "properties": element.get("properties", {}),
+                                "tags": element.get("tags", []),
+                                "external": element.get("external", {}),
                                 "release_year": element.get("properties", {}).get("release_year"),
                                 "description": element.get("properties", {}).get("description"),
                                 "image": element.get("properties", {}).get("image", {}).get("url"),
@@ -252,15 +345,25 @@ def cinema_chatbot_api(request):
                                 "imdb_id": None,
                                 "imdb_user_rating": None,
                                 "imdb_user_rating_count": None
-                
                             }
+                            
+                            # Ajouter les informations IMDB si disponibles
                             imdb = element.get("external", {}).get("imdb", [])
-                            if imdb and isinstance(imdb, list):
+                            if imdb and isinstance(imdb, list) and len(imdb) > 0:
                                 imdb_info = imdb[0]
                                 film["imdb_id"] = imdb_info.get("id")
                                 film["imdb_user_rating"] = imdb_info.get("user_rating")
                                 film["imdb_user_rating_count"] = imdb_info.get("user_rating_count")
+                            
+                            # Stocker les détails complets du film dans la session
+                            if entity_id:
+                                request.session['movie_details'][entity_id] = film
+                                # S'assurer que la session est sauvegardée
+                                request.session.modified = True
+                            
+                            # Ajouter à la liste des recommandations
                             titles.append(film)
+                        
                         recommendations = titles
                     else:
                         recommendations = [f"Erreur API Qloo: {qloo_response.status_code}"]
@@ -282,6 +385,18 @@ def cinema_chatbot_api(request):
         if recommendations and (user_data is not None and (entity_ids or extra_params)):
             request.session['cinema_recommendations'] = recommendations
             request.session['cinema_qloo_url'] = qloo_url
+            
+            # S'assurer que les détails des films sont bien stockés dans la session
+            if 'movie_details' not in request.session:
+                request.session['movie_details'] = {}
+                
+            # Mise à jour des détails des films dans la session
+            for film in recommendations:
+                if 'entity_id' in film and film['entity_id']:
+                    request.session['movie_details'][film['entity_id']] = film
+                    
+            # Marquer la session comme modifiée pour s'assurer qu'elle est sauvegardée
+            request.session.modified = True
 
         return JsonResponse({
             "message": bot_message,
@@ -335,8 +450,11 @@ def get_movies_from_qloo(request):
 
 def movie_detail(request):
     entity_id = request.GET.get('id')
-    if not entity_id:
-        return render(request, 'users/movie_detail.html', {'error': "Aucun identifiant de film fourni."})
+    # 1. Cherche d'abord dans la session
+    movie_details = request.session.get('movie_details', {})
+    if entity_id in movie_details:
+        return render(request, 'users/movie_detail.html', {'movie': movie_details[entity_id]})
+    # 2. Cas spécial the-godfather
     if entity_id == 'the-godfather':
         godfather_data = {
             'name': 'The Godfather',
@@ -378,7 +496,8 @@ def movie_detail(request):
             'image_url': 'https://upload.wikimedia.org/wikipedia/en/1/1c/Godfather_ver1.jpg',
         }
         return render(request, 'users/movie_detail.html', {'movie': godfather_data})
-    # comportement existant pour les autres films
+    if not entity_id:
+        return render(request, 'users/movie_detail.html', {'movie': {}, 'error': "Aucun identifiant de film fourni."})
     api_key = "ELT40OrStBysskCLRvuxrB9-h6ZakP_jZ2O0j9TMHZI"
     url = f"https://hackathon.api.qloo.com/v2/entities/{entity_id}"
     headers = {
@@ -388,12 +507,18 @@ def movie_detail(request):
     try:
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            return render(request, 'users/movie_detail.html', {'error': f"Erreur API externe: {response.status_code}"})
+            return render(request, 'users/movie_detail.html', {
+                'movie': {},
+                'error': f"Erreur API externe: {response.status_code}"
+            })
         data = response.json()
         entity = data.get('entity', {})
         return render(request, 'users/movie_detail.html', {'movie': entity})
     except Exception as e:
-        return render(request, 'users/movie_detail.html', {'error': f"Erreur serveur: {str(e)}"})
+        return render(request, 'users/movie_detail.html', {
+            'movie': {},
+            'error': f"Erreur serveur: {str(e)}"
+        })
 
 # Fonction améliorée pour générer une URL Qloo/ClooAI GET
 def build_qloo_url(
