@@ -95,6 +95,7 @@ def destination_chatbot_api(request):
         
         try:
             # Cherche le DERNIER bloc ```json ... ```
+            import re
             matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', bot_message))
             json_str = None
             if matches:

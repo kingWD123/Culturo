@@ -29,15 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const typingIndicator = addTypingIndicator();
         
         // Send message to backend
-        fetch('/restaurants/chatbot/', {
+        fetch('/restaurants/api/chatbot/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
             body: JSON.stringify({
-                message: message,
-                history: [] // We'll implement chat history later
+                history: [{ role: 'user', content: message }]
             })
         })
         .then(response => response.json())
@@ -97,16 +96,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let content = `
                 <h3>${restaurant.name || 'Nom non disponible'}</h3>
-                <p>${restaurant.properties?.address || 'Adresse non disponible'}</p>
-                <p>Note: ${restaurant.properties?.business_rating || 'Non noté'}</p>
+                <p>${restaurant.location || 'Adresse non disponible'}</p>
+                <p>Cuisine: ${restaurant.cuisine || 'Non spécifiée'}</p>
+                <p>Note: ${restaurant.rating || 'Non noté'}/5</p>
+                <p>Prix: ${restaurant.price_range || '€€'}</p>
             `;
             
-            if (restaurant.properties?.price_level) {
-                content += `<p>Prix: ${'$'.repeat(restaurant.properties.price_level)}</p>`;
-            }
-            
-            if (restaurant.properties?.website) {
-                content += `<p><a href="${restaurant.properties.website}" target="_blank">Site web</a></p>`;
+            if (restaurant.img) {
+                content = `<img src="${restaurant.img}" alt="${restaurant.name}" style="width:100%;height:120px;object-fit:cover;border-radius:4px;margin-bottom:8px;">` + content;
             }
             
             restaurantDiv.innerHTML = content;

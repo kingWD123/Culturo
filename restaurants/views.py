@@ -2,7 +2,7 @@ import json
 import os
 import random
 import requests
-import re
+import re  # Assurez-vous que cette importation est bien présente
 import ast
 from urllib.parse import urlencode
 from django.shortcuts import render
@@ -12,15 +12,15 @@ from django.conf import settings
 
 # Import Google Generative AI
 import google.generativeai as genai
+from django.conf import settings
 
 # Configuration de l'API Gemini
-genai.configure(api_key=os.environ.get('GOOGLE_API_KEY', 'your-api-key'))
-model = genai.GenerativeModel('gemini-pro')
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # Fonction pour récupérer des images d'Unsplash
 def get_unsplash_image(query):
     try:
-        unsplash_access_key = os.environ.get('UNSPLASH_ACCESS_KEY', 'your-unsplash-key')
+        unsplash_access_key = settings.UNSPLASH_ACCESS_KEY
         url = f"https://api.unsplash.com/search/photos?query={query}&client_id={unsplash_access_key}&per_page=1"
         response = requests.get(url)
         data = response.json()
@@ -32,7 +32,7 @@ def get_unsplash_image(query):
 
 # Fonction pour construire l'URL Qloo
 def build_qloo_url(entity_type, entity_id=None, limit=10):
-    qloo_api_key = os.environ.get('QLOO_API_KEY', 'your-qloo-key')
+    qloo_api_key = settings.CLOOAI_API_KEY
     base_url = "https://api.qloo.com/v1/recommendations"
     
     if entity_id:
@@ -51,8 +51,20 @@ def restaurant_recommandations(request):
 def restaurant_chatbot_api(request):
     if request.method == 'POST':
         try:
+            print("\n\n==== NOUVELLE REQUÊTE CHATBOT ====\n")
+            print("Requête reçue:", request.body.decode('utf-8'))
             data = json.loads(request.body)
+            print("Données JSON complètes:", json.dumps(data, indent=2))
             chat_history = data.get('history', [])
+            print("Historique du chat:", json.dumps(chat_history, indent=2))
+            print("Type de l'historique:", type(chat_history))
+            print("Nombre d'éléments dans l'historique:", len(chat_history))
+            
+            if len(chat_history) > 0:
+                print("Premier message de l'historique:", chat_history[0])
+                print("Type du premier message:", type(chat_history[0]))
+                if isinstance(chat_history[0], dict):
+                    print("Clés du premier message:", chat_history[0].keys())
             
             # Formatage de l'historique pour Gemini
             gemini_history = []
@@ -62,7 +74,7 @@ def restaurant_chatbot_api(request):
             
             # Si c'est le premier message ou si l'historique est vide
             if not gemini_history:
-                gemini_history = [{"role": "user", "parts": ["Donne-moi des recommandations de restaurants populaires en France."]}]
+                gemini_history = [{"role": "user", "parts": ["Bonjour, je cherche un restaurant. Pouvez-vous m'aider ?"]}]
             
             # Ajout d'un contexte système pour guider le modèle
             system_prompt = """
@@ -70,7 +82,7 @@ def restaurant_chatbot_api(request):
             Ton objectif est d'aider l'utilisateur à trouver des restaurants qui correspondent à ses préférences.
             
             Pose des questions pour comprendre :
-            - La région ou ville en France où l'utilisateur souhaite manger
+            - La région ou ville où l'utilisateur souhaite manger
             - Le type de cuisine recherché (ex : italienne, française, japonaise)
             - Le budget (ex : économique, moyen, luxe)
             - L'ambiance recherchée (ex : romantique, familial, branché)
@@ -99,19 +111,39 @@ def restaurant_chatbot_api(request):
             gemini_history.insert(0, {"role": "model", "parts": [system_prompt]})
             
             # Appel à l'API Gemini
-            response = model.generate_content(gemini_history)
-            response_text = response.text
+            try:
+                print("Calling Gemini API with model: gemini-1.5-flash")
+                print("Gemini history:", gemini_history)
+                # Utilisation de l'API Gemini
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                response = model.generate_content(gemini_history)
+                response_text = response.text
+                print("Gemini API response received successfully")
+            except Exception as e:
+                print(f"Error calling Gemini API: {e}")
+                print(f"Error type: {type(e)}")
+                print(f"Error details: {str(e)}")
+                raise
             
             # Extraction du JSON avec les paramètres Qloo
             qloo_params = None
             try:
-                # Cherche le DERNIER bloc ```json ... ```
-                matches = list(re.finditer(r'```json\s*([\s\S]+?)\s*```', response_text))
+                # Méthode alternative pour extraire le JSON sans utiliser re.finditer
                 json_str = None
-                if matches:
-                    json_str = matches[-1].group(1)
-                else:
-                    # Fallback: essaie d'extraire le dernier objet JSON de la réponse
+                # Cherche le dernier bloc ```json ... ```
+                json_start = response_text.rfind("```json")
+                if json_start != -1:
+                    # Trouve le début du contenu JSON après ```json
+                    content_start = response_text.find("\n", json_start)
+                    if content_start != -1:
+                        # Trouve la fin du bloc ```
+                        content_end = response_text.find("```", content_start)
+                        if content_end != -1:
+                            # Extrait le contenu JSON
+                            json_str = response_text[content_start+1:content_end].strip()
+                
+                # Si aucun bloc JSON n'a été trouvé, essaie d'extraire un objet JSON
+                if not json_str:
                     try:
                         start = response_text.rindex("{")
                         # Remonte pour trouver le début du dernier objet JSON
@@ -143,11 +175,55 @@ def restaurant_chatbot_api(request):
                     
                 # Si aucun paramètre n'a été trouvé, utiliser des valeurs par défaut
                 if not qloo_params:
+                    # Essayer d'extraire des informations de la réponse textuelle
+                    location = ""  # Ne pas définir de lieu par défaut
+                    cuisine_types = ["restaurant"]
+                    
+                    # Rechercher des mentions de lieux sans utiliser re
+                    location_keywords = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'France']
+                    
+                    # Recherche simple de mots-clés de lieux dans le texte
+                    for loc in location_keywords:
+                        if loc.lower() in response_text.lower():
+                            location = loc
+                            break
+                            
+                    # Si aucun lieu n'est trouvé, essayer de détecter les phrases avec "à", "en", "dans", "sur"
+                    if location == "France":
+                        text_lower = response_text.lower()
+                        for prefix in [' à ', ' en ', ' dans ', ' sur ']:
+                            if prefix in text_lower:
+                                # Trouver la position du préfixe
+                                pos = text_lower.find(prefix) + len(prefix)
+                                # Extraire le mot qui suit
+                                end_pos = min(pos + 20, len(text_lower))
+                                word = text_lower[pos:end_pos].split()[0].strip(',.;:!?')
+                                if word and len(word) > 2:
+                                    location = word.capitalize()
+                                    break
+                    
+                    # Rechercher des types de cuisine
+                    cuisine_keywords = [
+                        'italien', 'français', 'japonais', 'chinois', 'indien', 'mexicain', 
+                        'thaï', 'espagnol', 'grec', 'américain', 'vietnamien', 'coréen', 
+                        'libanais', 'turc', 'pizza', 'sushi', 'burger', 'végétarien', 'vegan'
+                    ]
+                    
+                    for keyword in cuisine_keywords:
+                        if keyword in response_text.lower():
+                            cuisine_types.append(keyword)
+                    
+                    # Construction des paramètres Qloo
                     qloo_params = {
                         "filter.type": "urn:entity:place",
-                        "filter.location.query": "France",
-                        "signal.interests.tags": ["restaurant"]
+                        "signal.interests.tags": cuisine_types if len(cuisine_types) > 1 else ["restaurant"]
                     }
+                    
+                    # Ajouter le paramètre de localisation seulement si un lieu a été spécifié
+                    if location:
+                        qloo_params["filter.location.query"] = location
+                    
+                    print(f"Paramètres extraits du texte: {qloo_params}")
             except Exception as e:
                 print(f"Erreur lors de l'extraction du JSON: {e}")
                 qloo_params = {
@@ -180,7 +256,7 @@ def restaurant_chatbot_api(request):
                 
                 # Ajout des headers nécessaires
                 qloo_headers = {
-                    "x-api-key": os.environ.get('CLOOAI_API_KEY', 'your-qloo-key'),
+                    "x-api-key": settings.CLOOAI_API_KEY,
                     "Accept": "application/json"
                 }
                 
@@ -307,9 +383,20 @@ def restaurant_chatbot_api(request):
             if not restaurants_data:
                 restaurants_data = generate_mock_restaurants(3)
             
-            # Filtrer le JSON technique de la réponse pour l'affichage
-            import re
-            display_response = re.sub(r'```json[\s\S]*?```', '', response_text).strip()
+            # Filtrer le JSON technique de la réponse pour l'affichage sans utiliser re
+            display_response = response_text
+            # Supprimer tous les blocs ```json ... ```
+            json_start = display_response.find("```json")
+            while json_start != -1:
+                json_end = display_response.find("```", json_start + 7)
+                if json_end != -1:
+                    # Supprimer le bloc JSON
+                    display_response = display_response[:json_start] + display_response[json_end+3:]
+                    # Chercher le prochain bloc
+                    json_start = display_response.find("```json")
+                else:
+                    break
+            display_response = display_response.strip()
             
             return JsonResponse({
                 'message': display_response,
