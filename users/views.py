@@ -38,7 +38,7 @@ def CinemaRecommandations(request):
     
     import requests
     headers = {
-        "x-api-key": settings.CLOOAI_API_KEY,
+        "x-api-key": settings.CLOOAI_API_KEY,  # CORRECTION
         "Accept": "application/json"
     }
     
@@ -153,7 +153,7 @@ def get_movie_urns_from_titles(titles):
         try:
             url = f"https://hackathon.api.qloo.com/v2/entities/search?query={title}&type=movie"
             headers = {
-                "x-api-key": settings.GEMINI_API_KEY,  # ou la clé API ClooAI si différente
+                "x-api-key": settings.CLOOAI_API_KEY,  # CORRECTION: Utiliser CLOOAI_API_KEY au lieu de GEMINI_API_KEY
                 "Accept": "application/json"
             }
             response = requests.get(url, headers=headers)
