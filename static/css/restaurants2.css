@@ -1,0 +1,232 @@
+/* Sidebar Toggle Button */
+.sidebar-toggle-btn {
+    position: fixed;
+    top: calc(var(--navbar-height) + 1.5rem);
+    left: 1.5rem;
+    z-index: 1100;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    transform: translateX(0);
+}
+
+.sidebar-toggle-btn:hover {
+    background: var(--primary-hover);
+    transform: translateX(0) scale(1.05);
+}
+
+.sidebar-toggle-btn.shifted {
+    transform: translateX(380px);
+}
+
+/* Carousel Styles */
+.bottom-carousel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1001;
+    padding: 0 0 1.5rem 1.5rem;
+    pointer-events: none;
+    transform: translateY(110%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.bottom-carousel.visible {
+    transform: translateY(0);
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    padding-right: 1.5rem;
+}
+
+.carousel-track::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carousel-track::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.carousel-track::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.carousel-card {
+    flex: 0 0 280px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid var(--card-border);
+    pointer-events: auto;
+    position: relative;
+}
+
+.carousel-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.carousel-card-content {
+    padding: 1rem;
+}
+
+.carousel-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: white;
+    text-align: center;
+}
+
+.carousel-card p {
+    font-size: 0.85rem;
+    margin: 0.2rem 0;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-card p i {
+    width: 16px;
+    margin-right: 8px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.restaurant-rating {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+    justify-content: center;
+}
+
+.rating-stars {
+    color: #fbbf24;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.rating-value {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.price-level {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    text-align: center;
+    width: 100%;
+}
+
+.cuisine-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    justify-content: center;
+}
+
+.cuisine-tag {
+    background: rgba(74, 144, 226, 0.2);
+    color: #90caf9;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* Carousel Buttons */
+.carousel-hide-btn {
+    position: absolute;
+    top: -12px;
+    right: 2rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1002;
+    transition: var(--transition);
+    pointer-events: auto;
+}
+
+.carousel-hide-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.carousel-show-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+.carousel-show-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.carousel-show-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}

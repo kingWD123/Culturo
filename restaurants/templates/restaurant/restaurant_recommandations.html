@@ -1,0 +1,757 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+    /* Use a variable for the navbar height to make it easily adjustable */
+    :root {
+        --navbar-height: 80px;
+        /* Adjust this value based on your actual navbar height */
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #f4f7fb;
+        overflow: hidden;
+        /* Prevent scrollbars from the main layout */
+    }
+
+    #map {
+        position: fixed;
+        top: var(--navbar-height);
+        /* Start below the navbar */
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - var(--navbar-height));
+        /* Fill remaining height */
+        z-index: 1;
+    }
+
+    .sidebar-float {
+        position: fixed;
+        top: var(--navbar-height);
+        /* Start below the navbar */
+        left: 0;
+        height: calc(100vh - var(--navbar-height));
+        /* Fill remaining height */
+        width: 340px;
+        background: #22304a;
+        color: #fff;
+        box-shadow: 2px 0 24px rgba(40, 40, 80, 0.13);
+        z-index: 1002;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(.4, 2, .6, 1);
+        display: flex;
+        flex-direction: column;
+        padding: 2.5rem 2rem 2rem 2rem;
+    }
+
+    .sidebar-float.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-float h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .sidebar-float .close-btn {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.7rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .sidebar-float .close-btn:hover {
+        opacity: 1;
+    }
+
+    .sidebar-float .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .sidebar-float .sidebar-footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.95rem;
+        opacity: 0.7;
+    }
+
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: calc(var(--navbar-height) + 2rem);
+        /* Position below navbar */
+        left: 2rem;
+        z-index: 1100;
+        background: #22304a;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 54px;
+        height: 54px;
+        box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+        font-size: 1.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #2a365d;
+    }
+
+    .sidebar-toggle-btn.shifted {
+        transform: translateX(340px);
+        /* Move button with sidebar */
+    }
+
+    /* Carousel Styles */
+    .bottom-carousel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+        padding: 0 0 1.5rem 1.5rem;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .bottom-carousel.hidden {
+        transform: translateY(110%);
+    }
+
+    /* Animation for carousel entry */
+    @keyframes slideInUp {
+        from {
+            transform: translateY(110%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    .carousel-entry {
+        animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .carousel-track {
+        display: flex;
+        gap: 0.8rem;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        pointer-events: all;
+    }
+
+    .carousel-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .carousel-card {
+        flex: 0 0 220px;
+        background: rgba(34, 48, 74, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: #fff;
+        border-radius: 1rem;
+        padding: 0.7rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .carousel-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .carousel-card img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 0.7rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .carousel-card h3 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin: 0 0 0.2rem 0;
+    }
+
+    .carousel-card p {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    .carousel-card .price {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #ff914d;
+        margin-top: 0.4rem;
+    }
+
+    .carousel-hide-btn {
+        position: absolute;
+        top: -10px;
+        right: 2rem;
+        background: rgba(34, 48, 74, 0.9);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 1.5rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1002;
+        pointer-events: all;
+        transition: background 0.2s, opacity 0.3s;
+    }
+
+    .carousel-hide-btn.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Button to show the carousel */
+    .show-carousel-btn {
+        position: fixed;
+        bottom: 108px;
+        /* Positioned above the chatbot button */
+        right: 32px;
+        /* Aligned with the chatbot button */
+        z-index: 1000;
+        background: #22304a;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 54px;
+        height: 54px;
+        box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+        font-size: 1.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: background 0.2s, opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+    }
+
+    .show-carousel-btn.visible {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: all;
+    }
+
+    .show-carousel-btn:hover {
+        background: #a8122b;
+    }
+
+    @media (max-width: 600px) {
+        .sidebar-float {
+            width: 90vw;
+            padding: 1.2rem 1rem;
+        }
+
+        .sidebar-toggle-btn {
+            left: 1rem;
+            top: calc(var(--navbar-height) + 1rem);
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+        }
+
+        .sidebar-toggle-btn.shifted {
+            opacity: 0;
+            pointer-events: none;
+            /* Hide button on mobile when open */
+        }
+
+        .bottom-carousel {
+            padding: 0 0 1rem 1rem;
+        }
+
+        .carousel-card {
+            flex: 0 0 180px;
+        }
+
+        .show-carousel-btn {
+            bottom: 92px;
+            /* Adjusted for mobile */
+            right: 22px;
+            width: 48px;
+            height: 48px;
+        }
+    }
+
+    /* Chatbot Styles inspired by the new design */
+    #chatbot-toggle {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        z-index: 9999;
+        background: #eb3452;
+        /* Orange icon like in the image */
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        box-shadow: 0 4px 16px rgba(40, 40, 80, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    #chatbot-toggle:hover {
+        transform: scale(1.1);
+    }
+
+    #restaurant-chatbot {
+        display: none;
+        position: fixed;
+        bottom: 110px;
+        /* Positioned right above the icon */
+        right: 32px;
+        width: 360px;
+        max-width: 90vw;
+        background: #1E1E1E;
+        /* Dark background */
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 450px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .chatbot-header {
+        background: #D90429;
+        /* Red header */
+        color: #fff;
+        padding: 0.8rem 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    #chatbot-close {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    #chatbot-messages {
+        flex: 1 1 auto;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .chat-bubble {
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+
+    .bot-message {
+        align-self: flex-start;
+        background: #000;
+        color: #fff;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background: #333;
+        color: #fff;
+    }
+    
+    .bot-message.error {
+        background: #D90429;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    #chatbot-form {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #1E1E1E;
+    }
+
+    #chatbot-input {
+        flex: 1 1 auto;
+        border: none;
+        background: #fff;
+        border-radius: 20px;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        margin-right: 0.8rem;
+        outline: none;
+        color: #000;
+    }
+
+    #chatbot-send {
+        background: #D90429;
+        /* Red send button */
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    /* Hide the previous modal implementation */
+    .chatbot-toggle-btn,
+    .chatbot-modal {
+        display: none;
+    }
+</style>
+
+<!-- Bouton flottant pour ouvrir la sidebar -->
+<button class="sidebar-toggle-btn" id="openSidebarBtn" title="Ouvrir les filtres ou résultats">
+    <span>&#9776;</span>
+</button>
+
+<!-- Sidebar latérale masquée par défaut -->
+<div class="sidebar-float" id="sidebarFloat">
+    <button class="close-btn" id="closeSidebarBtn" title="Fermer">&times;</button>
+    <h2>Filtres & Résultats</h2>
+    <div class="sidebar-content">
+        <p>Ici tu pourras mettre tes filtres, résultats, ou toute autre information utile.</p>
+        <ul style="margin-top:1.5rem;opacity:0.8;">
+            <li>• Filtres de recherche</li>
+            <li>• Liste des restaurants</li>
+            <li>• Détails d'un restaurant</li>
+            <li>• ...</li>
+        </ul>
+    </div>
+    <div class="sidebar-footer">Culturo &copy; 2024</div>
+</div>
+
+<div id="map"></div>
+
+<!-- Carousel flottant en bas de page -->
+<div class="bottom-carousel" id="bottomCarousel">
+    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Masquer le carrousel">&times;</button>
+    <div class="carousel-track" id="carouselTrack">
+        <!-- Les cartes de restaurant seront injectées ici par JS -->
+    </div>
+</div>
+
+<!-- Bouton pour réafficher le carrousel -->
+<button class="show-carousel-btn" id="showCarouselBtn" title="Afficher les restaurants">
+    <i class="fa-solid fa-utensils"></i>
+</button>
+
+<!-- Floating Chatbot Icon and Chat Window -->
+<button id="chatbot-toggle" aria-label="Open Chatbot">
+    <i class="fas fa-comments"></i>
+</button>
+<div id="restaurant-chatbot">
+    <div class="chatbot-header">
+        <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
+        <button id="chatbot-close" aria-label="Close Chatbot">&times;</button>
+    </div>
+    <div id="chatbot-messages">
+        <div class="chat-bubble bot-message">
+            Bonjour ! Comment puis-je vous aider à trouver votre prochain restaurant ? Je peux vous recommander des restaurants selon vos préférences de cuisine, de budget ou de région en France.
+        </div>
+    </div>
+    <form id="chatbot-form">
+        <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off">
+        <button id="chatbot-send" type="submit"><i class="fas fa-paper-plane"></i></button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Map Initialization
+        const map = L.map('map').setView([48.85, 2.35], 5); // Default view
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        let markers = [];
+
+        // Function to update the map with new restaurants
+        function updateMap(restaurants) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            if (!restaurants || restaurants.length === 0) return;
+
+            restaurants.forEach(rest => {
+                const marker = L.marker([rest.latitude, rest.longitude]).addTo(map);
+                marker.bindPopup(`
+                    <div style='min-width:180px; font-family: sans-serif;'>
+                        <img src='${rest.img}' alt='Image de ${rest.name}' style='width:100%;height:90px;object-fit:cover;border-radius:0.5rem;margin-bottom:0.5rem;'>
+                        <b style='font-size:1.1em;'>${rest.name}</b><br>
+                        <span style='color:#4a5568;font-size:0.9em;'>${rest.cuisine} - ${rest.location}</span><br>
+                        <span style='color:#4a5568;font-size:0.9em;'>Prix: ${rest.price_range} - Note: ${rest.rating}</span>
+                    </div>
+                `);
+                markers.push(marker);
+            });
+
+            // Center map on the first result
+            map.setView([restaurants[0].latitude, restaurants[0].longitude], 12);
+        }
+
+        // Function to update the carousel with new restaurants
+        function updateCarousel(restaurants) {
+            const carouselTrack = document.getElementById('carouselTrack');
+            if (!restaurants || restaurants.length === 0) {
+                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucun restaurant trouvé pour le moment.</p>";
+                return;
+            }
+
+            carouselTrack.innerHTML = restaurants.map(r => {
+                return `
+                <div class="carousel-card" onclick="window.open('/restaurants/detail/${encodeURIComponent(r.name)}/', '_blank')">
+                    <img src="${r.img}" alt="Image de ${r.name}">
+                    <h3>${r.name}</h3>
+                    <p>${r.cuisine} - ${r.location}</p>
+                    <div class="price">${r.price_range} - Note: ${r.rating}</div>
+                </div>
+            `}).join('');
+        }
+
+        // Sidebar logic
+        const sidebar = document.getElementById('sidebarFloat');
+        const openSidebarBtn = document.getElementById('openSidebarBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.add('open'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+
+        // Carousel hide/show logic
+        const carouselContainer = document.getElementById('bottomCarousel');
+        const showCarouselBtn = document.getElementById('showCarouselBtn');
+        const hideCarouselBtn = document.getElementById('hideCarouselBtn');
+
+        carouselContainer.classList.add('carousel-entry'); // Initial animation
+        hideCarouselBtn.addEventListener('click', () => {
+            carouselContainer.classList.add('hidden');
+            showCarouselBtn.classList.add('visible');
+        });
+        showCarouselBtn.addEventListener('click', () => {
+            carouselContainer.classList.remove('hidden');
+            showCarouselBtn.classList.remove('visible');
+        });
+
+        // Chatbot Logic
+        const toggle = document.getElementById('chatbot-toggle');
+        const chatbot = document.getElementById('restaurant-chatbot');
+        const closeBtnChatbot = document.getElementById('chatbot-close');
+        const chatForm = document.getElementById('chatbot-form');
+        const chatInput = document.getElementById('chatbot-input');
+        const chatBox = document.getElementById('chatbot-messages');
+        
+        // Initialiser l'historique du chat avec le message de bienvenue
+        const welcomeMessage = document.querySelector('.chat-bubble.bot-message').textContent.trim();
+        let chatHistory = [
+            { role: 'model', content: welcomeMessage }
+        ];
+        
+        console.log('Historique initial du chat:', chatHistory);
+
+        toggle.addEventListener('click', () => {
+            chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
+        });
+
+        closeBtnChatbot.addEventListener('click', () => {
+            chatbot.style.display = 'none';
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMsg = chatInput.value.trim();
+            if (!userMsg) return;
+
+            try {
+                console.log('Envoi du message utilisateur:', userMsg);
+                console.log('Historique de conversation actuel:', JSON.stringify(chatHistory));
+                
+                // Display user message
+                const userDiv = document.createElement('div');
+                userDiv.className = 'chat-bubble user-message';
+                userDiv.textContent = userMsg;
+                chatBox.appendChild(userDiv);
+                chatInput.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+                chatHistory.push({ role: 'user', content: userMsg });
+
+                // Call restaurant API
+                console.log('Appel de l\'API restaurant...');
+                const response = await fetch("{% url 'restaurants:restaurant_chatbot_api' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Réponse de l\'API:', data);
+
+                // Filtre le JSON technique de la réponse
+                let botMsg = data.message;
+                botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                console.log('Message filtré du bot:', botMsg);
+
+                // Affiche toujours la réponse conversationnelle du bot
+                if (botMsg && botMsg.trim()) {
+                    const botDiv = document.createElement('div');
+                    botDiv.className = 'chat-bubble bot-message';
+                    botDiv.textContent = botMsg.trim();
+                    chatBox.appendChild(botDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                } else {
+                    console.warn('Message du bot vide après filtrage');
+                }
+                
+                chatHistory.push({ role: 'model', content: data.message });
+
+                // Affiche les recommandations seulement si elles existent
+                if (data.restaurants && data.restaurants.length > 0) {
+                    console.log('Mise à jour de la carte et du carrousel avec', data.restaurants.length, 'restaurants');
+                    updateMap(data.restaurants);
+                    updateCarousel(data.restaurants);
+                    // Rendre le carrousel visible s'il ne l'est pas déjà
+                    carouselContainer.classList.remove('hidden');
+                    showCarouselBtn.classList.remove('visible');
+                } else {
+                    console.warn('Aucun restaurant reçu dans la réponse');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'interaction avec le chatbot:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message error';
+                errorDiv.textContent = 'Désolé, une erreur est survenue. Veuillez réessayer.';
+                chatBox.appendChild(errorDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+
+        // --- Initial Load ---
+        async function fetchInitialRestaurants() {
+            // Affiche un état de chargement
+            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Recherche de recommandations...</p>";
+
+            // Utiliser un historique initial simple
+            const initialHistory = [{ role: 'user', content: 'Donne-moi des recommandations de restaurants populaires en France.' }];
+            console.log('Historique initial pour la requête:', JSON.stringify(initialHistory));
+
+            try {
+                console.log('Appel initial à l\'API restaurant...');
+                const response = await fetch("{% url 'restaurants:restaurant_chatbot_api' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: initialHistory })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Réponse initiale de l\'API:', data);
+
+                if (data.restaurants && data.restaurants.length > 0) {
+                    console.log('Mise à jour initiale de la carte et du carrousel avec', data.restaurants.length, 'restaurants');
+                    updateMap(data.restaurants);
+                    updateCarousel(data.restaurants);
+                    // Rendre le carrousel visible
+                    carouselContainer.classList.remove('hidden');
+                    showCarouselBtn.classList.remove('visible');
+                    
+                    // Mettre à jour l'historique du chat avec la conversation initiale
+                    chatHistory = [
+                        { role: 'model', content: welcomeMessage },
+                        { role: 'user', content: initialHistory[0].content },
+                        { role: 'model', content: data.message }
+                    ];
+                    console.log('Historique du chat après réponse initiale:', JSON.stringify(chatHistory));
+                    
+                    // Afficher la réponse du bot
+                    let botMsg = data.message;
+                    botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                    
+                    if (botMsg && botMsg.trim()) {
+                        const botDiv = document.createElement('div');
+                        botDiv.className = 'chat-bubble bot-message';
+                        botDiv.textContent = botMsg.trim();
+                        chatBox.appendChild(botDiv);
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                } else {
+                    console.warn('Aucun restaurant reçu dans la réponse initiale');
+                    // Gère le cas où aucun restaurant n'est retourné au départ
+                    updateCarousel([]); // Affiche le message "Aucun restaurant trouvé"
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement initial des restaurants:", error);
+                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Erreur de chargement des restaurants.</p>";
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message error';
+                errorDiv.textContent = 'Désolé, une erreur est survenue lors du chargement des recommandations initiales. Veuillez me poser une question pour obtenir des recommandations.';
+                chatBox.appendChild(errorDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // Lance la récupération automatique au chargement de la page
+        fetchInitialRestaurants();
+    });
+</script>
+{% endblock %}
