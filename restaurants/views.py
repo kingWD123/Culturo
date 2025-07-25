@@ -64,25 +64,25 @@ def restaurant_chatbot_api(request):
             history = data.get("history", [])
 
             system_prompt = (
-                "Tu es un assistant spécialisé dans les recommandations de restaurants. "
-                "Pose des questions pour comprendre :\n"
-                "- La région ou ville en France où l'utilisateur souhaite manger\n"
-                "- Le type de cuisine recherché (ex : italienne, française, japonaise)\n"
-                "- Le budget (ex : économique, moyen, luxe)\n"
-                "- L'ambiance recherchée (ex : romantique, familial, branché)\n"
-                "Quand tu as assez d'informations, génère le JSON Qloo à la fin de ta réponse, entre balises ```json et ``` "
-                "Le JSON doit être STRICTEMENT valide, conforme à la norme JSON : toutes les clés et valeurs doivent être entourées de guillemets doubles, aucune virgule en trop, aucune syntaxe Python, pas de commentaires. "
-                "Exemple strictement valide :\n"
+                "You are an assistant specialized in restaurant recommendations. "
+                "Ask questions to understand:\n"
+                "- The region or city in France where the user wants to eat\n"
+                "- The type of cuisine sought (e.g., Italian, French, Japanese)\n"
+                "- The budget (e.g., economical, medium, luxury)\n"
+                "- The desired atmosphere (e.g., romantic, family-friendly, trendy)\n"
+                "When you have enough information, generate the Qloo JSON at the end of your response, between ```json and ``` tags "
+                "The JSON must be STRICTLY valid, compliant with JSON standard: all keys and values must be surrounded by double quotes, no extra commas, no Python syntax, no comments. "
+                "Strictly valid example:\n"
                 '{\n'
                 '  "filter.type": "urn:entity:place",\n'
                 '  "filter.location.query": "Paris",\n'
                 '  "signal.interests.tags": ["restaurant", "italian"]\n'
                 '}\n'
-                "N'invente pas de tags ou de paramètres si l'utilisateur ne les a pas donnés.\n"
-                "L'utilisateur n'est pas obligé de répondre à toutes les questions.\n"
-                "Pose les questions les unes après les autres, pour ne pas submerger l'utilisateur.\n"
-                "N'évoque jamais les paramètres Qloo dans tes réponses.\n"
-                "Adapte tes questions pour obtenir ces informations de façon naturelle."
+                "Don't invent tags or parameters if the user hasn't provided them.\n"
+                "The user is not required to answer all questions.\n"
+                "Ask questions one by one, so as not to overwhelm the user.\n"
+                "Never mention Qloo parameters in your responses.\n"
+                "Adapt your questions to obtain this information naturally."
             )
 
             try:
@@ -97,7 +97,7 @@ def restaurant_chatbot_api(request):
             except Exception as e:
                 print(f"Gemini API Error: {type(e).__name__}: {e}")
                 return JsonResponse({
-                    "message": "Désolé, une erreur est survenue. Veuillez réessayer.",
+                    "message": "Sorry, an error occurred. Please try again.",
                     "restaurants": []
                 })
 
@@ -165,7 +165,7 @@ def restaurant_chatbot_api(request):
                         properties = entity.get("properties", {})
                         
                         # Extraction de la cuisine à partir des mots-clés
-                        cuisine = 'Non spécifiée'
+                        cuisine = 'Not specified'
                         if 'keywords' in properties and len(properties['keywords']) > 0:
                             # Parcourir les mots-clés pour trouver un type de cuisine
                             cuisine_keywords = ['italian', 'french', 'japanese', 'chinese', 'indian', 'mexican', 'thai', 'spanish', 'greek', 'american', 'vietnamese', 'korean', 'lebanese', 'turkish']
@@ -176,13 +176,13 @@ def restaurant_chatbot_api(request):
                                     break
                             
                             # Si aucun mot-clé de cuisine n'a été trouvé, utiliser le premier mot-clé
-                            if cuisine == 'Non spécifiée' and len(properties['keywords']) > 0:
+                            if cuisine == 'Not specified' and len(properties['keywords']) > 0:
                                 cuisine = properties['keywords'][0]['name'].capitalize()
                         
                         restaurant["cuisine"] = cuisine
                         
                         # Extraction de l'adresse
-                        restaurant["location"] = properties.get("address", "Adresse non disponible")
+                        restaurant["location"] = properties.get("address", "Address not available")
                         
                         # Extraction du prix
                         price_level = properties.get("price_level", 2)
@@ -193,7 +193,7 @@ def restaurant_chatbot_api(request):
                         
                         # Génération d'une description
                         location_query = qloo_params.get("filter.location.query", "France")
-                        restaurant["description"] = f"Un excellent restaurant {cuisine.lower()} situé à {location_query}."
+                        restaurant["description"] = f"An excellent {cuisine.lower()} restaurant located in {location_query}."
                         
                         # Coordonnées par défaut (à améliorer avec de vraies coordonnées)
                         location_coords = {
@@ -231,18 +231,18 @@ def restaurant_chatbot_api(request):
                 "restaurants": restaurants
             })
 
-        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+        return JsonResponse({"error": "Method not allowed"}, status=405)
     
     except Exception as e:
         print(f"Unexpected error in restaurant_chatbot_api: {type(e).__name__}: {e}")
         return JsonResponse({
-            "message": "Désolé, une erreur est survenue. Veuillez réessayer.",
+            "message": "Sorry, an error occurred. Please try again.",
             "restaurants": []
         }, status=500)
 
 # Fonction pour générer des données fictives de restaurants
 def generate_mock_restaurants(count=3):
-    cuisines = ['Française', 'Italienne', 'Japonaise', 'Mexicaine', 'Indienne', 'Thaïlandaise']
+    cuisines = ['French', 'Italian', 'Japanese', 'Mexican', 'Indian', 'Thai']
     locations = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Strasbourg']
     price_ranges = ['€', '€€', '€€€', '€€€€']
     
@@ -262,17 +262,13 @@ def generate_mock_restaurants(count=3):
         location = random.choice(locations)
         base_coords = city_coords.get(location, (48.8566, 2.3522))
         
-        # Ajouter une petite variation aux coordonnées
-        lat_variation = random.uniform(-0.02, 0.02)
-        lng_variation = random.uniform(-0.02, 0.02)
-        
         restaurant = {
             'name': f"Restaurant {chr(65+i)}",
             'cuisine': cuisine,
             'location': location,
             'price_range': random.choice(price_ranges),
             'rating': round(random.uniform(3.5, 5.0), 1),
-            'description': f"Un excellent restaurant {cuisine.lower()} situé à {location}.",
+            'description': f"An excellent {cuisine.lower()} restaurant located in {location}.",
             'latitude': base_coords[0] + lat_variation,
             'longitude': base_coords[1] + lng_variation,
             'img': get_unsplash_image(f"{cuisine} food restaurant")
@@ -290,7 +286,7 @@ def restaurant_detail(request, restaurant_name):
     restaurant_name = restaurant_name.replace('-', ' ').title()
     
     # Génération d'un restaurant fictif
-    cuisines = ['Française', 'Italienne', 'Japonaise', 'Mexicaine', 'Indienne', 'Thaïlandaise']
+    cuisines = ['French', 'Italian', 'Japanese', 'Mexican', 'Indian', 'Thai']
     locations = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Strasbourg']
     
     restaurant = {
@@ -299,20 +295,25 @@ def restaurant_detail(request, restaurant_name):
         'location': random.choice(locations),
         'price_range': random.choice(['€', '€€', '€€€', '€€€€']),
         'rating': round(random.uniform(3.5, 5.0), 1),
-        'description': f"Un excellent restaurant situé à {random.choice(locations)}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        'description': f"An excellent restaurant located in {random.choice(locations)}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         'img': get_unsplash_image(f"{restaurant_name} restaurant"),
         'address': f"{random.randint(1, 100)} rue de {random.choice(['Paris', 'Lyon', 'Bordeaux', 'Lille'])}, {random.randint(10000, 99999)} France",
         'phone': f"+33 {random.randint(1, 9)} {random.randint(10, 99)} {random.randint(10, 99)} {random.randint(10, 99)} {random.randint(10, 99)}",
         'website': f"https://www.{restaurant_name.lower().replace(' ', '')}.fr",
         'hours': {
-            'Lundi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Mardi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Mercredi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Jeudi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Vendredi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Samedi': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
-            'Dimanche': 'Fermé' if random.choice([True, False]) else f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00"
+            'Monday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Tuesday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Wednesday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Thursday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Friday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Saturday': f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00",
+            'Sunday': 'Closed' if random.choice([True, False]) else f"{random.randint(11, 12)}:00 - {random.randint(21, 23)}:00"
         }
     }
     
     return render(request, 'restaurant/restaurant_detail.html', {'restaurant': restaurant})
+
+# Additional mock data for testing
+def get_mock_restaurant_data():
+    cuisines = ['French', 'Italian', 'Japanese', 'Mexican', 'Indian', 'Thai']
+    return cuisines

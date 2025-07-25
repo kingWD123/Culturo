@@ -190,9 +190,9 @@
     <section class="cinema-section" id="now-showing">
         <h2 class="section-title">Now Showing</h2>
         <div class="cinema-movies-grid"></div>
-        <!-- Debug: Afficher les données brutes -->
+        <!-- Debug: Display raw data -->
         <div id="debug-recommendations" style="display:none; color: white; background: #1a1a1a; padding: 10px; margin: 10px 0; border-radius: 5px;">
-            <h4>Données brutes des recommandations:</h4>
+            <h4>Raw recommendation data:</h4>
             <pre>{{ recommendations|safe }}</pre>
         </div>
         
@@ -200,28 +200,28 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('=== DEBUG: Début du chargement des recommandations ===');
+                console.log('=== DEBUG: Starting recommendation loading ===');
                 var initialElement = document.getElementById('initial-recommendations');
                 if (!initialElement) {
-                    console.error('❌ ERREUR: Élément avec l\'ID "initial-recommendations" introuvable');
+                    console.error('❌ ERROR: Element with ID "initial-recommendations" not found');
                     return;
                 }
                 
-                console.log('✅ Données brutes du script JSON:', initialElement.textContent);
+                console.log('✅ Raw JSON script data:', initialElement.textContent);
                 
                 var recommendations = [];
                 try {
                     recommendations = JSON.parse(initialElement.textContent);
-                    console.log('✅ Données parsées avec succès:', recommendations);
+                    console.log('✅ Data parsed successfully:', recommendations);
                     
-                    // Afficher des informations détaillées sur chaque film
+                    // Display detailed information for each movie
                     if (recommendations && Array.isArray(recommendations)) {
-                        console.log(`📊 Nombre de recommandations: ${recommendations.length}`);
+                        console.log(`📊 Number of recommendations: ${recommendations.length}`);
                         recommendations.forEach((film, index) => {
-                            console.log(`\n🎬 Film #${index + 1}:`);
-                            console.log(`   Nom: ${film.name || 'Non spécifié'}`);
-                            console.log(`   ID: ${film.entity_id || 'Non spécifié'}`);
-                            console.log('   Propriétés image:', {
+                            console.log(`\n🎬 Movie #${index + 1}:`);
+                            console.log(`   Name: ${film.name || 'Not specified'}`);
+                            console.log(`   ID: ${film.entity_id || 'Not specified'}`);
+                            console.log('   Image properties:', {
                                 'film.image': film.image,
                                 'film.image_url': film.image_url,
                                 'film.properties.image': film.properties?.image,
@@ -229,11 +229,11 @@
                             });
                         });
                     } else {
-                        console.warn('⚠️ Les recommandations ne sont pas un tableau:', recommendations);
+                        console.warn('⚠️ Recommendations is not an array:', recommendations);
                     }
                 } catch (e) {
-                    console.error('❌ ERREUR lors de l\'analyse des recommandations:', e);
-                    console.error('Contenu brut des recommandations:', initialElement.textContent);
+                    console.error('❌ ERROR parsing recommendations:', e);
+                    console.error('Raw recommendation content:', initialElement.textContent);
                     return;
                 }
                 
@@ -242,7 +242,7 @@
                     updateNowShowing(recommendations);
                 } else {
                     console.error('Recommendations is not an array or is empty:', recommendations);
-                    // Afficher un message d'erreur à l'utilisateur
+                    // Display error message to user
                     const grid = document.querySelector('.cinema-movies-grid');
                     if (grid) {
                         grid.innerHTML = '<div class="error-message">Unable to load recommendations. Please try again later.</div>';
@@ -315,7 +315,7 @@
 {% block extra_js %}
 <script src="{% static 'js/culturo.js' %}"></script>
 <script>
-    console.log('JS chatbot chargé');
+    console.log('JS chatbot loaded');
     document.addEventListener('DOMContentLoaded', function () {
         var toggle = document.getElementById('chatbot-toggle');
         var chatbot = document.getElementById('cinema-chatbot');
@@ -331,9 +331,9 @@
             });
         }
 
-        // --- Affichage dynamique des recommandations cinéma ---
-        // On suppose que le chatbot JS envoie les requêtes à /cinema_chatbot_api et reçoit la réponse JSON
-        // On intercepte la soumission du formulaire du chatbot pour gérer l'affichage
+        // --- Dynamic cinema recommendations display ---
+        // Assumes chatbot JS sends requests to /cinema_chatbot_api and receives JSON response
+        // Intercepts chatbot form submission to handle display
         var chatbotForm = document.getElementById('chatbot-form');
         var chatbotInput = document.getElementById('chatbot-input');
         var chatbotMessages = document.getElementById('chatbot-messages');
@@ -346,7 +346,7 @@
                 e.preventDefault();
                 var userMsg = chatbotInput.value.trim();
                 if (!userMsg) return;
-                // Affiche le message utilisateur
+                // Display user message
                 var userDiv = document.createElement('div');
                 userDiv.style.alignSelf = 'flex-end';
                 userDiv.style.background = '#ffecd2';
@@ -358,28 +358,28 @@
                 chatbotMessages.appendChild(userDiv);
                 chatbotInput.value = '';
                 chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-                // Ajoute au chatHistory
+                // Add to chatHistory
                 chatHistory.push({ role: 'user', content: userMsg });
-                // Affiche le spinner de chargement
+                // Show loading spinner
                 if (recLoading) recLoading.style.display = 'flex';
-                // Appel API
+                // API call
                 var response = await fetch('/cinema_chatbot_api', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ history: chatHistory })
                 });
                 var data = await response.json();
-                console.log('Réponse backend:', data);
-                // Masque le spinner de chargement
+                console.log('Backend response:', data);
+                // Hide loading spinner
                 if (recLoading) recLoading.style.display = 'none';
-                // Affiche la réponse du bot
-                console.log('SCRIPT INLINE TEMPLATE - MESSAGE BOT:', data.message);
+                // Display bot response
+                console.log('INLINE TEMPLATE SCRIPT - BOT MESSAGE:', data.message);
                 var botDiv = document.createElement('div');
                 botDiv.style.alignSelf = 'flex-start';
                 var message = data.message;
                 var trimmed = message && message.trim();
                 if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
-                  // Ne rien afficher du tout
+                  // Don't display anything
                 } else {
                   botDiv.textContent = message;
                   botDiv.style.borderRadius = '12px';
@@ -389,11 +389,11 @@
                   chatbotMessages.appendChild(botDiv);
                 }
                 chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-                // Ajoute au chatHistory
+                // Add to chatHistory
                 chatHistory.push({ role: 'model', content: data.message });
-                // Si recommandations présentes et done=true, redirige vers la page de résultats
+                // If recommendations present and done=true, redirect to results page
                 if (data.recommendations && data.recommendations.length && data.done) {
-                    console.log('Redirection vers la page de résultats');
+                    console.log('Redirecting to results page');
                     // window.location.href = '/cinema_recommendations_result/';
                 }
             });

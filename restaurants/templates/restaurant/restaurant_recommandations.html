@@ -453,21 +453,21 @@
     }
 </style>
 
-<!-- Bouton flottant pour ouvrir la sidebar -->
-<button class="sidebar-toggle-btn" id="openSidebarBtn" title="Ouvrir les filtres ou résultats">
+<!-- Floating button to open sidebar -->
+<button class="sidebar-toggle-btn" id="openSidebarBtn" title="Open filters or results">
     <span>&#9776;</span>
 </button>
 
-<!-- Sidebar latérale masquée par défaut -->
+<!-- Sidebar hidden by default -->
 <div class="sidebar-float" id="sidebarFloat">
-    <button class="close-btn" id="closeSidebarBtn" title="Fermer">&times;</button>
-    <h2>Filtres & Résultats</h2>
+    <button class="close-btn" id="closeSidebarBtn" title="Close">&times;</button>
+    <h2>Filters & Results</h2>
     <div class="sidebar-content">
-        <p>Ici tu pourras mettre tes filtres, résultats, ou toute autre information utile.</p>
+        <p>Here you can put your filters, results, or any other useful information.</p>
         <ul style="margin-top:1.5rem;opacity:0.8;">
-            <li>• Filtres de recherche</li>
-            <li>• Liste des restaurants</li>
-            <li>• Détails d'un restaurant</li>
+            <li>• Search filters</li>
+            <li>• Restaurant list</li>
+            <li>• Restaurant details</li>
             <li>• ...</li>
         </ul>
     </div>
@@ -476,16 +476,16 @@
 
 <div id="map"></div>
 
-<!-- Carousel flottant en bas de page -->
+<!-- Floating carousel at bottom of page -->
 <div class="bottom-carousel" id="bottomCarousel">
-    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Masquer le carrousel">&times;</button>
+    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Hide carousel">&times;</button>
     <div class="carousel-track" id="carouselTrack">
-        <!-- Les cartes de restaurant seront injectées ici par JS -->
+        <!-- Restaurant cards will be injected here by JS -->
     </div>
 </div>
 
-<!-- Bouton pour réafficher le carrousel -->
-<button class="show-carousel-btn" id="showCarouselBtn" title="Afficher les restaurants">
+<!-- Button to show carousel again -->
+<button class="show-carousel-btn" id="showCarouselBtn" title="Show restaurants">
     <i class="fa-solid fa-utensils"></i>
 </button>
 
@@ -500,7 +500,7 @@
     </div>
     <div id="chatbot-messages">
         <div class="chat-bubble bot-message">
-            Bonjour ! Comment puis-je vous aider à trouver votre prochain restaurant ? Je peux vous recommander des restaurants selon vos préférences de cuisine, de budget ou de région en France.
+            Hello! How can I help you find your next restaurant? I can recommend restaurants based on your cuisine, budget, or region preferences in France.
         </div>
     </div>
     <form id="chatbot-form">
@@ -548,17 +548,17 @@
         function updateCarousel(restaurants) {
             const carouselTrack = document.getElementById('carouselTrack');
             if (!restaurants || restaurants.length === 0) {
-                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucun restaurant trouvé pour le moment.</p>";
+                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>No restaurants found at the moment.</p>";
                 return;
             }
 
             carouselTrack.innerHTML = restaurants.map(r => {
                 return `
                 <div class="carousel-card" onclick="window.open('/restaurants/detail/${encodeURIComponent(r.name)}/', '_blank')">
-                    <img src="${r.img}" alt="Image de ${r.name}">
+                    <img src="${r.img}" alt="Image of ${r.name}">
                     <h3>${r.name}</h3>
                     <p>${r.cuisine} - ${r.location}</p>
-                    <div class="price">${r.price_range} - Note: ${r.rating}</div>
+                    <div class="price">${r.price_range} - Rating: ${r.rating}</div>
                 </div>
             `}).join('');
         }
@@ -594,13 +594,13 @@
         const chatInput = document.getElementById('chatbot-input');
         const chatBox = document.getElementById('chatbot-messages');
         
-        // Initialiser l'historique du chat avec le message de bienvenue
+        // Initialize chat history with welcome message
         const welcomeMessage = document.querySelector('.chat-bubble.bot-message').textContent.trim();
         let chatHistory = [
             { role: 'model', content: welcomeMessage }
         ];
         
-        console.log('Historique initial du chat:', chatHistory);
+        console.log('Initial chat history:', chatHistory);
 
         toggle.addEventListener('click', () => {
             chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
@@ -616,8 +616,8 @@
             if (!userMsg) return;
 
             try {
-                console.log('Envoi du message utilisateur:', userMsg);
-                console.log('Historique de conversation actuel:', JSON.stringify(chatHistory));
+                console.log('Sending user message:', userMsg);
+                console.log('Current conversation history:', JSON.stringify(chatHistory));
                 
                 // Display user message
                 const userDiv = document.createElement('div');
@@ -629,7 +629,7 @@
                 chatHistory.push({ role: 'user', content: userMsg });
 
                 // Call restaurant API
-                console.log('Appel de l\'API restaurant...');
+                console.log('Calling restaurant API...');
                 const response = await fetch("{% url 'restaurants:restaurant_chatbot_api' %}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -637,18 +637,18 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
+                    throw new Error(`HTTP Error: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Réponse de l\'API:', data);
+                console.log('API response:', data);
 
-                // Filtre le JSON technique de la réponse
+                // Filter technical JSON from response
                 let botMsg = data.message;
                 botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
-                console.log('Message filtré du bot:', botMsg);
+                console.log('Filtered bot message:', botMsg);
 
-                // Affiche toujours la réponse conversationnelle du bot
+                // Always display conversational bot response
                 if (botMsg && botMsg.trim()) {
                     const botDiv = document.createElement('div');
                     botDiv.className = 'chat-bubble bot-message';
@@ -656,27 +656,27 @@
                     chatBox.appendChild(botDiv);
                     chatBox.scrollTop = chatBox.scrollHeight;
                 } else {
-                    console.warn('Message du bot vide après filtrage');
+                    console.warn('Empty bot message after filtering');
                 }
                 
                 chatHistory.push({ role: 'model', content: data.message });
 
-                // Affiche les recommandations seulement si elles existent
+                // Display recommendations only if they exist
                 if (data.restaurants && data.restaurants.length > 0) {
-                    console.log('Mise à jour de la carte et du carrousel avec', data.restaurants.length, 'restaurants');
+                    console.log('Updating map and carousel with', data.restaurants.length, 'restaurants');
                     updateMap(data.restaurants);
                     updateCarousel(data.restaurants);
-                    // Rendre le carrousel visible s'il ne l'est pas déjà
+                    // Make carousel visible if it's not already
                     carouselContainer.classList.remove('hidden');
                     showCarouselBtn.classList.remove('visible');
                 } else {
-                    console.warn('Aucun restaurant reçu dans la réponse');
+                    console.warn('No restaurants received in response');
                 }
             } catch (error) {
-                console.error('Erreur lors de l\'interaction avec le chatbot:', error);
+                console.error('Error during chatbot interaction:', error);
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-bubble bot-message error';
-                errorDiv.textContent = 'Désolé, une erreur est survenue. Veuillez réessayer.';
+                errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
                 chatBox.appendChild(errorDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
@@ -684,15 +684,15 @@
 
         // --- Initial Load ---
         async function fetchInitialRestaurants() {
-            // Affiche un état de chargement
-            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Recherche de recommandations...</p>";
+            // Display loading state
+            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Searching for recommendations...</p>";
 
-            // Utiliser un historique initial simple
-            const initialHistory = [{ role: 'user', content: 'Donne-moi des recommandations de restaurants populaires en France.' }];
-            console.log('Historique initial pour la requête:', JSON.stringify(initialHistory));
+            // Use simple initial history
+            const initialHistory = [{ role: 'user', content: 'Give me popular restaurant recommendations in France.' }];
+            console.log('Initial history for request:', JSON.stringify(initialHistory));
 
             try {
-                console.log('Appel initial à l\'API restaurant...');
+                console.log('Initial call to restaurant API...');
                 const response = await fetch("{% url 'restaurants:restaurant_chatbot_api' %}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -700,29 +700,29 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
+                    throw new Error(`HTTP Error: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Réponse initiale de l\'API:', data);
+                console.log('Initial API response:', data);
 
                 if (data.restaurants && data.restaurants.length > 0) {
-                    console.log('Mise à jour initiale de la carte et du carrousel avec', data.restaurants.length, 'restaurants');
+                    console.log('Initial update of map and carousel with', data.restaurants.length, 'restaurants');
                     updateMap(data.restaurants);
                     updateCarousel(data.restaurants);
-                    // Rendre le carrousel visible
+                    // Make carousel visible
                     carouselContainer.classList.remove('hidden');
                     showCarouselBtn.classList.remove('visible');
                     
-                    // Mettre à jour l'historique du chat avec la conversation initiale
+                    // Update chat history with initial conversation
                     chatHistory = [
                         { role: 'model', content: welcomeMessage },
                         { role: 'user', content: initialHistory[0].content },
                         { role: 'model', content: data.message }
                     ];
-                    console.log('Historique du chat après réponse initiale:', JSON.stringify(chatHistory));
+                    console.log('Chat history after initial response:', JSON.stringify(chatHistory));
                     
-                    // Afficher la réponse du bot
+                    // Display bot response
                     let botMsg = data.message;
                     botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
                     
@@ -734,23 +734,23 @@
                         chatBox.scrollTop = chatBox.scrollHeight;
                     }
                 } else {
-                    console.warn('Aucun restaurant reçu dans la réponse initiale');
-                    // Gère le cas où aucun restaurant n'est retourné au départ
-                    updateCarousel([]); // Affiche le message "Aucun restaurant trouvé"
+                    console.warn('No restaurants received in initial response');
+                    // Handle case where no restaurants are returned initially
+                    updateCarousel([]); // Display "No restaurants found" message
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement initial des restaurants:", error);
-                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Erreur de chargement des restaurants.</p>";
+                console.error("Error loading initial restaurants:", error);
+                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Error loading restaurants.</p>";
                 
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-bubble bot-message error';
-                errorDiv.textContent = 'Désolé, une erreur est survenue lors du chargement des recommandations initiales. Veuillez me poser une question pour obtenir des recommandations.';
+                errorDiv.textContent = 'Sorry, an error occurred while loading initial recommendations. Please ask me a question to get recommendations.';
                 chatBox.appendChild(errorDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
 
-        // Lance la récupération automatique au chargement de la page
+        // Launch automatic fetch on page load
         fetchInitialRestaurants();
     });
 </script>

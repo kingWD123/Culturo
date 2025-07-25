@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 import requests
 import time
 
+# Configure Gemini
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 
@@ -22,7 +23,7 @@ def home(request):
 
 def CinemaRecommandations(request):
     """Page of cinema recommendations"""
-    print("DEBUG: Début de la vue CinemaRecommandations")
+    print("DEBUG: Start of CinemaRecommandations view")
     
     # Critères par défaut adaptés à l'API Qloo
     params = {
@@ -46,17 +47,17 @@ def CinemaRecommandations(request):
     movie_details = {}
     
     try:
-        print(f"DEBUG: Appel API vers {qloo_url}")
+        print(f"DEBUG: API call to {qloo_url}")
         response = requests.get(qloo_url, headers=headers)
-        print(f"DEBUG: Réponse API - Status: {response.status_code}")
+        print(f"DEBUG: API response - Status: {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
-            print(f"DEBUG: Données brutes de l'API: {data}")
+            print(f"DEBUG: Raw API data: {data}")
             
-            # Vérifier si nous avons des résultats
+            # Check if we have results
             if not data.get("results", {}).get("entities"):
-                print("DEBUG: Aucun résultat trouvé dans la réponse de l'API")
+                print("DEBUG: No results found in API response")
             
             for element in data.get("results", {}).get("entities", []):
                 film = {
@@ -72,13 +73,13 @@ def CinemaRecommandations(request):
                 if film["entity_id"]:
                     movie_details[film["entity_id"]] = film
         else:
-            print(f"DEBUG: Erreur API - Status: {response.status_code}")
-            print(f"DEBUG: Réponse API: {response.text}")
+            print(f"DEBUG: API error - Status: {response.status_code}")
+            print(f"DEBUG: API response: {response.text}")
     except Exception as e:
-        print(f"DEBUG: Exception lors de l'appel API: {str(e)}")
+        print(f"DEBUG: Exception during API call: {str(e)}")
     
-    print(f"DEBUG: Nombre de recommandations: {len(recommendations)}")
-    print(f"DEBUG: Détails des films: {movie_details}")
+    print(f"DEBUG: Number of recommendations: {len(recommendations)}")
+    print(f"DEBUG: Movie details: {movie_details}")
     
     # Stocke tous les détails en session
     request.session['movie_details'] = movie_details
@@ -86,43 +87,43 @@ def CinemaRecommandations(request):
     # Ajout de données de test si aucune recommandation n'est trouvée
     if not recommendations:
         print("\n" + "="*80)
-        print("DEBUG: Aucune recommandation trouvée, utilisation des données de test")
+        print("DEBUG: No recommendations found, using test data")
         print("="*80)
         
-        # Log détaillé des en-têtes de la requête
-        print("\nEn-têtes de la requête:")
+        # Detailed request headers log
+        print("\nRequest headers:")
         for header, value in request.META.items():
             if header.startswith('HTTP_') or header in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
                 print(f"{header}: {value}")
                 
-        # Log de la session
-        print("\nContenu de la session:", dict(request.session))
+        # Session log
+        print("\nSession content:", dict(request.session))
         
-        # Log des paramètres GET
-        print("\nParamètres GET:", dict(request.GET))
+        # GET parameters log
+        print("\nGET parameters:", dict(request.GET))
         
-        # Log des paramètres POST
-        print("\nParamètres POST:", dict(request.POST))
+        # POST parameters log
+        print("\nPOST parameters:", dict(request.POST))
         recommendations = [
             {
-                "name": "Film de test 1",
+                "name": "Test Movie 1",
                 "entity_id": "test1",
                 "properties": {"release_year": "2023"},
-                # Formatage pour correspondre à ce qu'attend le JavaScript
+                # Formatting to match what JavaScript expects
                 "image": {
                     "url": "https://via.placeholder.com/300x450?text=Film+1"
                 },
-                "release_year": "2023"  # Ajouté pour la compatibilité
+                "release_year": "2023"  # Added for compatibility
             },
             {
-                "name": "Film de test 2",
+                "name": "Test Movie 2",
                 "entity_id": "test2",
                 "properties": {"release_year": "2022"},
-                # Formatage pour correspondre à ce qu'attend le JavaScript
+                # Formatting to match what JavaScript expects
                 "image": {
                     "url": "https://via.placeholder.com/300x450?text=Film+2"
                 },
-                "release_year": "2022"  # Ajouté pour la compatibilité
+                "release_year": "2022"  # Added for compatibility
             }
         ]
     
@@ -135,7 +136,7 @@ def CinemaRecommandations(request):
         }
     }
     
-    print(f"DEBUG: Contexte envoyé au template: {context}")
+    print(f"DEBUG: Context sent to template: {context}")
     return render(request, 'users/cinema_recommandations.html', context)
 
 def ArtistsRecommandations(request):
@@ -146,7 +147,7 @@ def EventsRecommandations(request):
     """Page of events recommendations"""
 
 def get_movie_urns_from_titles(titles):
-    """Recherche les URNs ClooAI pour une liste de titres de films."""
+    """Search ClooAI URNs for a list of movie titles."""
     urns = []
     not_found = []
     for title in titles:
@@ -169,7 +170,7 @@ def get_movie_urns_from_titles(titles):
                 not_found.append(title)
             time.sleep(0.2)  # Petite pause pour éviter le rate limit
         except Exception as e:
-            print(f"Erreur lors de la recherche d'URN pour {title}: {e}")
+            print(f"Error searching URN for {title}: {e}")
             not_found.append(title)
     return urns, not_found
 
@@ -180,32 +181,32 @@ def cinema_chatbot_api(request):
         history = data.get("history", [])
 
         system_prompt = (
-            "Tu es un assistant spécialisé dans les recommandations de films via ClooAI. "
-            "Pose des questions adaptatives pour recueillir les informations disponibles. "
-            "L'utilisateur n'est pas obligé de fournir toutes les informations.\n\n"
-            "Questions à poser (une par une, selon les réponses) :\n"
-            "2. Quels genres préfères-tu ? (action, thriller, comédie, etc.) (optionnel)\n"
-            "3. Dans quelle ville/pays te trouves-tu ? (optionnel)\n"
-            "4. Quel est ton âge approximatif ? (optionnel)\n"
-            "5. Quelle période de films préfères-tu ? (années récentes, classiques, etc.) (optionnel)\n"
-            "6. Quelle note minimale souhaites-tu ? (optionnel)\n"
-            "7. Quelle langue préfères-tu ? (optionnel)\n\n"
-            "Quand tu as suffisamment d'informations (au moins 3-4 critères), affiche un résumé en JSON avec seulement les informations fournies :\n"
+            "You are an assistant specialized in movie recommendations via ClooAI. "
+            "Ask adaptive questions to gather available information. "
+            "The user is not required to provide all information.\n\n"
+            "Questions to ask (one by one, according to responses):\n"
+            "2. What genres do you prefer? (action, thriller, comedy, etc.) (optional)\n"
+            "3. In which city/country are you located? (optional)\n"
+            "4. What is your approximate age? (optional)\n"
+            "5. What movie period do you prefer? (recent years, classics, etc.) (optional)\n"
+            "6. What minimum rating do you want? (optional)\n"
+            "7. What language do you prefer? (optional)\n\n"
+            "When you have enough information (at least 3-4 criteria), display a JSON summary with only the provided information:\n"
             '{\n'
-            '  "films_aimes": ["titre1", "titre2"], // seulement si fourni\n'
-            '  "genres": ["action", "thriller"], // seulement si fourni\n'
-            '  "localisation": "Paris", // seulement si fourni\n'
-            '  "age": "18_to_35", // seulement si fourni\n'
-            '  "genre": "male", // seulement si fourni\n'
-            '  "annee_min": 2000, // seulement si fourni\n'
-            '  "annee_max": 2024, // seulement si fourni\n'
-            '  "note_min": 3.5, // seulement si fourni\n'
-            '  "langue": "français" // seulement si fourni\n'
+            '  "films_aimes": ["title1", "title2"], // only if provided\n'
+            '  "genres": ["action", "thriller"], // only if provided\n'
+            '  "localisation": "Paris", // only if provided\n'
+            '  "age": "18_to_35", // only if provided\n'
+            '  "genre": "male", // only if provided\n'
+            '  "annee_min": 2000, // only if provided\n'
+            '  "annee_max": 2024, // only if provided\n'
+            '  "note_min": 3.5, // only if provided\n'
+            '  "langue": "english" // only if provided\n'
             '}\n\n'
-            "Ne propose le résumé JSON que quand tu as au moins quelques informations utiles. "
-            "Fais un petit resume des informations fournis par le user a la fin de son dernier message"
-            "Adapte tes questions selon les réponses précédentes."
-            "Adapte toi à la langue de l'utilisateur, et garde à l'esprit que l'utilisateur est là pour découvrir"
+            "Only propose the JSON summary when you have at least some useful information. "
+            "Make a small summary of the information provided by the user at the end of their last message. "
+            "Adapt your questions according to previous responses. "
+            "Adapt to the user's language, and keep in mind that the user is here to discover"
         )
 
         messages = [{"role": "user", "parts": [system_prompt]}]

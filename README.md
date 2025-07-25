@@ -1,200 +1,200 @@
 # Culturo
 
-Culturo est une plateforme web immersive de recommandations culturelles autour du cinéma, de la musique, des livres, de la gastronomie et des événements culturels, axée sur la découverte d'ambiances, de contextes locaux et d'écosystèmes culturels, sans se limiter à des lieux physiques.
+Culturo is an immersive web platform for cultural recommendations around cinema, music, books, gastronomy and cultural events, focused on discovering atmospheres, local contexts and cultural ecosystems, without being limited to physical places.
 
-## Objectifs
-- Proposer des recommandations culturelles personnalisées et immersives.
-- Associer films et musiques à des ambiances ou contextes culturels locaux.
-- Suggérer des playlists thématiques selon les genres populaires ou les moments.
-- Recommander des livres et documentaires sur l'histoire et la culture locale.
-- Permettre de "voyager" depuis chez soi grâce à des œuvres typiques d'une destination.
-- Offrir un écosystème culturel local enrichi : profils d'artistes, événements, œuvres, conseils de découverte.
+## Objectives
+- Provide personalized and immersive cultural recommendations.
+- Associate films and music with local atmospheres or cultural contexts.
+- Suggest thematic playlists according to popular genres or moments.
+- Recommend books and documentaries on local history and culture.
+- Allow "traveling" from home through works typical of a destination.
+- Offer an enriched local cultural ecosystem: artist profiles, events, works, discovery advice.
 
-## Fonctionnalités principales
-- **Recommandations immersives** : œuvres associées à des ambiances, contextes ou destinations.
-- **Playlists thématiques** : musique, films, lectures selon des thèmes ou genres.
-- **Découverte locale** : livres, documentaires, recettes, artistes, événements par région/pays.
-- **Profils d'artistes** : fiches détaillées d'artistes locaux.
-- **Suggestions personnalisées** : recommandations selon les goûts culturels de l'utilisateur.
-- **Calendrier culturel** : agenda des festivals, spectacles, événements par région/pays.
-- **Conseils de découverte** : idées d'activités culturelles à domicile ou en voyage.
+## Main Features
+- **Immersive recommendations**: works associated with atmospheres, contexts or destinations.
+- **Thematic playlists**: music, films, readings according to themes or genres.
+- **Local discovery**: books, documentaries, recipes, artists, events by region/country.
+- **Artist profiles**: detailed profiles of local artists.
+- **Personalized suggestions**: recommendations according to the user's cultural tastes.
+- **Cultural calendar**: agenda of festivals, shows, events by region/country.
+- **Discovery advice**: ideas for cultural activities at home or while traveling.
 
-## Structure technique
-- Django (backend, modèles, vues, templates)
-- Modèles principaux : UserProfile, Artiste, Œuvre (Film, Musique, Livre, Recette), Événement, Playlist, ConseilCulturel
+## Technical Structure
+- Django (backend, models, views, templates)
+- Main models: UserProfile, Artist, Work (Film, Music, Book, Recipe), Event, Playlist, CulturalAdvice
 
-## Pages principales
-- Accueil immersive (exploration par ambiance, destination, thématique)
-- Profils culturels utilisateurs
-- Fiches artistes/œuvres/événements
-- Playlists thématiques
-- Calendrier culturel
-- Conseils de découverte
+## Main Pages
+- Immersive home page (exploration by atmosphere, destination, theme)
+- User cultural profiles
+- Artist/work/event profiles
+- Thematic playlists
+- Cultural calendar
+- Discovery advice
 
 ## Installation
-1. Cloner le dépôt
-2. Installer les dépendances Python
-3. Lancer les migrations Django
-4. Démarrer le serveur de développement
+1. Clone the repository
+2. Install Python dependencies
+3. Run Django migrations
+4. Start the development server
 
 ## Contribution
-Toute contribution est la bienvenue pour enrichir la base culturelle et améliorer l'expérience immersive !
+Any contribution is welcome to enrich the cultural database and improve the immersive experience!
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-### 🎯 Profil Culturel Personnalisé
-- **Préférences musicales** : Jazz, Rock, Classique, Électronique, etc.
-- **Goûts cinématographiques** : Drame, Comédie, Documentaire, Art House, etc.
-- **Saveurs culinaires** : Italien, Japonais, Street Food, Fine Dining, etc.
-- **Activités culturelles** : Musées, Théâtre, Festivals, Galeries d'art, etc.
-- **Style de voyage** : Détendu, Actif, Culturel, Aventureux, Luxe
-- **Niveau d'aventure** : Échelle de 1 à 10
-- **Budget** : Économique, Modéré, Luxe
+### 🎯 Personalized Cultural Profile
+- **Musical preferences**: Jazz, Rock, Classical, Electronic, etc.
+- **Cinematographic tastes**: Drama, Comedy, Documentary, Art House, etc.
+- **Culinary flavors**: Italian, Japanese, Street Food, Fine Dining, etc.
+- **Cultural activities**: Museums, Theater, Festivals, Art Galleries, etc.
+- **Travel style**: Relaxed, Active, Cultural, Adventurous, Luxury
+- **Adventure level**: Scale from 1 to 10
+- **Budget**: Economic, Moderate, Luxury
 
-### 🤖 Algorithme IA Intelligent
-- Analyse des préférences culturelles
-- Calcul de scores de compatibilité (0-100%)
-- Recommandations personnalisées
-- Prêt pour l'intégration Qloo Taste AI™
+### 🤖 Intelligent AI Algorithm
+- Analysis of cultural preferences
+- Calculation of compatibility scores (0-100%)
+- Personalized recommendations
+- Ready for Qloo Taste AI™ integration
 
-### 🗺️ Destinations Culturelles
-- **New Orleans** : Jazz, cuisine créole, Mardi Gras
-- **Paris** : Art, gastronomie, musées
-- **Tokyo** : Technologie, temples, cuisine japonaise
-- **Barcelona** : Architecture moderniste, culture catalane
-- **Istanbul** : Histoire, cuisine ottomane, culture mixte
-- **Marrakech** : Souks, riads, culture arabo-berbère
+### 🗺️ Cultural Destinations
+- **New Orleans**: Jazz, Creole cuisine, Mardi Gras
+- **Paris**: Art, gastronomy, museums
+- **Tokyo**: Technology, temples, Japanese cuisine
+- **Barcelona**: Modernist architecture, Catalan culture
+- **Istanbul**: History, Ottoman cuisine, mixed culture
+- **Marrakech**: Souks, riads, Arab-Berber culture
 
-### 📅 Itinéraires Personnalisés
-- Génération automatique d'itinéraires
-- Activités culturelles authentiques
-- Planning jour par jour
-- Points d'intérêt locaux
+### 📅 Personalized Itineraries
+- Automatic itinerary generation
+- Authentic cultural activities
+- Day-by-day planning
+- Local points of interest
 
 ## 🚀 Installation
 
-### Prérequis
+### Prerequisites
 - Python 3.8+
 - Django 4.2+
-- SQLite (par défaut) ou PostgreSQL
+- SQLite (default) or PostgreSQL
 
 ### Installation
 
-1. **Cloner le repository**
+1. **Clone the repository**
 ```bash
-git clone https://github.com/votre-username/culturo.git
+git clone https://github.com/your-username/culturo.git
 cd culturo
 ```
 
-2. **Créer un environnement virtuel**
+2. **Create a virtual environment**
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
-# ou
+# or
 venv\Scripts\activate  # Windows
 ```
 
-3. **Installer les dépendances**
+3. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Configurer la base de données**
+4. **Configure the database**
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. **Créer un superutilisateur**
+5. **Create a superuser**
 ```bash
 python manage.py createsuperuser
 ```
 
-6. **Lancer le serveur de développement**
+6. **Start the development server**
 ```bash
 python manage.py runserver
 ```
 
-7. **Accéder à l'application**
-- Site web : http://localhost:8000
-- Admin : http://localhost:8000/admin
+7. **Access the application**
+- Website: http://localhost:8000
+- Admin: http://localhost:8000/admin
 
 ## 🏗️ Architecture
 
-### Modèles de Données
+### Data Models
 
 #### `CulturalProfile`
-- Profil culturel de l'utilisateur
-- Préférences musicales, cinématographiques, culinaires
-- Style de voyage et niveau d'aventure
+- User's cultural profile
+- Musical, cinematographic, culinary preferences
+- Travel style and adventure level
 
 #### `Destination`
-- Destinations avec caractéristiques culturelles
-- Tags culturels, scènes musicales, cuisine locale
-- Images et informations pratiques
+- Destinations with cultural characteristics
+- Cultural tags, music scenes, local cuisine
+- Images and practical information
 
 #### `CulturalHighlight`
-- Points d'intérêt culturels spécifiques
-- Restaurants, musées, clubs, galeries
-- Informations détaillées et horaires
+- Specific cultural points of interest
+- Restaurants, museums, clubs, galleries
+- Detailed information and schedules
 
 #### `Itinerary`
-- Itinéraires personnalisés
-- Score de compatibilité culturelle
-- Statut et dates de voyage
+- Personalized itineraries
+- Cultural compatibility score
+- Status and travel dates
 
 #### `ItineraryDay` & `ItineraryItem`
-- Structure détaillée des itinéraires
-- Activités par jour avec horaires
-- Types d'activités (visite, repas, transport)
+- Detailed itinerary structure
+- Activities by day with schedules
+- Activity types (visit, meal, transport)
 
-### Technologies Utilisées
+### Technologies Used
 
 #### Frontend
-- **Tailwind CSS** : Framework CSS utilitaire
-- **Alpine.js** : Framework JavaScript léger
-- **Font Awesome** : Icônes
-- **Google Fonts** : Typographie (Inter)
+- **Tailwind CSS**: Utility CSS framework
+- **Alpine.js**: Lightweight JavaScript framework
+- **Font Awesome**: Icons
+- **Google Fonts**: Typography (Inter)
 
 #### Backend
-- **Django 4.2** : Framework web Python
-- **SQLite** : Base de données (développement)
-- **Django Admin** : Interface d'administration
+- **Django 4.2**: Python web framework
+- **SQLite**: Database (development)
+- **Django Admin**: Administration interface
 
-#### Fonctionnalités Avancées
-- **Animations CSS** : Transitions fluides
-- **Intersection Observer** : Animations au scroll
-- **API REST** : Calcul de compatibilité culturelle
-- **Responsive Design** : Mobile-first
+#### Advanced Features
+- **CSS Animations**: Smooth transitions
+- **Intersection Observer**: Scroll animations
+- **REST API**: Cultural compatibility calculation
+- **Responsive Design**: Mobile-first
 
 ## 🎨 Design System
 
-### Couleurs
-- **Primaire** : Gradient purple-600 à blue-600
-- **Secondaire** : Gray-50 à Gray-900
-- **Accent** : Purple-500, Blue-500
+### Colors
+- **Primary**: Gradient purple-600 to blue-600
+- **Secondary**: Gray-50 to Gray-900
+- **Accent**: Purple-500, Blue-500
 
-### Typographie
-- **Police principale** : Inter (Google Fonts)
-- **Hiérarchie** : text-5xl à text-sm
-- **Poids** : 300, 400, 500, 600, 700, 800
+### Typography
+- **Main font**: Inter (Google Fonts)
+- **Hierarchy**: text-5xl to text-sm
+- **Weights**: 300, 400, 500, 600, 700, 800
 
-### Composants
-- **Cartes** : Rounded-2xl, shadow-lg, hover effects
-- **Boutons** : Gradient backgrounds, rounded-full
-- **Formulaires** : Modern checkboxes, sliders personnalisés
-- **Navigation** : Sticky, responsive, dropdown menus
+### Components
+- **Cards**: Rounded-2xl, shadow-lg, hover effects
+- **Buttons**: Gradient backgrounds, rounded-full
+- **Forms**: Modern checkboxes, custom sliders
+- **Navigation**: Sticky, responsive, dropdown menus
 
 ## 🔧 Configuration
 
-### Variables d'Environnement
+### Environment Variables
 ```bash
 # settings.py
-SECRET_KEY = 'votre-secret-key'
+SECRET_KEY = 'your-secret-key'
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Base de données
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -203,7 +203,7 @@ DATABASES = {
 }
 ```
 
-### Fichiers Statiques
+### Static Files
 ```bash
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -212,90 +212,90 @@ STATICFILES_DIRS = [
 ]
 ```
 
-## 📱 Utilisation
+## 📱 Usage
 
-### 1. Créer un Profil Culturel
-- Accédez à `/profile/`
-- Sélectionnez vos préférences dans chaque catégorie
-- Définissez votre style de voyage et budget
-- Sauvegardez votre profil
+### 1. Create a Cultural Profile
+- Access `/profile/`
+- Select your preferences in each category
+- Define your travel style and budget
+- Save your profile
 
-### 2. Recevoir des Recommandations
-- Consultez `/recommendations/`
-- Découvrez les destinations qui correspondent à votre profil
-- Voir les scores de compatibilité culturelle
+### 2. Receive Recommendations
+- Visit `/recommendations/`
+- Discover destinations that match your profile
+- View cultural compatibility scores
 
-### 3. Explorer une Destination
-- Cliquez sur "Découvrir" pour voir les détails
-- Consultez les points d'intérêt culturels
-- Découvrez la scène musicale et culinaire
+### 3. Explore a Destination
+- Click "Discover" to see details
+- Browse cultural points of interest
+- Discover the music and culinary scene
 
-### 4. Créer un Itinéraire
-- Cliquez sur "Planifier" pour créer un itinéraire
-- Définissez vos dates de voyage
-- Recevez un planning personnalisé
+### 4. Create an Itinerary
+- Click "Plan" to create an itinerary
+- Set your travel dates
+- Receive a personalized schedule
 
 ## 🔮 Roadmap
 
 ### Phase 1 - MVP ✅
-- [x] Modèles de données
-- [x] Interface utilisateur moderne
-- [x] Algorithme de recommandation basique
-- [x] Création d'itinéraires
+- [x] Data models
+- [x] Modern user interface
+- [x] Basic recommendation algorithm
+- [x] Itinerary creation
 
-### Phase 2 - IA Avancée 🚧
-- [ ] Intégration Qloo Taste AI™
-- [ ] Analyse de sentiment des avis
-- [ ] Recommandations en temps réel
-- [ ] Apprentissage automatique
+### Phase 2 - Advanced AI 🚧
+- [ ] Qloo Taste AI™ integration
+- [ ] Review sentiment analysis
+- [ ] Real-time recommendations
+- [ ] Machine learning
 
-### Phase 3 - Fonctionnalités Sociales 📅
-- [ ] Partage d'itinéraires
-- [ ] Communauté de voyageurs
-- [ ] Avis et notes
-- [ ] Photos et stories
+### Phase 3 - Social Features 📅
+- [ ] Itinerary sharing
+- [ ] Traveler community
+- [ ] Reviews and ratings
+- [ ] Photos and stories
 
 ### Phase 4 - Expansion 📅
-- [ ] Application mobile
-- [ ] Réservations intégrées
-- [ ] Guide audio culturel
-- [ ] Expériences immersives AR/VR
+- [ ] Mobile application
+- [ ] Integrated bookings
+- [ ] Cultural audio guide
+- [ ] Immersive AR/VR experiences
 
 ## 🤝 Contribution
 
-Nous accueillons les contributions ! Voici comment participer :
+We welcome contributions! Here's how to participate:
 
-1. **Fork** le projet
-2. **Créez** une branche pour votre fonctionnalité
-3. **Commitez** vos changements
-4. **Poussez** vers la branche
-5. **Ouvrez** une Pull Request
+1. **Fork** the project
+2. **Create** a branch for your feature
+3. **Commit** your changes
+4. **Push** to the branch
+5. **Open** a Pull Request
 
 ### Guidelines
-- Suivez les conventions PEP 8 pour Python
-- Utilisez des noms de variables descriptifs
-- Ajoutez des tests pour les nouvelles fonctionnalités
-- Documentez votre code
+- Follow PEP 8 conventions for Python
+- Use descriptive variable names
+- Add tests for new features
+- Document your code
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+This project is under MIT license. See the `LICENSE` file for more details.
 
-## 🙏 Remerciements
+## 🙏 Acknowledgments
 
-- **Qloo** pour Taste AI™
-- **Unsplash** pour les images
-- **Tailwind CSS** pour le framework CSS
-- **Alpine.js** pour les interactions JavaScript
-- **Django** pour le framework web
+- **Qloo** for Taste AI™
+- **Unsplash** for images
+- **Tailwind CSS** for the CSS framework
+- **Alpine.js** for JavaScript interactions
+- **Django** for the web framework
 
 ## 📞 Contact
 
-- **Email** : contact@culturo.com
-- **Site web** : https://culturo.com
-- **Twitter** : @culturo_app
-- **Instagram** : @culturo_app
+- **Email**: contact@culturo.com
+- **Website**: https://culturo.com
+- **Twitter**: @culturo_app
+- **Instagram**: @culturo_app
 
 ---
 
-**Culturo** - Transformez votre passion en passeport 🌍✨ 
+**Culturo** - Transform your passion into a passport 🌍✨

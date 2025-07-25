@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('send-button');
     
     // Initial bot message
-    addBotMessage("Bonjour ! Je suis votre assistant de voyage. Dans quelle ville ou pays souhaitez-vous des recommandations de restaurants ?");
+    addBotMessage("Hello! I'm your travel assistant. In which city or country would you like restaurant recommendations?");
     
     // Send message when button is clicked
     sendButton.addEventListener('click', sendMessage);
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             chatMessages.removeChild(typingIndicator);
-            addBotMessage("Désolé, une erreur s'est produite. Veuillez réessayer.");
+            addBotMessage("Sorry, an error occurred. Please try again.");
         });
     }
     
@@ -96,9 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
             restaurantDiv.className = 'restaurant-card';
             
             let content = `
-                <h3>${restaurant.name || 'Nom non disponible'}</h3>
-                <p>${restaurant.properties?.address || 'Adresse non disponible'}</p>
-                <p>Note: ${restaurant.properties?.business_rating || 'Non noté'}</p>
+                <h3>${restaurant.name || 'Name not available'}</h3>
+                <p>${restaurant.properties?.address || 'Address not available'}</p>
+                <p>Rating: ${restaurant.properties?.business_rating || 'Not rated'}</p>
             `;
             
             if (restaurant.properties?.price_level) {
