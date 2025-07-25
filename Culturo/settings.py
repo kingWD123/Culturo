@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
-    'books',
     'destination',
     'restaurants',
 ]
@@ -117,11 +116,11 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Gemini API Key so
-# GEMINI_API_KEY = "AIzaSyB3mLRx22oRcSAheuUIPx7dj66KNsDB6-8"
+GEMINI_API_KEY = "AIzaSyB3mLRx22oRcSAheuUIPx7dj66KNsDB6-8"
 
 #Gemini API Key ju
 
-GEMINI_API_KEY = "AIzaSyCs0C7RvUvUluyTNjWqR7siZ3mMRzNLb6E"
+# GEMINI_API_KEY = "AIzaSyCs0C7RvUvUluyTNjWqR7siZ3mMRzNLb6E"
 
 # GEMINI_API_KEY = "AIzaSyBB_MTCcY75BFvJK5lZysnRUncWoHeUMOQ"
 

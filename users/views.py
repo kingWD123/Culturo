@@ -75,10 +75,6 @@ def CinemaRecommandations(request):
             print(f"DEBUG: Erreur API - Status: {response.status_code}")
             print(f"DEBUG: Réponse API: {response.text}")
     except Exception as e:
-<<<<<<< HEAD
-        print(f"Erreur lors de l'appel à l'API Qloo: {e}")
-    return render(request, 'users/cinema_recommandations.html', {"recommendations": recommendations})
-=======
         print(f"DEBUG: Exception lors de l'appel API: {str(e)}")
     
     print(f"DEBUG: Nombre de recommandations: {len(recommendations)}")
@@ -141,7 +137,6 @@ def CinemaRecommandations(request):
     
     print(f"DEBUG: Contexte envoyé au template: {context}")
     return render(request, 'users/cinema_recommandations.html', context)
->>>>>>> 4f64e079cf9fc1c472f578c5a5f2e069ff2eb5bb
 
 
 def get_movie_urns_from_titles(titles):
