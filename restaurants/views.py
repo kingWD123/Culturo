@@ -48,7 +48,10 @@ def build_qloo_url(entity_type="urn:entity:place", extra_params=None):
     
     return base_url + "?" + urlencode(params)
 
-# Vue principale pour les recommandations de restaurants
+# Vue principale pour les restaurant
+def restaurant_page(request):
+    return render(request, 'restaurant/restaurant.html')
+# Vue secondaire pour les recommandations de restaurants
 def restaurant_recommandations(request):
     return render(request, 'restaurant/restaurant_recommandations.html')
 
