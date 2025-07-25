@@ -1,4 +1,4 @@
-// Apparition douce avec stagger section par section
+// Smooth appearance with stagger section by section
 function revealOnScroll() {
     document.querySelectorAll('.section, .decouvertes, .univers-grid, .decouvertes-grid').forEach(section => {
         const cards = section.querySelectorAll('.reveal');
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Bouton scroll-to-top
     const scrollBtn = document.createElement('button');
     scrollBtn.innerHTML = '↑';
-    scrollBtn.setAttribute('aria-label', 'Remonter');
+    scrollBtn.setAttribute('aria-label', 'Back to top');
     scrollBtn.style.position = 'fixed';
     scrollBtn.style.bottom = '32px';
     scrollBtn.style.right = '32px';
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Tilt 3D sur les cartes univers/découvertes
     document.querySelectorAll('.univers-card, .decouverte-card').forEach(tiltCard);
 
-    // Focus animé sur le champ email de la newsletter
+    // Animated focus on newsletter email field
     const emailInput = document.querySelector('.newsletter-form input[type="email"]');
     if (emailInput) {
         emailInput.addEventListener('focus', () => {
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Animation de compteur sur un chiffre clé (ex: univers explorés)
+    // Counter animation on a key figure (e.g.: explored universes)
     const counter = document.querySelector('.counter-animated');
     if (counter) {
         let done = false;
@@ -186,4 +186,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-}); 
+});

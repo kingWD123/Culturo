@@ -98,28 +98,28 @@ class CulturalProfile(models.Model):
         return f"Cultural Profile for {self.user.username}"
 
 class Destination(models.Model):
-    """Destinations avec leurs caractéristiques culturelles"""
+    """Destinations with their cultural characteristics"""
     name = models.CharField(max_length=200)
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     description = models.TextField()
     
-    # Coordonnées géographiques
+    # Geographic coordinates
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     
-    # Caractéristiques culturelles
-    cultural_tags = models.JSONField(default=list)  # Tags culturels (jazz, art, food, etc.)
+    # Cultural characteristics
+    cultural_tags = models.JSONField(default=list)  # Cultural tags (jazz, art, food, etc.)
     music_scene = models.TextField(blank=True)
     film_culture = models.TextField(blank=True)
     culinary_highlights = models.TextField(blank=True)
     cultural_activities = models.JSONField(default=list)
     
-    # Images et médias
+    # Images and media
     main_image = models.URLField(blank=True)
     gallery_images = models.JSONField(default=list)
     
-    # Informations pratiques
+    # Practical information
     best_time_to_visit = models.CharField(max_length=100, blank=True)
     average_cost = models.CharField(max_length=50, blank=True)
     
@@ -130,7 +130,7 @@ class Destination(models.Model):
         return f"{self.city}, {self.country}"
 
 class CulturalHighlight(models.Model):
-    """Points d'intérêt culturels spécifiques"""
+    """Specific cultural points of interest"""
     destination = models.ForeignKey(Destination, on_delete=models.CASCADE, related_name='highlights')
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=50)  # restaurant, venue, museum, etc.
@@ -139,7 +139,7 @@ class CulturalHighlight(models.Model):
     website = models.URLField(blank=True)
     image = models.URLField(blank=True)
     
-    # Caractéristiques culturelles
+    # Cultural characteristics
     cultural_tags = models.JSONField(default=list)
     price_range = models.CharField(max_length=20, blank=True)
     opening_hours = models.TextField(blank=True)
@@ -148,7 +148,7 @@ class CulturalHighlight(models.Model):
         return f"{self.name} - {self.destination.city}"
 
 class Itinerary(models.Model):
-    """Itinéraire personnalisé pour un utilisateur"""
+    """Personalized itinerary for a user"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='itineraries')
     destination = models.ForeignKey(Destination, on_delete=models.CASCADE, related_name='itineraries')
     title = models.CharField(max_length=200)
@@ -158,7 +158,7 @@ class Itinerary(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
-    # Statut
+    # Status
     STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('planned', 'Planned'),
@@ -166,7 +166,7 @@ class Itinerary(models.Model):
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
-    # Score de compatibilité culturelle (0-100)
+    # Cultural compatibility score (0-100)
     cultural_match_score = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         default=0
@@ -179,7 +179,7 @@ class Itinerary(models.Model):
         return f"{self.title} - {self.destination.city}"
 
 class ItineraryDay(models.Model):
-    """Journée spécifique dans un itinéraire"""
+    """Specific day in an itinerary"""
     itinerary = models.ForeignKey(Itinerary, on_delete=models.CASCADE, related_name='days')
     day_number = models.IntegerField()
     date = models.DateField()
@@ -193,7 +193,7 @@ class ItineraryDay(models.Model):
         return f"Day {self.day_number} - {self.itinerary.title}"
 
 class ItineraryItem(models.Model):
-    """Élément spécifique dans une journée d'itinéraire"""
+    """Specific item in an itinerary day"""
     day = models.ForeignKey(ItineraryDay, on_delete=models.CASCADE, related_name='items')
     highlight = models.ForeignKey(CulturalHighlight, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
@@ -202,7 +202,7 @@ class ItineraryItem(models.Model):
     end_time = models.TimeField(null=True, blank=True)
     order = models.IntegerField(default=0)
     
-    # Type d'activité
+    # Activity type
     ACTIVITY_TYPES = [
         ('visit', 'Visit'),
         ('meal', 'Meal'),
@@ -218,10 +218,10 @@ class ItineraryItem(models.Model):
     def __str__(self):
         return f"{self.title} - Day {self.day.day_number}"
 
-# ================= NOUVEAUX MODELES CULTURO ===================
+# ================= NEW CULTURO MODELS ===================
 
 class Artiste(models.Model):
-    """Profil d'artiste local (musicien, réalisateur, auteur, chef, etc.)"""
+    """Local artist profile (musician, director, author, chef, etc.)"""
     nom = models.CharField(max_length=200)
     bio = models.TextField()
     pays = models.CharField(max_length=100)
@@ -232,28 +232,28 @@ class Artiste(models.Model):
         return self.nom
 
 class Oeuvre(models.Model):
-    """Oeuvre culturelle : Film, Musique, Livre, Recette"""
+    """Cultural work: Film, Music, Book, Recipe"""
     TYPES = [
         ('film', 'Film'),
-        ('musique', 'Musique'),
-        ('livre', 'Livre'),
-        ('recette', 'Recette'),
+        ('musique', 'Music'),
+        ('livre', 'Book'),
+        ('recette', 'Recipe'),
     ]
     titre = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=TYPES)
     description = models.TextField()
-    ambiance = models.CharField(max_length=200, blank=True)  # ex: "soirée jazz à Paris"
+    ambiance = models.CharField(max_length=200, blank=True)  # ex: "jazz evening in Paris"
     contexte = models.CharField(max_length=200, blank=True)
     artiste = models.ForeignKey(Artiste, on_delete=models.SET_NULL, null=True, blank=True, related_name='oeuvres')
     pays = models.CharField(max_length=100, blank=True)
     region = models.CharField(max_length=100, blank=True)
-    lien = models.URLField(blank=True)  # lien vers l'oeuvre (streaming, fiche, etc.)
+    lien = models.URLField(blank=True)  # link to the work (streaming, sheet, etc.)
     image = models.URLField(blank=True)
     def __str__(self):
         return f"{self.titre} ({self.get_type_display()})"
 
 class Evenement(models.Model):
-    """Evénement culturel (festival, spectacle, etc.)"""
+    """Cultural event (festival, show, etc.)"""
     nom = models.CharField(max_length=200)
     type = models.CharField(max_length=100)
     date = models.DateField()
@@ -268,13 +268,13 @@ class Evenement(models.Model):
         return f"{self.nom} - {self.pays}"
 
 class Playlist(models.Model):
-    """Playlist thématique (musique, films, lectures)"""
+    """Thematic playlist (music, movies, readings)"""
     THEME_CHOICES = [
-        ('voyage', 'Voyage'),
-        ('soirée', 'Soirée'),
-        ('lecture', 'Lecture'),
-        ('découverte', 'Découverte'),
-        ('autre', 'Autre'),
+        ('voyage', 'Travel'),
+        ('soirée', 'Evening'),
+        ('lecture', 'Reading'),
+        ('découverte', 'Discovery'),
+        ('autre', 'Other'),
     ]
     titre = models.CharField(max_length=200)
     theme = models.CharField(max_length=50, choices=THEME_CHOICES, default='autre')
@@ -287,14 +287,14 @@ class Playlist(models.Model):
         return self.titre
 
 class ConseilCulturel(models.Model):
-    """Conseil de découverte culturelle à domicile ou en voyage"""
+    """Cultural discovery advice at home or while traveling"""
     TYPE_CHOICES = [
-        ('domicile', 'À domicile'),
-        ('voyage', 'En voyage'),
+        ('domicile', 'At home'),
+        ('voyage', 'While traveling'),
     ]
     texte = models.TextField()
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     pays = models.CharField(max_length=100, blank=True)
     region = models.CharField(max_length=100, blank=True)
     def __str__(self):
-        return f"Conseil {self.get_type_display()} - {self.pays or 'Général'}"
+        return f"Advice {self.get_type_display()} - {self.pays or 'General'}"

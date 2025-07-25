@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('send-button');
     
     // Initial bot message
-    addBotMessage("Bonjour ! Je suis votre assistant de voyage. Dans quelle ville ou pays souhaitez-vous des recommandations de restaurants ?");
+    addBotMessage("Hello! I'm your travel assistant. In which city or country would you like restaurant recommendations?");
     
     // Send message when button is clicked
     sendButton.addEventListener('click', sendMessage);
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             chatMessages.removeChild(typingIndicator);
-            addBotMessage("Désolé, une erreur s'est produite. Veuillez réessayer.");
+            addBotMessage("Sorry, an error occurred. Please try again.");
         });
     }
     
@@ -95,12 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
             restaurantDiv.className = 'restaurant-card';
             
             let content = `
-                <h3>${restaurant.name || 'Nom non disponible'}</h3>
-                <p>${restaurant.location || 'Adresse non disponible'}</p>
-                <p>Cuisine: ${restaurant.cuisine || 'Non spécifiée'}</p>
-                <p>Note: ${restaurant.rating || 'Non noté'}/5</p>
-                <p>Prix: ${restaurant.price_range || '€€'}</p>
+                <h3>${restaurant.name || 'Name not available'}</h3>
+                <p>${restaurant.properties?.address || 'Address not available'}</p>
+                <p>Rating: ${restaurant.properties?.business_rating || 'Not rated'}</p>
             `;
+            
+            if (restaurant.properties?.price_level) {
+                content += `<p>Prix: ${'$'.repeat(restaurant.properties.price_level)}</p>`;
+            }
             
             if (restaurant.img) {
                 content = `<img src="${restaurant.img}" alt="${restaurant.name}" style="width:100%;height:120px;object-fit:cover;border-radius:4px;margin-bottom:8px;">` + content;

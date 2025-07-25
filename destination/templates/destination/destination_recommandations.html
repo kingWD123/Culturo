@@ -201,51 +201,37 @@
 
     .carousel-card p {
         font-size: 0.8rem;
-        opacity: 0.8;
         margin: 0;
-    }
-
-    .carousel-card .price {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #ff914d;
-        margin-top: 0.4rem;
+        opacity: 0.8;
     }
 
     .carousel-hide-btn {
         position: absolute;
-        top: -10px;
-        right: 2rem;
-        background: rgba(34, 48, 74, 0.9);
+        top: 0.5rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.2);
         color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: none;
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        font-size: 1.5rem;
-        line-height: 1;
+        width: 30px;
+        height: 30px;
+        font-size: 1.2rem;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        z-index: 1002;
-        pointer-events: all;
-        transition: background 0.2s, opacity 0.3s;
+        transition: background 0.2s;
+        z-index: 10;
     }
 
-    .carousel-hide-btn.hidden {
-        opacity: 0;
-        pointer-events: none;
+    .carousel-hide-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
     }
 
-    /* Button to show the carousel */
     .show-carousel-btn {
         position: fixed;
-        bottom: 108px;
-        /* Positioned above the chatbot button */
-        right: 32px;
-        /* Aligned with the chatbot button */
-        z-index: 1000;
+        bottom: 2rem;
+        right: 8rem;
         background: #22304a;
         color: #fff;
         border: none;
@@ -254,232 +240,219 @@
         height: 54px;
         box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
         font-size: 1.7rem;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+        z-index: 1100;
         opacity: 0;
-        transform: scale(0.8);
-        transition: background 0.2s, opacity 0.3s, transform 0.3s;
-        pointer-events: none;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s, transform 0.2s;
     }
 
     .show-carousel-btn.visible {
         opacity: 1;
-        transform: scale(1);
-        pointer-events: all;
+        visibility: visible;
     }
 
     .show-carousel-btn:hover {
-        background: #a8122b;
+        background: #2a365d;
+        transform: scale(1.05);
     }
 
-    @media (max-width: 600px) {
-        .sidebar-float {
-            width: 90vw;
-            padding: 1.2rem 1rem;
-        }
-
-        .sidebar-toggle-btn {
-            left: 1rem;
-            top: calc(var(--navbar-height) + 1rem);
-            width: 44px;
-            height: 44px;
-            font-size: 1.3rem;
-        }
-
-        .sidebar-toggle-btn.shifted {
-            opacity: 0;
-            pointer-events: none;
-            /* Hide button on mobile when open */
-        }
-
-        .bottom-carousel {
-            padding: 0 0 1rem 1rem;
-        }
-
-        .carousel-card {
-            flex: 0 0 180px;
-        }
-
-        .show-carousel-btn {
-            bottom: 92px;
-            /* Adjusted for mobile */
-            right: 22px;
-            width: 48px;
-            height: 48px;
-        }
-    }
-
-    /* Chatbot Styles inspired by the new design */
+    /* Chatbot Styles */
     #chatbot-toggle {
         position: fixed;
-        bottom: 32px;
-        right: 32px;
-        z-index: 9999;
-        background: #eb3452;
-        /* Orange icon like in the image */
-        color: #fff;
-        border: none;
-        border-radius: 50%;
+        bottom: 20px;
+        right: 20px;
         width: 60px;
         height: 60px;
-        box-shadow: 0 4px 16px rgba(40, 40, 80, 0.2);
+        background: #e50914;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        cursor: pointer;
-        transition: transform 0.2s;
+        font-size: 24px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        z-index: 1200;
     }
 
     #chatbot-toggle:hover {
         transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
     }
 
-    #cinema-chatbot {
-        display: none;
+    #destination-chatbot {
         position: fixed;
-        bottom: 110px;
-        /* Positioned right above the icon */
-        right: 32px;
-        width: 360px;
-        max-width: 90vw;
-        background: #1E1E1E;
-        /* Dark background */
-        border-radius: 18px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
-        overflow: hidden;
+        bottom: 100px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background: #181818;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
-        height: 450px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1201;
+        overflow: hidden;
+        color: #fff;
     }
 
     .chatbot-header {
-        background: #D90429;
-        /* Red header */
-        color: #fff;
-        padding: 0.8rem 1.2rem;
-        font-weight: 700;
+        background: #e50914;
+        color: white;
+        padding: 15px 20px;
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
     }
 
     #chatbot-close {
         background: none;
         border: none;
-        color: #fff;
-        font-size: 1.5rem;
+        color: white;
+        font-size: 20px;
         cursor: pointer;
-        opacity: 0.8;
-    }
-
-    #chatbot-messages {
-        flex: 1 1 auto;
-        padding: 1rem;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-
-    .chat-bubble {
-        padding: 0.7rem 1rem;
-        border-radius: 12px;
-        max-width: 85%;
-        word-wrap: break-word;
-    }
-
-    .bot-message {
-        align-self: flex-start;
-        background: #000;
-        color: #fff;
-    }
-
-    .user-message {
-        align-self: flex-end;
-        background: #333;
-        color: #fff;
-    }
-
-    #chatbot-form {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: #1E1E1E;
-    }
-
-    #chatbot-input {
-        flex: 1 1 auto;
-        border: none;
-        background: #fff;
-        border-radius: 20px;
-        padding: 0.8rem 1.2rem;
-        font-size: 1rem;
-        margin-right: 0.8rem;
-        outline: none;
-        color: #000;
-    }
-
-    #chatbot-send {
-        background: #D90429;
-        /* Red send button */
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        width: 42px;
-        height: 42px;
+        padding: 0;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
-        cursor: pointer;
-        flex-shrink: 0;
+        border-radius: 50%;
+        transition: background 0.2s;
     }
 
-    /* Hide the previous modal implementation */
-    .chatbot-toggle-btn,
-    .chatbot-modal {
-        display: none;
+    #chatbot-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    #chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #181818;
+        color: #fff;
+    }
+
+    .chat-bubble {
+        margin-bottom: 15px;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        word-wrap: break-word;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    .user-message {
+        background: #e50914;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .bot-message {
+        background: #e5e5e5;
+        color: #111;
+        border: 1px solid #e9ecef;
+        margin-right: auto;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #chatbot-form {
+        padding: 20px;
+        background: #181818;
+        border-top: 1px solid #333;
+        display: flex;
+        gap: 10px;
+    }
+
+    #chatbot-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        outline: none;
+        font-size: 14px;
+        background: #fff;
+        color: #111;
+    }
+
+    #chatbot-input:focus {
+        border-color: #e50914;
+        box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+    }
+
+    #chatbot-send {
+        background: #e50914;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+
+    #chatbot-send:hover {
+        background: #b0060f;
+        transform: scale(1.05);
     }
 </style>
 
-<!-- Bouton flottant pour ouvrir la sidebar -->
-<button class="sidebar-toggle-btn" id="openSidebarBtn" title="Ouvrir les filtres ou résultats">
-    <span>&#9776;</span>
-</button>
-
-<!-- Sidebar latérale masquée par défaut -->
+<!-- Sidebar flottant -->
 <div class="sidebar-float" id="sidebarFloat">
-    <button class="close-btn" id="closeSidebarBtn" title="Fermer">&times;</button>
-    <h2>Filtres & Résultats</h2>
+    <button class="close-btn" id="closeSidebarBtn">&times;</button>
+    <h2>DESTINATIONS</h2>
     <div class="sidebar-content">
-        <p>Ici tu pourras mettre tes filtres, résultats, ou toute autre information utile.</p>
+        <p>Here you can add your filters, results, or any other useful information.</p>
         <ul style="margin-top:1.5rem;opacity:0.8;">
-            <li>• Filtres de recherche</li>
-            <li>• Liste des destinations</li>
-            <li>• Détails d'un lieu</li>
+            <li>• Search filters</li>
+            <li>• Destination list</li>
+            <li>• Location details</li>
             <li>• ...</li>
         </ul>
     </div>
     <div class="sidebar-footer">Culturo &copy; 2024</div>
 </div>
 
+<!-- Bouton pour ouvrir la sidebar -->
+<button class="sidebar-toggle-btn" id="openSidebarBtn">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
 <div id="map"></div>
 
-<!-- Carousel flottant en bas de page -->
+<!-- Floating carousel at the bottom of the page -->
 <div class="bottom-carousel" id="bottomCarousel">
-    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Masquer le carrousel">&times;</button>
+    <button class="carousel-hide-btn" id="hideCarouselBtn" title="Hide carousel">&times;</button>
     <div class="carousel-track" id="carouselTrack">
-        <!-- Les cartes de destination seront injectées ici par JS -->
+        <!-- Destination cards will be injected here by JS -->
     </div>
 </div>
 
-<!-- Bouton pour réafficher le carrousel -->
-<button class="show-carousel-btn" id="showCarouselBtn" title="Afficher les destinations">
+<!-- Button to show the carousel again -->
+<button class="show-carousel-btn" id="showCarouselBtn" title="Show destinations">
     <i class="fa-solid fa-layer-group"></i>
 </button>
 
@@ -487,14 +460,14 @@
 <button id="chatbot-toggle" aria-label="Open Chatbot">
     <i class="fas fa-comments"></i>
 </button>
-<div id="cinema-chatbot">
+<div id="destination-chatbot">
     <div class="chatbot-header">
         <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
         <button id="chatbot-close" aria-label="Close Chatbot">&times;</button>
     </div>
     <div id="chatbot-messages">
         <div class="chat-bubble bot-message">
-            Bonjour ! Comment puis-je vous aider à trouver votre prochaine destination ?
+            Hello! How can I help you find your next destination?
         </div>
     </div>
     <form id="chatbot-form">
@@ -526,7 +499,7 @@
                 const marker = L.marker([dest.latitude, dest.longitude]).addTo(map);
                 marker.bindPopup(`
                     <div style='min-width:180px; font-family: sans-serif;'>
-                        <img src='${dest.img}' alt='Image de ${dest.name}' style='width:100%;height:90px;object-fit:cover;border-radius:0.5rem;margin-bottom:0.5rem;'>
+                        <img src='${dest.img}' alt='Image of ${dest.name}' style='width:100%;height:90px;object-fit:cover;border-radius:0.5rem;margin-bottom:0.5rem;'>
                         <b style='font-size:1.1em;'>${dest.name}</b><br>
                         <span style='color:#4a5568;font-size:0.9em;'>${locationString}</span>
                     </div>
@@ -542,7 +515,7 @@
         function updateCarousel(destinations) {
             const carouselTrack = document.getElementById('carouselTrack');
             if (!destinations || destinations.length === 0) {
-                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Aucune destination trouvée pour le moment.</p>";
+                carouselTrack.innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>No destinations found at the moment.</p>";
                 return;
             }
 
@@ -550,7 +523,7 @@
                 const locationString = `${d.location1 || ''}${d.location2 ? ', ' + d.location2 : ''}`;
                 return `
                 <div class="carousel-card" onclick="window.open('/destination/detail/${encodeURIComponent(d.name)}/', '_blank')">
-                    <img src="${d.img}" alt="Image de ${d.name}">
+                    <img src="${d.img}" alt="Image of ${d.name}">
                     <h3>${d.name}</h3>
                     <p>${locationString}</p>
                 </div>
@@ -582,12 +555,15 @@
 
         // Chatbot Logic
         const toggle = document.getElementById('chatbot-toggle');
-        const chatbot = document.getElementById('cinema-chatbot');
+        const chatbot = document.getElementById('destination-chatbot');
         const closeBtnChatbot = document.getElementById('chatbot-close');
         const chatForm = document.getElementById('chatbot-form');
         const chatInput = document.getElementById('chatbot-input');
         const chatBox = document.getElementById('chatbot-messages');
         let chatHistory = [];
+
+        // Show chatbot by default on page load
+        chatbot.style.display = 'flex';
 
         toggle.addEventListener('click', () => {
             chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
@@ -612,42 +588,62 @@
             chatHistory.push({ role: 'user', content: userMsg });
 
             // Call destination API
-            const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history: chatHistory })
-            });
-            const data = await response.json();
+            try {
+                const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                console.log('Destinations received:', data.destinations);
 
-            // Filtre le JSON technique de la réponse
-            let botMsg = data.message;
-            botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                // Filter out technical JSON from the response
+                let botMsg = data.message;
+                botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
 
-            // Affiche toujours la réponse conversationnelle du bot
-            if (botMsg.trim()) {
-                const botDiv = document.createElement('div');
-                botDiv.className = 'chat-bubble bot-message';
-                botDiv.textContent = botMsg.trim();
-                chatBox.appendChild(botDiv);
+                // Always display the conversational bot response
+                if (botMsg.trim()) {
+                    const botDiv = document.createElement('div');
+                    botDiv.className = 'chat-bubble bot-message';
+                    botDiv.textContent = botMsg.trim();
+                    chatBox.appendChild(botDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+                chatHistory.push({ role: 'model', content: data.message });
+
+                // Display recommendations only if they exist
+                if (data.destinations && data.destinations.length > 0) {
+                    console.log('Updating map and carousel with destinations:', data.destinations);
+                    updateMap(data.destinations);
+                    updateCarousel(data.destinations);
+                    
+                    // Make carousel visible if it's hidden
+                    if (carouselContainer.classList.contains('hidden')) {
+                        carouselContainer.classList.remove('hidden');
+                        showCarouselBtn.classList.remove('visible');
+                    }
+                } else {
+                    console.log('No destinations received in response');
+                }
+            } catch (error) {
+                console.error('Error during chatbot interaction:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message';
+                errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
+                chatBox.appendChild(errorDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
-            }
-            chatHistory.push({ role: 'model', content: data.message });
-
-            // Affiche les recommandations seulement si elles existent
-            if (data.destinations && data.destinations.length > 0) {
-                updateMap(data.destinations);
-                updateCarousel(data.destinations);
-                // chatbot.style.display = 'none';
             }
         });
 
         // --- Initial Load ---
         async function fetchInitialDestinations() {
-            // Affiche un état de chargement
-            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Recherche de recommandations...</p>";
+            // Display loading state
+            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Searching for recommendations...</p>";
 
-            // On peut envoyer un historique initial vide ou avec un message générique
-            const initialHistory = [{ role: 'user', content: 'Donne-moi des recommandations de destinations populaires en ce moment.' }];
+            // We can send an empty initial history or with a generic message
+            const initialHistory = [{ role: 'user', content: 'Give me recommendations for popular destinations right now.' }];
 
             try {
                 const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
@@ -661,16 +657,16 @@
                     updateMap(data.destinations);
                     updateCarousel(data.destinations);
                 } else {
-                    // Gère le cas où aucune destination n'est retournée au départ
-                    updateCarousel([]); // Affiche le message "Aucune destination trouvée"
+                    // Handle the case where no destinations are returned initially
+                    updateCarousel([]); // Display the "No destinations found" message
                 }
             } catch (error) {
                 console.error("Error fetching initial destinations:", error);
-                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Erreur de chargement des destinations.</p>";
+                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Error loading destinations.</p>";
             }
         }
 
-        // Lance la récupération automatique au chargement de la page
+        // Launch automatic retrieval on page load
         fetchInitialDestinations();
     });
 </script>

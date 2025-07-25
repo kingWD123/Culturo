@@ -1,7 +1,7 @@
 {% extends "users/base.html" %}
 {% block content %}
 <style>
-    /* Navbar harmonisée (déjà présent) */
+    /* Harmonized navbar (already present) */
     .navbar,
     .navbar-container {
         background: #101018 !important;
@@ -45,7 +45,7 @@
         background: #c81c3a !important;
     }
 
-    /* Hero moderne inspiré Pinterest/portfolio */
+    /* Modern hero inspired by Pinterest/portfolio */
     .hero-modern {
         position: relative;
         width: 100%;
@@ -193,7 +193,7 @@
         }
     }
 
-    /* Portfolio styles (déjà présents) */
+    /* Portfolio styles (already present) */
     body,
     .content,
     .container,
@@ -288,18 +288,18 @@
 
 {% if images %}
 <div class="hero-modern">
-    <img src="{{ images.0 }}" alt="Image principale de {{ name }}" class="hero-bg-img">
+    <img src="{{ images.0 }}" alt="Main image of {{ name }}" class="hero-bg-img">
     <div class="hero-modern-overlay"></div>
     <div class="hero-modern-content">
         <div class="hero-modern-card">
             <h1>
-                <span class="hero-main">Partez à la découverte de</span><br>
+                <span class="hero-main">Discover the wonders of</span><br>
                 <span class="hero-dest">{{ name|title }}</span>
             </h1>
             <p class="hero-sub">
-                Laissez-vous inspirer par la beauté et la culture de cette destination unique.
+                Let yourself be inspired by the beauty and culture of this unique destination.
             </p>
-            <a href="#portfolio" class="hero-btn">Explorer la galerie</a>
+            <a href="#portfolio" class="hero-btn">Explore the gallery</a>
         </div>
     </div>
 </div>
@@ -307,10 +307,10 @@
 <div id="portfolio" class="masonry">
     {% for img in images|slice:'1:' %}
     <div class="masonry-item">
-        <img src="{{ img }}" alt="Image de {{ name }}">
+        <img src="{{ img }}" alt="Image of {{ name }}">
     </div>
     {% empty %}
-    <p style="color:#fff;">Aucune image trouvée.</p>
+    <p style="color:#fff;">No images found.</p>
     {% endfor %}
 </div>
 {% endblock %}

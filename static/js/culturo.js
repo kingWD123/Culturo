@@ -399,10 +399,10 @@ class CulturoApp {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
     function appendBotMessageAnimated(message) {
-        console.log('TEST FILTRAGE CULTURO.JS', message);
-        console.log('MESSAGE BRUT DU BOT:', JSON.stringify(message));
+        console.log('TEST FILTERING CULTURO.JS', message);
+        console.log('RAW BOT MESSAGE:', JSON.stringify(message));
         var trimmed = message && message.trim();
-        console.log('MESSAGE FILTRÉ TRIMMED:', trimmed);
+        console.log('FILTERED TRIMMED MESSAGE:', trimmed);
         if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
             return;
         }
@@ -465,12 +465,12 @@ class CulturoApp {
                 })
                 .catch(() => {
                     const grid = document.querySelector('.cinema-movies-grid');
-                    if (grid) grid.innerHTML = '<div style="padding:1rem;">Erreur lors du chargement des films.</div>';
+                    if (grid) grid.innerHTML = '<div style="padding:1rem;">Error loading movies.</div>';
                 });
             }
         } catch (e) {
             removeTypingIndicator();
-            appendBotMessageAnimated("Erreur lors de la connexion au chatbot.");
+            appendBotMessageAnimated("Error connecting to chatbot.");
         }
         isBotTyping = false;
     }
@@ -895,7 +895,7 @@ function updateNowShowing(movies) {
         controls.innerHTML = '';
         if (page > 0) {
             const prevBtn = document.createElement('button');
-            prevBtn.textContent = 'Précédent';
+            prevBtn.textContent = 'Previous';
             prevBtn.className = 'btn btn-secondary';
             prevBtn.onclick = () => {
                 currentPage--;
@@ -905,7 +905,7 @@ function updateNowShowing(movies) {
         }
         if (end < movies.length) {
             const nextBtn = document.createElement('button');
-            nextBtn.textContent = 'Suivant';
+            nextBtn.textContent = 'Next';
             nextBtn.className = 'btn btn-secondary';
             nextBtn.onclick = () => {
                 currentPage++;
@@ -950,4 +950,4 @@ document.addEventListener('DOMContentLoaded', function () {
             // ... code existant ...
         });
     }
-}); 
+});
