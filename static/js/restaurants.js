@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Fonction utilitaire pour obtenir un cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Initialisation de la carte Leaflet
     let map = L.map('map').setView([46.603354, 1.888334], 6); // Vue par défaut sur la France
     let markers = [];
@@ -69,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showTypingIndicator();
         
         try {
-            const response = await fetch('/restaurants/chatbot-api/', {
+            const response = await fetch('/restaurants/api/chatbot/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -334,22 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         return stars;
-    }
-    
-    // Fonction utilitaire pour obtenir un cookie
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
     }
     
     // Gestionnaires d'événements

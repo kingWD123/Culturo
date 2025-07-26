@@ -325,8 +325,8 @@
     }
 </style>
 
-<div class="chatbot-container"
-    style="position: fixed; bottom: 100px; right: 32px; z-index: 9998; width: 340px; max-width: 90vw; height: 420px; display: none; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); overflow: hidden; display: flex; flex-direction: column;">
+<!-- SUPPRIMEZ COMPLÈTEMENT ce premier chatbot (lignes 325-350 environ) -->
+<!-- <div class="chatbot-container" style="position: fixed; bottom: 100px; right: 32px; z-index: 9998; width: 340px; max-width: 90vw; height: 420px; display: none; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); overflow: hidden; display: flex; flex-direction: column;">
     <div
         style="background: #b61b23; color: #fff; padding: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
         <span><i class="fas fa-robot"></i> Culturo Chatbot</span>
@@ -336,19 +336,21 @@
     <div id="chatbot-messages"
         style="flex: 1 1 auto; padding: 1rem; background: #f8f9fa; overflow-y: auto; font-size: 1rem; display: flex; flex-direction: column; gap: 0.7rem;">
         <div class="chat-message bot"
-            style="align-self: flex-start; background: #b61b23; border-radius: 12px; padding: 0.7rem 1rem; box-shadow: 0 2px 8px rgba(40,40,80,0.07); max-width: 85%;">
+            style="align-self: flex-start; background: #b61b23; color: #fff; border-radius: 12px; padding: 0.7rem 1rem; box-shadow: 0 2px 8px rgba(40,40,80,0.07); max-width: 85%;">
             Hello! How can I help you with cinema recommendations or events?
         </div>
     </div>
     <form id="chatbot-form"
         style="display: flex; align-items: center; padding: 0.7rem 1rem; background: #fff; border-top: 1px solid #eee;">
         <input id="chatbot-input" type="text" placeholder="Type your message..." autocomplete="off"
-            style="flex: 1 1 auto; border: none; background: #fff; border-radius: 20px; padding: 0.6rem 1rem; font-size: 1rem; margin-right: 0.7rem; outline: none;">
+            style="flex: 1 1 auto; border: 1px solid #dee2e6; background: #fff; border-radius: 20px; padding: 0.6rem 1rem; font-size: 1rem; margin-right: 0.7rem; outline: none; color: #212529;">
         <button id="chatbot-send" type="submit"
             style="background: #b61b23; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;"><i
                 class="fas fa-paper-plane"></i></button>
     </form>
 </div>
+
+<!-- GARDEZ SEULEMENT ce chatbot -->
 <div id="cinema-chatbot"
     style="display: none; position: fixed; bottom: 100px; right: 32px; width: 340px; max-width: 90vw; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(40,40,80,0.18); z-index: 10000; overflow: hidden; display: flex; flex-direction: column; height: 420px;">
     <div
@@ -425,7 +427,7 @@
                 // Show loading spinner
                 if (recLoading) recLoading.style.display = 'flex';
                 // API call
-                var response = await fetch('/cinema_chatbot_api', {
+                var response = await fetch('/cinema_chatbot_api/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ history: chatHistory })
