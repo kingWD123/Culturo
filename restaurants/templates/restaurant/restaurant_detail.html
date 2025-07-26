@@ -1,0 +1,549 @@
+{% extends "users/base.html" %}
+{% block content %}
+<style>
+    /* Harmonized navbar */
+    .navbar,
+    .navbar-container {
+        background: #101018 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100%;
+        margin: 0;
+        padding: 0.7rem 0 0.7rem 0;
+    }
+
+    .navbar a,
+    .navbar .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .navbar a:hover,
+    .navbar .nav-link:hover {
+        color: #eb3452 !important;
+    }
+
+    .navbar .brand,
+    .navbar .logo {
+        color: #eb3452 !important;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    .navbar .btn-signup {
+        background: #eb3452 !important;
+        color: #fff !important;
+        border-radius: 2rem;
+        font-weight: 700;
+        padding: 0.5rem 1.5rem;
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .navbar .btn-signup:hover {
+        background: #d12a47 !important;
+    }
+
+    /* Modern hero for restaurant */
+    body {
+        background: #101018 !important;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hero-modern {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 2.5rem auto;
+        height: 420px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 8px 48px #eb3452cc, 0 2px 16px #000a;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .hero-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        filter: brightness(0.7) contrast(1.08) blur(0.5px);
+        transition: filter 0.3s;
+    }
+
+    .hero-modern-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #101018 60%, rgba(235, 52, 82, 0.18) 100%);
+        opacity: 0.92;
+        z-index: 2;
+    }
+
+    .hero-modern-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        padding-left: 4vw;
+    }
+
+    .hero-modern-card {
+        background: rgba(16, 16, 24, 0.92);
+        border-radius: 24px;
+        padding: 2.2rem 2.5rem 2.2rem 2.5rem;
+        max-width: 480px;
+        box-shadow: 0 4px 32px #eb3452cc;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        animation: fadeInUp 0.8s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    .hero-modern-card h1 {
+        font-size: 2.3rem;
+        font-weight: 900;
+        margin-bottom: 1.1rem;
+        line-height: 1.1;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+    .hero-restaurant {
+        color: #eb3452;
+        background: linear-gradient(90deg, #eb3452 60%, #fff 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        font-size: 2.7rem;
+        letter-spacing: 2px;
+    }
+
+    .hero-sub {
+        color: #fff;
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.92;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        background: #eb3452;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 2rem;
+        padding: 0.7rem 2.2rem;
+        font-size: 1.1rem;
+        text-decoration: none;
+        box-shadow: 0 2px 12px #eb3452aa;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .hero-btn:hover {
+        background: #d12a47;
+        transform: scale(1.05);
+        text-decoration: none;
+        color: #fff;
+    }
+
+    /* Restaurant details section */
+    .restaurant-details {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem 2rem 1rem;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 3rem;
+    }
+
+    .restaurant-info {
+        background: #181824;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 32px rgba(235, 52, 82, 0.10);
+    }
+
+    .restaurant-info h2 {
+        color: #eb3452;
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+
+    .restaurant-info h3 {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem 0;
+    }
+
+    .restaurant-info p {
+        color: #fff;
+        opacity: 0.9;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .info-item {
+        background: rgba(235, 52, 82, 0.1);
+        border: 1px solid rgba(235, 52, 82, 0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .info-item .icon {
+        font-size: 1.5rem;
+        color: #eb3452;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-item .label {
+        font-size: 0.9rem;
+        color: #fff;
+        opacity: 0.7;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-item .value {
+        font-size: 1.1rem;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .hours-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+
+    .hours-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    .hours-day {
+        font-weight: 600;
+        color: #eb3452;
+    }
+
+    .hours-time {
+        color: #fff;
+        opacity: 0.9;
+    }
+
+    /* Reservation card */
+    .reservation-card {
+        background: #181824;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 4px 32px rgba(235, 52, 82, 0.10);
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .reservation-card h3 {
+        color: #eb3452;
+        font-size: 1.8rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid rgba(235, 52, 82, 0.3);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #eb3452;
+        box-shadow: 0 0 0 2px rgba(235, 52, 82, 0.2);
+    }
+
+    .btn-reserve {
+        width: 100%;
+        background: #eb3452;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-reserve:hover {
+        background: #d12a47;
+        transform: translateY(-2px);
+    }
+
+    /* Gallery section */
+    .gallery-section {
+        max-width: 1200px;
+        margin: 3rem auto 0 auto;
+        padding: 0 1rem;
+    }
+
+    .gallery-section h2 {
+        color: #eb3452;
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .gallery-item {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s;
+    }
+
+    .gallery-item:hover {
+        transform: scale(1.02);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .restaurant-details {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .hero-modern {
+            height: 300px;
+            margin: 0 1rem 2rem 1rem;
+        }
+
+        .hero-modern-card {
+            padding: 1.5rem;
+            max-width: 90%;
+        }
+
+        .hero-modern-card h1 {
+            font-size: 1.8rem;
+        }
+
+        .hero-restaurant {
+            font-size: 2rem;
+        }
+
+        .gallery-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="hero-modern">
+    <img src="{{ restaurant.img }}" alt="{{ restaurant.name }}" class="hero-bg-img">
+    <div class="hero-modern-overlay"></div>
+    <div class="hero-modern-content">
+        <div class="hero-modern-card">
+            <h1>{{ restaurant.name }}</h1>
+            <div class="hero-restaurant">Restaurant</div>
+            <p class="hero-sub">{{ restaurant.cuisine }} • {{ restaurant.location }}</p>
+            <a href="#reservation" class="hero-btn">Réserver une table</a>
+        </div>
+    </div>
+</div>
+
+<div class="restaurant-details">
+    <div class="restaurant-info">
+        <h2>À propos du restaurant</h2>
+        <p>{{ restaurant.description }}</p>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="icon">🍽️</div>
+                <div class="label">Cuisine</div>
+                <div class="value">{{ restaurant.cuisine }}</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">💰</div>
+                <div class="label">Prix</div>
+                <div class="value">{{ restaurant.price_range }}</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">⭐</div>
+                <div class="label">Note</div>
+                <div class="value">{{ restaurant.rating }}/5</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">📍</div>
+                <div class="label">Localisation</div>
+                <div class="value">{{ restaurant.location }}</div>
+            </div>
+        </div>
+
+        <h3>Informations de contact</h3>
+        <p><strong>Adresse :</strong> {{ restaurant.address }}</p>
+        <p><strong>Téléphone :</strong> {{ restaurant.phone }}</p>
+        <p><strong>Site web :</strong> <a href="{{ restaurant.website }}" target="_blank" style="color: #eb3452;">{{ restaurant.website }}</a></p>
+
+        <h3>Horaires d'ouverture</h3>
+        <div class="hours-grid">
+            {% for day, hours in restaurant.hours.items %}
+            <div class="hours-item">
+                <span class="hours-day">{{ day }}</span>
+                <span class="hours-time">{{ hours }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="reservation-card" id="reservation">
+        <h3>Réserver une table</h3>
+        <form>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="time">Heure</label>
+                <select id="time" name="time" required>
+                    <option value="">Choisir une heure</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="guests">Nombre de personnes</label>
+                <select id="guests" name="guests" required>
+                    <option value="">Choisir</option>
+                    <option value="1">1 personne</option>
+                    <option value="2">2 personnes</option>
+                    <option value="3">3 personnes</option>
+                    <option value="4">4 personnes</option>
+                    <option value="5">5 personnes</option>
+                    <option value="6">6 personnes</option>
+                    <option value="7">7 personnes</option>
+                    <option value="8">8 personnes</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Nom</label>
+                <input type="text" id="name" name="name" placeholder="Votre nom" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Téléphone</label>
+                <input type="tel" id="phone" name="phone" placeholder="Votre numéro de téléphone" required>
+            </div>
+            <div class="form-group">
+                <label for="special">Demandes spéciales (optionnel)</label>
+                <input type="text" id="special" name="special" placeholder="Allergies, préférences...">
+            </div>
+            <button type="submit" class="btn-reserve">Confirmer la réservation</button>
+        </form>
+    </div>
+</div>
+
+<div class="gallery-section">
+    <h2>Galerie</h2>
+    <div class="gallery-grid">
+        <div class="gallery-item">
+            <img src="{{ restaurant.img }}" alt="Photo du restaurant">
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" alt="Intérieur du restaurant">
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400" alt="Plat signature">
+        </div>
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400" alt="Ambiance du restaurant">
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set minimum date to today
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+    
+    // Handle form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Réservation confirmée ! Vous recevrez un email de confirmation.');
+    });
+</script>
+
+{% endblock %}

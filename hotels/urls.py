@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.hotel_page, name='hotel_home_page'),
     path('map/', views.hotel_map, name='hotel_map'),
     path('api/chatbot/', views.hotel_chatbot_api, name='hotel_chatbot_api'),
+    path('detail/<str:hotel_name>/', views.hotel_detail, name='hotel_detail'),
 ]

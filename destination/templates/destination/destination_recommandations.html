@@ -522,7 +522,7 @@
             carouselTrack.innerHTML = destinations.map(d => {
                 const locationString = `${d.location1 || ''}${d.location2 ? ', ' + d.location2 : ''}`;
                 return `
-                <div class="carousel-card" onclick="window.open('/destination/detail/${encodeURIComponent(d.name)}/', '_blank')">
+                <div class="carousel-card" onclick="window.location.href='/destination/detail/${encodeURIComponent(d.name)}/'">
                     <img src="${d.img}" alt="Image of ${d.name}">
                     <h3>${d.name}</h3>
                     <p>${locationString}</p>
@@ -639,31 +639,63 @@
 
         // --- Initial Load ---
         async function fetchInitialDestinations() {
-            // Display loading state
-            document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Searching for recommendations...</p>";
-
-            // We can send an empty initial history or with a generic message
-            const initialHistory = [{ role: 'user', content: 'Give me recommendations for popular destinations right now.' }];
-
-            try {
-                const response = await fetch("{% url 'destination:destination_chatbot_api' %}", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ history: initialHistory })
-                });
-                const data = await response.json();
-
-                if (data.destinations && data.destinations.length > 0) {
-                    updateMap(data.destinations);
-                    updateCarousel(data.destinations);
-                } else {
-                    // Handle the case where no destinations are returned initially
-                    updateCarousel([]); // Display the "No destinations found" message
+            // Generate default destinations directly
+            const defaultDestinations = [
+                {
+                    name: "Paris",
+                    location1: "France",
+                    location2: "Europe",
+                    latitude: 48.8566,
+                    longitude: 2.3522,
+                    img: "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop"
+                },
+                {
+                    name: "Tokyo",
+                    location1: "Japan",
+                    location2: "Asia",
+                    latitude: 35.6762,
+                    longitude: 139.6503,
+                    img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop"
+                },
+                {
+                    name: "New York",
+                    location1: "United States",
+                    location2: "North America",
+                    latitude: 40.7128,
+                    longitude: -74.0060,
+                    img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=300&fit=crop"
+                },
+                {
+                    name: "Rome",
+                    location1: "Italy",
+                    location2: "Europe",
+                    latitude: 41.9028,
+                    longitude: 12.4964,
+                    img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&h=300&fit=crop"
+                },
+                {
+                    name: "Barcelona",
+                    location1: "Spain",
+                    location2: "Europe",
+                    latitude: 41.3851,
+                    longitude: 2.1734,
+                    img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop"
+                },
+                {
+                    name: "Bali",
+                    location1: "Indonesia",
+                    location2: "Asia",
+                    latitude: -8.3405,
+                    longitude: 115.0920,
+                    img: "https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=400&h=300&fit=crop"
                 }
-            } catch (error) {
-                console.error("Error fetching initial destinations:", error);
-                document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Error loading destinations.</p>";
-            }
+            ];
+
+            // Update map and carousel with default destinations
+            updateMap(defaultDestinations);
+            updateCarousel(defaultDestinations);
+            
+            console.log('Default destinations loaded:', defaultDestinations);
         }
 
         // Launch automatic retrieval on page load

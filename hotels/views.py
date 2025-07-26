@@ -471,3 +471,78 @@ def generate_mock_hotels(count=3, location_query="worldwide"):
         hotels.append(hotel)
     
     return hotels
+
+
+def hotel_detail(request, hotel_name):
+    """Vue pour afficher les détails d'un hôtel et permettre la réservation"""
+    # Décodage du nom de l'hôtel (remplace les tirets par des espaces)
+    hotel_name_decoded = hotel_name.replace('-', ' ').title()
+    
+    # Génération de données fictives pour l'hôtel (dans une vraie app, on récupérerait depuis la DB)
+    import random
+    
+    # Données de base de l'hôtel
+    hotel_data = {
+        'name': hotel_name_decoded,
+        'location': random.choice(['Paris, France', 'London, UK', 'Tokyo, Japan', 'New York, USA', 'Rome, Italy']),
+        'rating': round(random.uniform(4.0, 5.0), 1),
+        'price_per_night': random.randint(80, 500),
+        'description': f"Experience luxury and comfort at {hotel_name_decoded}. Our hotel offers exceptional service and world-class amenities in the heart of the city.",
+        'amenities': random.sample(['WiFi', 'Pool', 'Spa', 'Gym', 'Restaurant', 'Bar', 'Room Service', 'Concierge', 'Parking', 'Business Center'], 6),
+        'address': f"{random.randint(1, 999)} {random.choice(['Main St', 'Central Ave', 'Grand Blvd', 'Royal Rd', 'Palace St'])}, City Center",
+        'phone': f"+{random.randint(1, 99)} {random.randint(1, 9)} {random.randint(10, 99)} {random.randint(10, 99)} {random.randint(10, 99)} {random.randint(10, 99)}",
+        'email': f"reservations@{hotel_name_decoded.lower().replace(' ', '')}.com",
+        'check_in': "15:00",
+        'check_out': "11:00",
+        'room_types': [
+            {
+                'name': 'Standard Room',
+                'price': random.randint(80, 150),
+                'description': 'Comfortable room with modern amenities',
+                'capacity': '2 guests',
+                'size': '25 m²'
+            },
+            {
+                'name': 'Deluxe Room',
+                'price': random.randint(150, 250),
+                'description': 'Spacious room with city view',
+                'capacity': '2-3 guests',
+                'size': '35 m²'
+            },
+            {
+                'name': 'Suite',
+                'price': random.randint(250, 500),
+                'description': 'Luxury suite with separate living area',
+                'capacity': '4 guests',
+                'size': '50 m²'
+            }
+        ]
+    }
+    
+    # Récupération d'images depuis Unsplash
+    images = []
+    try:
+        search_query = f"{hotel_name_decoded} hotel luxury"
+        url = f"https://api.unsplash.com/search/photos?query={search_query}&client_id={settings.UNSPLASH_ACCESS_KEY}&per_page=20&orientation=landscape"
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            images = [img['urls']['regular'] for img in data.get('results', [])]
+    except Exception as e:
+        print(f"Erreur Unsplash: {e}")
+    
+    # Images par défaut si Unsplash ne fonctionne pas
+    if not images:
+        images = [
+            "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+            "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800",
+            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800"
+        ]
+    
+    context = {
+        'hotel': hotel_data,
+        'images': images,
+        'hotel_name': hotel_name_decoded
+    }
+    
+    return render(request, 'hotels/hotel_detail.html', context)

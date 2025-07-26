@@ -1,0 +1,694 @@
+{% extends "users/base.html" %}
+{% block content %}
+<style>
+    /* Harmonized navbar */
+    .navbar,
+    .navbar-container {
+        background: #101018 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100%;
+        margin: 0;
+        padding: 0.7rem 0 0.7rem 0;
+    }
+
+    .navbar a,
+    .navbar .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .navbar a:hover,
+    .navbar .nav-link:hover {
+        color: #D90429 !important;
+    }
+
+    .navbar .brand,
+    .navbar .logo {
+        color: #D90429 !important;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    .navbar .btn-signup {
+        background: #D90429 !important;
+        color: #fff !important;
+        border-radius: 2rem;
+        font-weight: 700;
+        padding: 0.5rem 1.5rem;
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .navbar .btn-signup:hover {
+        background: #c81c3a !important;
+    }
+
+    /* Modern hero for hotel */
+    body {
+        background: #101018 !important;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hero-modern {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 2.5rem auto;
+        height: 420px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 8px 48px #D90429cc, 0 2px 16px #000a;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .hero-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        filter: brightness(0.7) contrast(1.08) blur(0.5px);
+        transition: filter 0.3s;
+    }
+
+    .hero-modern-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #101018 60%, rgba(217, 4, 41, 0.18) 100%);
+        opacity: 0.92;
+        z-index: 2;
+    }
+
+    .hero-modern-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        padding-left: 4vw;
+    }
+
+    .hero-modern-card {
+        background: rgba(16, 16, 24, 0.92);
+        border-radius: 24px;
+        padding: 2.2rem 2.5rem 2.2rem 2.5rem;
+        max-width: 480px;
+        box-shadow: 0 4px 32px #D90429cc;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        animation: fadeInUp 0.8s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    .hero-modern-card h1 {
+        font-size: 2.3rem;
+        font-weight: 900;
+        margin-bottom: 1.1rem;
+        line-height: 1.1;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+    .hero-hotel {
+        color: #D90429;
+        background: linear-gradient(90deg, #D90429 60%, #fff 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        font-size: 2.7rem;
+        letter-spacing: 2px;
+    }
+
+    .hero-sub {
+        color: #fff;
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.92;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        background: #D90429;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 2rem;
+        padding: 0.7rem 2.2rem;
+        font-size: 1.1rem;
+        text-decoration: none;
+        box-shadow: 0 2px 12px #D90429aa;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .hero-btn:hover {
+        background: #c81c3a;
+        transform: scale(1.05);
+        text-decoration: none;
+        color: #fff;
+    }
+
+    /* Hotel details section */
+    .hotel-details {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem 2rem 1rem;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 3rem;
+    }
+
+    .hotel-info {
+        background: #181824;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 32px rgba(217, 4, 41, 0.10);
+    }
+
+    .hotel-info h2 {
+        color: #D90429;
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+
+    .hotel-info h3 {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem 0;
+    }
+
+    .hotel-info p {
+        color: #fff;
+        opacity: 0.9;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .amenity-item {
+        background: #22304a;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .contact-item {
+        background: #22304a;
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .contact-item strong {
+        color: #D90429;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Reservation section */
+    .reservation-card {
+        background: #181824;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 32px rgba(217, 4, 41, 0.10);
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .reservation-card h3 {
+        color: #D90429;
+        font-size: 1.8rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .room-types {
+        margin-bottom: 2rem;
+    }
+
+    .room-type {
+        background: #22304a;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+    .room-type:hover,
+    .room-type.selected {
+        border-color: #D90429;
+        background: #2a3a5a;
+    }
+
+    .room-type h4 {
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .room-price {
+        color: #D90429;
+        font-size: 1.5rem;
+        font-weight: 900;
+        float: right;
+    }
+
+    .room-details {
+        color: #fff;
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        color: #fff;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 2px solid #22304a;
+        background: #22304a;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #D90429;
+    }
+
+    .reserve-btn {
+        width: 100%;
+        background: #D90429;
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        border-radius: 2rem;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .reserve-btn:hover {
+        background: #c81c3a;
+        transform: scale(1.02);
+    }
+
+    /* Gallery section */
+    .gallery-section {
+        max-width: 1200px;
+        margin: 3rem auto 0 auto;
+        padding: 0 1rem;
+    }
+
+    .gallery-title {
+        text-align: center;
+        color: #fff;
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 2rem;
+    }
+
+    .masonry {
+        column-count: 3;
+        column-gap: 1.5rem;
+    }
+
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #181824;
+        box-shadow: 0 4px 32px rgba(217, 4, 41, 0.10), 0 1.5px 8px #000a;
+        position: relative;
+        animation: fadeInUp 0.7s cubic-bezier(.16, 1, .3, 1) both;
+        transition: box-shadow 0.2s, transform 0.2s, border 0.2s;
+        border: 2.5px solid transparent;
+        cursor: pointer;
+    }
+
+    .masonry-item img {
+        width: 100%;
+        display: block;
+        border-radius: 18px;
+        object-fit: cover;
+        min-height: 180px;
+        max-height: 420px;
+        filter: brightness(0.98) contrast(1.08);
+        transition: transform 0.25s, filter 0.2s;
+    }
+
+    .masonry-item:hover {
+        box-shadow: 0 8px 40px #D90429cc, 0 2px 16px #000a;
+        border: 2.5px solid #D90429;
+        transform: translateY(-8px) scale(1.035);
+    }
+
+    .masonry-item:hover img {
+        filter: brightness(1.08) contrast(1.13) saturate(1.1);
+        transform: scale(1.04) rotate(-1deg);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    /* Responsive design */
+    @media (max-width: 900px) {
+        .hero-modern {
+            height: 320px;
+        }
+
+        .hero-modern-card {
+            padding: 1.2rem 1.2rem;
+        }
+
+        .hero-modern-content {
+            padding-left: 2vw;
+        }
+
+        .hero-modern-card h1 {
+            font-size: 1.5rem;
+        }
+
+        .hero-hotel {
+            font-size: 1.7rem;
+        }
+
+        .hotel-details {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .masonry {
+            column-count: 2;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .hero-modern {
+            height: 220px;
+            border-radius: 16px;
+        }
+
+        .hero-modern-content {
+            padding-left: 0;
+            justify-content: center;
+        }
+
+        .hero-modern-card {
+            max-width: 95vw;
+            border-radius: 14px;
+        }
+
+        .masonry {
+            column-count: 1;
+        }
+
+        .contact-info {
+            grid-template-columns: 1fr;
+        }
+
+        .amenities-grid {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        }
+    }
+</style>
+
+{% if images %}
+<div class="hero-modern">
+    <img src="{{ images.0 }}" alt="Main image of {{ hotel.name }}" class="hero-bg-img">
+    <div class="hero-modern-overlay"></div>
+    <div class="hero-modern-content">
+        <div class="hero-modern-card">
+            <h1>
+                <span style="color: #fff; font-weight: 700;">Welcome to</span><br>
+                <span class="hero-hotel">{{ hotel.name }}</span>
+            </h1>
+            <p class="hero-sub">
+                Experience luxury and comfort in the heart of {{ hotel.location }}.
+            </p>
+            <a href="#reservation" class="hero-btn">Book Now</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="hotel-details">
+    <div class="hotel-info">
+        <h2>About {{ hotel.name }}</h2>
+        <p>{{ hotel.description }}</p>
+        
+        <h3>Amenities</h3>
+        <div class="amenities-grid">
+            {% for amenity in hotel.amenities %}
+            <div class="amenity-item">{{ amenity }}</div>
+            {% endfor %}
+        </div>
+
+        <h3>Contact Information</h3>
+        <div class="contact-info">
+            <div class="contact-item">
+                <strong>Address</strong>
+                {{ hotel.address }}
+            </div>
+            <div class="contact-item">
+                <strong>Phone</strong>
+                {{ hotel.phone }}
+            </div>
+            <div class="contact-item">
+                <strong>Email</strong>
+                {{ hotel.email }}
+            </div>
+            <div class="contact-item">
+                <strong>Rating</strong>
+                ⭐ {{ hotel.rating }}/5.0
+            </div>
+        </div>
+
+        <h3>Check-in & Check-out</h3>
+        <div class="contact-info">
+            <div class="contact-item">
+                <strong>Check-in</strong>
+                {{ hotel.check_in }}
+            </div>
+            <div class="contact-item">
+                <strong>Check-out</strong>
+                {{ hotel.check_out }}
+            </div>
+        </div>
+    </div>
+
+    <div class="reservation-card" id="reservation">
+        <h3>Make a Reservation</h3>
+        
+        <div class="room-types">
+            <h4 style="color: #fff; margin-bottom: 1rem;">Select Room Type</h4>
+            {% for room in hotel.room_types %}
+            <div class="room-type" onclick="selectRoom('{{ room.name }}', {{ room.price }})">
+                <h4>{{ room.name }} <span class="room-price">${{ room.price }}/night</span></h4>
+                <div class="room-details">
+                    {{ room.description }}<br>
+                    {{ room.capacity }} • {{ room.size }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form id="reservationForm" onsubmit="submitReservation(event)">
+            <div class="form-group">
+                <label for="checkin">Check-in Date</label>
+                <input type="date" id="checkin" name="checkin" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="checkout">Check-out Date</label>
+                <input type="date" id="checkout" name="checkout" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="guests">Number of Guests</label>
+                <select id="guests" name="guests" required>
+                    <option value="1">1 Guest</option>
+                    <option value="2">2 Guests</option>
+                    <option value="3">3 Guests</option>
+                    <option value="4">4 Guests</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            
+            <button type="submit" class="reserve-btn">Reserve Now</button>
+        </form>
+    </div>
+</div>
+
+{% if images %}
+<div class="gallery-section">
+    <h2 class="gallery-title">Hotel Gallery</h2>
+    <div class="masonry">
+        {% for img in images|slice:'1:' %}
+        <div class="masonry-item">
+            <img src="{{ img }}" alt="Image of {{ hotel.name }}">
+        </div>
+        {% empty %}
+        <p style="color:#fff;">No additional images found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+let selectedRoom = null;
+let selectedPrice = 0;
+
+function selectRoom(roomName, price) {
+    // Remove previous selection
+    document.querySelectorAll('.room-type').forEach(room => {
+        room.classList.remove('selected');
+    });
+    
+    // Add selection to clicked room
+    event.currentTarget.classList.add('selected');
+    
+    selectedRoom = roomName;
+    selectedPrice = price;
+}
+
+function submitReservation(event) {
+    event.preventDefault();
+    
+    if (!selectedRoom) {
+        alert('Please select a room type first.');
+        return;
+    }
+    
+    const formData = new FormData(event.target);
+    const checkin = formData.get('checkin');
+    const checkout = formData.get('checkout');
+    const guests = formData.get('guests');
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const phone = formData.get('phone');
+    
+    // Calculate number of nights
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
+    const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+    const totalPrice = nights * selectedPrice;
+    
+    // Show confirmation
+    const confirmation = `
+Reservation Confirmation:
+
+Hotel: {{ hotel.name }}
+Room: ${selectedRoom}
+Check-in: ${checkin}
+Check-out: ${checkout}
+Guests: ${guests}
+Nights: ${nights}
+Total Price: $${totalPrice}
+
+Guest Information:
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+
+Thank you for your reservation! A confirmation email will be sent shortly.
+    `;
+    
+    alert(confirmation);
+    
+    // In a real application, you would send this data to the server
+    console.log('Reservation data:', {
+        hotel: '{{ hotel.name }}',
+        room: selectedRoom,
+        checkin,
+        checkout,
+        guests,
+        nights,
+        totalPrice,
+        name,
+        email,
+        phone
+    });
+}
+
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkin').min = today;
+    document.getElementById('checkout').min = today;
+    
+    // Update checkout min date when checkin changes
+    document.getElementById('checkin').addEventListener('change', function() {
+        const checkinDate = new Date(this.value);
+        checkinDate.setDate(checkinDate.getDate() + 1);
+        document.getElementById('checkout').min = checkinDate.toISOString().split('T')[0];
+    });
+});
+</script>
+
+{% endblock %}
