@@ -239,7 +239,8 @@ def hotel_chatbot_api(request):
             
             # For other queries, use Gemini
             system_prompt = """You are a helpful hotel recommendation assistant. Your goal is to understand the user's hotel preferences and provide personalized recommendations.
-
+Be conversational and helpful. Ask one question at a time to avoid overwhelming the user.
+Give short responses with less thant 20 words\n
 Ask questions about:
 - Destination/location
 - Budget range
@@ -259,10 +260,11 @@ When you have enough information, provide a JSON response with hotel search para
 }
 ```
 
-Be conversational and helpful. Ask one question at a time to avoid overwhelming the user."""
+
+"""
 
             # Create the model
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             # Generate response
             chat = model.start_chat(history=conversation_history[:-1])
