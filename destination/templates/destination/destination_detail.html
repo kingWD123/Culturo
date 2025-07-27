@@ -273,16 +273,36 @@
         transform: scale(1.04) rotate(-1deg);
     }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px) scale(0.98);
-        }
+    .no-images-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        text-align: center;
+        padding: 2rem;
+    }
 
-        to {
-            opacity: 1;
-            transform: none;
-        }
+    .no-images-message {
+        color: #fff;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .back-to-destinations {
+        background: #eb3452;
+        color: #fff;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+    .back-to-destinations:hover {
+        background: #c81c3a;
+        color: #fff;
+        text-decoration: none;
     }
 </style>
 
@@ -303,14 +323,23 @@
         </div>
     </div>
 </div>
-{% endif %}
+
 <div id="portfolio" class="masonry">
     {% for img in images|slice:'1:' %}
     <div class="masonry-item">
         <img src="{{ img }}" alt="Image of {{ name }}">
     </div>
-    {% empty %}
-    <p style="color:#fff;">No images found.</p>
     {% endfor %}
 </div>
+{% else %}
+<div class="no-images-container">
+    <h1 class="no-images-message">No images found for {{ name|title }}</h1>
+    <p style="color: #ccc; margin-bottom: 2rem;">
+        We couldn't find images for this destination at the moment.
+    </p>
+    <a href="{% url 'destination:destination_recommandations' %}" class="back-to-destinations">
+        <i class="fas fa-arrow-left"></i> Back to Destinations
+    </a>
+</div>
+{% endif %}
 {% endblock %}
