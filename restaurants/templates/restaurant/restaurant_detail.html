@@ -409,14 +409,14 @@
             <h1>{{ restaurant.name }}</h1>
             <div class="hero-restaurant">Restaurant</div>
             <p class="hero-sub">{{ restaurant.cuisine }} • {{ restaurant.location }}</p>
-            <a href="#reservation" class="hero-btn">Réserver une table</a>
+            <a href="#reservation" class="hero-btn">Book a Table</a>
         </div>
     </div>
 </div>
 
 <div class="restaurant-details">
     <div class="restaurant-info">
-        <h2>À propos du restaurant</h2>
+        <h2>About the Restaurant</h2>
         <p>{{ restaurant.description }}</p>
 
         <div class="info-grid">
@@ -427,27 +427,27 @@
             </div>
             <div class="info-item">
                 <div class="icon">💰</div>
-                <div class="label">Prix</div>
+                <div class="label">Price</div>
                 <div class="value">{{ restaurant.price_range }}</div>
             </div>
             <div class="info-item">
                 <div class="icon">⭐</div>
-                <div class="label">Note</div>
+                <div class="label">Rating</div>
                 <div class="value">{{ restaurant.rating }}/5</div>
             </div>
             <div class="info-item">
                 <div class="icon">📍</div>
-                <div class="label">Localisation</div>
+                <div class="label">Location</div>
                 <div class="value">{{ restaurant.location }}</div>
             </div>
         </div>
 
-        <h3>Informations de contact</h3>
-        <p><strong>Adresse :</strong> {{ restaurant.address }}</p>
-        <p><strong>Téléphone :</strong> {{ restaurant.phone }}</p>
-        <p><strong>Site web :</strong> <a href="{{ restaurant.website }}" target="_blank" style="color: #eb3452;">{{ restaurant.website }}</a></p>
+        <h3>Contact Information</h3>
+        <p><strong>Address:</strong> {{ restaurant.address }}</p>
+        <p><strong>Phone:</strong> {{ restaurant.phone }}</p>
+        <p><strong>Website:</strong> <a href="{{ restaurant.website }}" target="_blank" style="color: #eb3452;">{{ restaurant.website }}</a></p>
 
-        <h3>Horaires d'ouverture</h3>
+        <h3>Opening Hours</h3>
         <div class="hours-grid">
             {% for day, hours in restaurant.hours.items %}
             <div class="hours-item">
@@ -459,16 +459,16 @@
     </div>
 
     <div class="reservation-card" id="reservation">
-        <h3>Réserver une table</h3>
+        <h3>Book a Table</h3>
         <form>
             <div class="form-group">
                 <label for="date">Date</label>
                 <input type="date" id="date" name="date" required>
             </div>
             <div class="form-group">
-                <label for="time">Heure</label>
+                <label for="time">Time</label>
                 <select id="time" name="time" required>
-                    <option value="">Choisir une heure</option>
+                    <option value="">Choose a time</option>
                     <option value="12:00">12:00</option>
                     <option value="12:30">12:30</option>
                     <option value="13:00">13:00</option>
@@ -483,54 +483,54 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="guests">Nombre de personnes</label>
+                <label for="guests">Number of Guests</label>
                 <select id="guests" name="guests" required>
-                    <option value="">Choisir</option>
-                    <option value="1">1 personne</option>
-                    <option value="2">2 personnes</option>
-                    <option value="3">3 personnes</option>
-                    <option value="4">4 personnes</option>
-                    <option value="5">5 personnes</option>
-                    <option value="6">6 personnes</option>
-                    <option value="7">7 personnes</option>
-                    <option value="8">8 personnes</option>
+                    <option value="">Choose</option>
+                    <option value="1">1 person</option>
+                    <option value="2">2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4">4 people</option>
+                    <option value="5">5 people</option>
+                    <option value="6">6 people</option>
+                    <option value="7">7 people</option>
+                    <option value="8">8 people</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="name">Nom</label>
-                <input type="text" id="name" name="name" placeholder="Votre nom" required>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
             </div>
             <div class="form-group">
-                <label for="phone">Téléphone</label>
-                <input type="tel" id="phone" name="phone" placeholder="Votre numéro de téléphone" required>
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="Your phone number" required>
             </div>
             <div class="form-group">
-                <label for="special">Demandes spéciales (optionnel)</label>
-                <input type="text" id="special" name="special" placeholder="Allergies, préférences...">
+                <label for="special">Special Requests (optional)</label>
+                <input type="text" id="special" name="special" placeholder="Allergies, preferences...">
             </div>
-            <button type="submit" class="btn-reserve">Confirmer la réservation</button>
+            <button type="submit" class="btn-reserve">Confirm Reservation</button>
         </form>
     </div>
 </div>
 
 <div class="gallery-section">
-    <h2>Galerie</h2>
+    <h2>Gallery</h2>
     <div class="gallery-grid">
         <div class="gallery-item">
-            <img src="{{ restaurant.img }}" alt="Photo du restaurant">
+            <img src="{{ restaurant.img }}" alt="Restaurant photo">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" alt="Intérieur du restaurant">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400" alt="Restaurant interior">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400" alt="Plat signature">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400" alt="Signature dish">
         </div>
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400" alt="Ambiance du restaurant">
+            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400" alt="Restaurant atmosphere">
         </div>
     </div>
 </div>
@@ -542,7 +542,7 @@
     // Handle form submission
     document.querySelector('form').addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Réservation confirmée ! Vous recevrez un email de confirmation.');
+        alert('Reservation confirmed! You will receive a confirmation email.');
     });
 </script>
 

@@ -430,28 +430,43 @@ class CulturoApp {
         history.push({ role: "user", content: message });
         showTypingIndicator();
         isBotTyping = true;
+        
         try {
+            console.log('🚀 Sending request to /cinema_chatbot_api/');
+            console.log('📤 Request data:', { history: history });
+            
             const response = await fetch('/cinema_chatbot_api/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ history: history })
             });
-            const data = await response.json();
-            removeTypingIndicator();
-            appendBotMessageAnimated(data.message);
-            history.push({ role: "assistant", content: data.message });
-            if (data.done && data.user_data) {
-                const pre = document.createElement('pre');
-                pre.textContent = JSON.stringify(data.user_data, null, 2);
-                pre.style.background = '#f8f9fa';
-                pre.style.borderRadius = '10px';
-                pre.style.padding = '0.7rem 1rem';
-                pre.style.margin = '8px 0 0 0';
-                pre.style.fontSize = '0.98rem';
-                messagesDiv.appendChild(pre);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response ok:', response.ok);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            // Ajout dynamique des films Now Showing
+            
+            const data = await response.json();
+            console.log('📥 Response data:', data);
+            
+            removeTypingIndicator();
+            
+            // Vérifier s'il y a une erreur dans la réponse
+            if (data.error) {
+                console.warn('⚠️ Server returned error:', data.error);
+            }
+            
+            // Afficher le message du bot (même en cas d'erreur, le serveur peut retourner un message utile)
+            if (data.message) {
+                appendBotMessageAnimated(data.message);
+                history.push({ role: "assistant", content: data.message });
+            }
+            
+            // Traitement des recommandations et autres données...
             if (data.qloo_url) {
                 fetch('/api/get_movies_from_qloo/', {
                     method: 'POST',
@@ -468,11 +483,32 @@ class CulturoApp {
                     if (grid) grid.innerHTML = '<div style="padding:1rem;">Error loading movies.</div>';
                 });
             }
+            
         } catch (e) {
+            console.error('❌ Chatbot API Error:', e);
             removeTypingIndicator();
-            appendBotMessageAnimated("Error connecting to chatbot.");
+            
+            // Message d'erreur plus informatif
+            let errorMessage = "I'm having some technical difficulties. ";
+            if (e.message.includes('404')) {
+                errorMessage += "The chatbot service is not available. Please try refreshing the page.";
+            } else if (e.message.includes('500')) {
+                errorMessage += "There's a server error. Please try again in a moment.";
+            } else if (e.message.includes('Failed to fetch')) {
+                errorMessage += "Please check your internet connection and try again.";
+            } else {
+                errorMessage += "Please try asking your question again.";
+            }
+            
+            appendBotMessageAnimated(errorMessage);
         }
         isBotTyping = false;
+    }
+
+    // Fonction pour récupérer le token CSRF
+    function getCsrfToken() {
+        const token = document.querySelector('[name=csrfmiddlewaretoken]');
+        return token ? token.value : '';
     }
 
     sendBtn.onclick = function (e) {
@@ -829,33 +865,37 @@ function updateNowShowing(movies) {
             // 1. Vérifier d'abord dans les propriétés (format de l'API Qloo)
             if (film.properties && film.properties.image) {
                 if (typeof film.properties.image === 'string') {
-                    imgSrc = film.properties.image;
+                    imgSrc = film.properties.image.trim(); // Ajout de trim()
                 } else if (film.properties.image.url) {
-                    imgSrc = film.properties.image.url;
+                    imgSrc = film.properties.image.url.trim(); // Ajout de trim()
                 }
             } 
             // 2. Vérifier si l'image est directement dans film.image (objet ou chaîne)
             else if (film.image) {
                 if (typeof film.image === 'string') {
-                    imgSrc = film.image;
+                    imgSrc = film.image.trim(); // Ajout de trim()
                 } else if (film.image.url) {
-                    imgSrc = film.image.url;
+                    imgSrc = film.image.url.trim(); // Ajout de trim()
                 }
             } 
             // 3. Vérifier image_url au niveau racine
             else if (film.image_url) {
-                imgSrc = film.image_url;
+                imgSrc = film.image_url.trim(); // Ajout de trim()
             }
             // 4. Vérifier poster_path dans les propriétés (format TMDB)
             else if (film.properties && film.properties.poster_path) {
                 imgSrc = `https://image.tmdb.org/t/p/w500${film.properties.poster_path}`;
             }
             
-            // 4. Image par défaut si aucune image n'est trouvée
-            if (!imgSrc) {
+            // Debug pour voir les URLs d'images
+            console.log(`🖼️ Image pour ${film.name}:`, imgSrc);
+            
+            // 5. Image par défaut si aucune image n'est trouvée
+            if (!imgSrc || imgSrc === '') {
                 imgSrc = 'https://via.placeholder.com/300x450?text=No+Image';
                 console.warn('Aucune image trouvée pour le film:', film.name || 'Inconnu');
             }
+            
             // Stockage local pour fallback page détail (entity_id, imdb_id, slug)
             if (film.entity_id) {
                 try { localStorage.setItem('movie_' + film.entity_id, JSON.stringify(film)); } catch (e) {}
@@ -872,10 +912,10 @@ function updateNowShowing(movies) {
             const card = document.createElement('div');
             card.className = 'cinema-movie-card';
             card.innerHTML = `
-                <img src="${imgSrc}" alt="${film.name || ''}" class="cinema-movie-img">
+                <img src="${imgSrc}" alt="${film.name || ''}" class="cinema-movie-img" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
                 <div class="cinema-movie-info">
                     <h4>${film.name || ''}</h4>
-                    ${film.release_year ? `<span class="cinema-movie-date">${film.release_year}</span>` : ''}
+                    ${film.properties && film.properties.release_year ? `<span class="cinema-movie-date">${film.properties.release_year}</span>` : ''}
                     <a href="/movie_detail/?id=${encodeURIComponent(detailId)}" class="btn btn-secondary">Discover</a>
                 </div>
             `;

@@ -414,6 +414,7 @@
                 e.preventDefault();
                 var userMsg = chatbotInput.value.trim();
                 if (!userMsg) return;
+                
                 // Display user message
                 var userDiv = document.createElement('div');
                 userDiv.style.alignSelf = 'flex-end';
@@ -426,43 +427,77 @@
                 chatbotMessages.appendChild(userDiv);
                 chatbotInput.value = '';
                 chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                
                 // Add to chatHistory
                 chatHistory.push({ role: 'user', content: userMsg });
+                
                 // Show loading spinner
                 if (recLoading) recLoading.style.display = 'flex';
-                // API call
-                var response = await fetch('/cinema_chatbot_api/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ history: chatHistory })
-                });
-                var data = await response.json();
-                console.log('Backend response:', data);
-                // Hide loading spinner
-                if (recLoading) recLoading.style.display = 'none';
-                // Display bot response
-                console.log('INLINE TEMPLATE SCRIPT - BOT MESSAGE:', data.message);
-                var botDiv = document.createElement('div');
-                botDiv.style.alignSelf = 'flex-start';
-                var message = data.message;
-                var trimmed = message && message.trim();
-                if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
-                  // Don't display anything
-                } else {
-                  botDiv.textContent = message;
-                  botDiv.style.borderRadius = '12px';
-                  botDiv.style.padding = '0.7rem 1rem';
-                  botDiv.style.margin = '0.2rem 0';
-                  botDiv.style.maxWidth = '85%';
-                  chatbotMessages.appendChild(botDiv);
-                }
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-                // Add to chatHistory
-                chatHistory.push({ role: 'model', content: data.message });
-                // If recommendations present and done=true, redirect to results page
-                if (data.recommendations && data.recommendations.length && data.done) {
-                    console.log('Redirecting to results page');
-                    // window.location.href = '/cinema_recommendations_result/';
+                
+                try {
+                    // API call
+                    var response = await fetch('/cinema_chatbot_api/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ history: chatHistory })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    var data = await response.json();
+                    console.log('Backend response:', data);
+                    
+                    // Hide loading spinner
+                    if (recLoading) recLoading.style.display = 'none';
+                    
+                    // Display bot response
+                    console.log('INLINE TEMPLATE SCRIPT - BOT MESSAGE:', data.message);
+                    var botDiv = document.createElement('div');
+                    botDiv.style.alignSelf = 'flex-start';
+                    var message = data.message;
+                    var trimmed = message && message.trim();
+                    if (trimmed && ((trimmed.startsWith('{') && trimmed.endsWith('}')) || /\{[\s\S]*?\}/.test(trimmed))) {
+                      // Don't display anything
+                    } else {
+                      botDiv.textContent = message;
+                      botDiv.style.background = '#b61b23';
+                      botDiv.style.color = '#fff';
+                      botDiv.style.borderRadius = '12px';
+                      botDiv.style.padding = '0.7rem 1rem';
+                      botDiv.style.margin = '0.2rem 0';
+                      botDiv.style.maxWidth = '85%';
+                      chatbotMessages.appendChild(botDiv);
+                    }
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                    
+                    // Add to chatHistory
+                    chatHistory.push({ role: 'model', content: data.message });
+                    
+                    // Update movie display if recommendations are present
+                    if (data.recommendations && data.recommendations.length) {
+                        updateNowShowing(data.recommendations);
+                    }
+                    
+                } catch (error) {
+                    console.error('Chatbot API Error:', error);
+                    
+                    // Hide loading spinner
+                    if (recLoading) recLoading.style.display = 'none';
+                    
+                    // Display error message
+                    var errorDiv = document.createElement('div');
+                    errorDiv.style.alignSelf = 'flex-start';
+                    errorDiv.style.background = '#dc3545';
+                    errorDiv.style.color = '#fff';
+                    errorDiv.style.borderRadius = '12px';
+                    errorDiv.style.padding = '0.7rem 1rem';
+                    errorDiv.style.margin = '0.2rem 0';
+                    errorDiv.style.maxWidth = '85%';
+                    errorDiv.textContent = 'Sorry, I encountered an error. Please try again.';
+                    chatbotMessages.appendChild(errorDiv);
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
                 }
             });
         }
