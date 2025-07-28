@@ -1,0 +1,433 @@
+/* Use a variable for the navbar height to make it easily adjustable */
+:root {
+    --navbar-height: 80px;
+    /* Adjust this value based on your actual navbar height */
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #f4f7fb;
+    overflow: hidden;
+    /* Prevent scrollbars from the main layout */
+}
+
+#map {
+    position: fixed;
+    top: var(--navbar-height);
+    /* Start below the navbar */
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--navbar-height));
+    /* Fill remaining height */
+    z-index: 1;
+}
+
+.sidebar-float {
+    position: fixed;
+    top: var(--navbar-height);
+    /* Start below the navbar */
+    left: 0;
+    height: calc(100vh - var(--navbar-height));
+    /* Fill remaining height */
+    width: 340px;
+    background: #22304a;
+    color: #fff;
+    box-shadow: 2px 0 24px rgba(40, 40, 80, 0.13);
+    z-index: 1002;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 2rem 2rem 2rem;
+}
+
+.sidebar-float.open {
+    transform: translateX(0);
+}
+
+.sidebar-float h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+.sidebar-float .close-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.7rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.sidebar-float .close-btn:hover {
+    opacity: 1;
+}
+
+.sidebar-float .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-float .sidebar-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+.sidebar-toggle-btn {
+    position: fixed;
+    top: calc(var(--navbar-height) + 2rem);
+    /* Position below navbar */
+    left: 2rem;
+    z-index: 1100;
+    background: #22304a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #2a365d;
+}
+
+.sidebar-toggle-btn.shifted {
+    transform: translateX(340px);
+    /* Move button with sidebar */
+}
+
+/* Carousel Styles */
+.bottom-carousel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1001;
+    padding: 0 0 1.5rem 1.5rem;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.bottom-carousel.hidden {
+    transform: translateY(110%);
+}
+
+/* Animation for carousel entry */
+@keyframes slideInUp {
+    from {
+        transform: translateY(110%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.carousel-entry {
+    animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    pointer-events: all;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-card {
+    flex: 0 0 220px;
+    background: rgba(34, 48, 74, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 0.7rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.carousel-card:hover {
+    transform: translateY(-5px);
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.carousel-card h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+}
+
+.carousel-card p {
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.carousel-card .booking-hint {
+    margin-top: auto; /* Pousse le hint vers le bas */
+    padding: 8px;
+    background: rgba(235, 52, 82, 0.2);
+    border: 1px solid rgba(235, 52, 82, 0.3);
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #fff;
+    opacity: 0.9;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Le hint garde sa taille */
+}
+
+.carousel-card:hover .booking-hint {
+    background: rgba(235, 52, 82, 0.3);
+    opacity: 1;
+}
+
+.carousel-hide-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 10;
+}
+
+.carousel-hide-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.show-carousel-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 8rem;
+    background: #22304a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+    font-size: 1.7rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.2s;
+}
+
+.show-carousel-btn.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.show-carousel-btn:hover {
+    background: #2a365d;
+    transform: scale(1.05);
+}
+
+/* Chatbot Styles */
+#chatbot-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: #e50914;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1200;
+}
+
+#chatbot-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+#destination-chatbot {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: #181818;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    z-index: 1201;
+    overflow: hidden;
+    color: #fff;
+}
+
+.chatbot-header {
+    background: #e50914;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+#chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+#chatbot-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #181818;
+    color: #fff;
+}
+
+.chat-bubble {
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word;
+    animation: fadeInUp 0.3s ease;
+}
+
+.user-message {
+    background: #e50914;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: #e5e5e5;
+    color: #111;
+    border: 1px solid #e9ecef;
+    margin-right: auto;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#chatbot-form {
+    padding: 20px;
+    background: #181818;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 10px;
+}
+
+#chatbot-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 14px;
+    background: #fff;
+    color: #111;
+}
+
+#chatbot-input:focus {
+    border-color: #e50914;
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+}
+
+#chatbot-send {
+    background: #e50914;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#chatbot-send:hover {
+    background: #b0060f;
+    transform: scale(1.05);
+}

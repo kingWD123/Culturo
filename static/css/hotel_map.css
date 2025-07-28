@@ -1,0 +1,463 @@
+/* Use a variable for the navbar height to make it easily adjustable */
+:root {
+    --navbar-height: 80px;
+    /* Adjust this value based on your actual navbar height */
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #f4f7fb;
+    overflow: hidden;
+    /* Prevent scrollbars from the main layout */
+}
+
+#map {
+    position: fixed;
+    top: var(--navbar-height);
+    /* Start below the navbar */
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--navbar-height));
+    /* Fill remaining height */
+    z-index: 1;
+}
+
+.sidebar-float {
+    position: fixed;
+    top: var(--navbar-height);
+    /* Start below the navbar */
+    left: 0;
+    height: calc(100vh - var(--navbar-height));
+    /* Fill remaining height */
+    width: 340px;
+    background: #22304a;
+    color: #fff;
+    box-shadow: 2px 0 24px rgba(40, 40, 80, 0.13);
+    z-index: 1002;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 2rem 2rem 2rem;
+}
+
+.sidebar-float.open {
+    transform: translateX(0);
+}
+
+.sidebar-float h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+.sidebar-float .close-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.7rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.sidebar-float .close-btn:hover {
+    opacity: 1;
+}
+
+.sidebar-float .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-float .sidebar-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+.sidebar-toggle-btn {
+    position: fixed;
+    top: calc(var(--navbar-height) + 2rem);
+    /* Position below navbar */
+    left: 2rem;
+    z-index: 1100;
+    background: #22304a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), background 0.2s, opacity 0.3s;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #2a365d;
+}
+
+.sidebar-toggle-btn.shifted {
+    transform: translateX(340px);
+    /* Move button with sidebar */
+}
+
+/* Carousel Styles */
+.bottom-carousel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1001;
+    padding: 0 0 1.5rem 1.5rem;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.bottom-carousel.hidden {
+    transform: translateY(110%);
+}
+
+/* Animation for carousel entry */
+@keyframes slideInUp {
+    from {
+        transform: translateY(110%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.carousel-entry {
+    animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    pointer-events: all;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-card {
+    flex: 0 0 220px;
+    height: 320px; /* Augmenté de 280px à 320px */
+    background: rgba(34, 48, 74, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 0.7rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    overflow: hidden; /* Gérer le débordement */
+}
+
+.carousel-card h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+    white-space: nowrap; /* Empêcher le retour à la ligne */
+    overflow: hidden; /* Cacher le débordement */
+    text-overflow: ellipsis; /* Ajouter des points de suspension */
+}
+
+.carousel-card p {
+    font-size: 0.75rem;
+    margin: 0.2rem 0;
+    opacity: 0.9;
+    overflow: hidden; /* Cacher le débordement */
+    text-overflow: ellipsis; /* Ajouter des points de suspension */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limiter à 2 lignes */
+    -webkit-box-orient: vertical;
+}
+
+.carousel-card .price {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4ade80;
+    margin-top: auto;
+}
+
+/* Styles pour les liens des cartes d'hôtels */
+.carousel-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.carousel-card-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.carousel-card .card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0.5rem;
+}
+
+.carousel-card .booking-hint {
+    margin-top: auto; /* Pousse le hint vers le bas */
+    padding: 8px;
+    background: rgba(217, 4, 41, 0.2);
+    border: 1px solid rgba(217, 4, 41, 0.3);
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #fff;
+    opacity: 0.9;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Le hint garde sa taille */
+}
+
+.carousel-card:hover .booking-hint {
+    background: rgba(217, 4, 41, 0.3);
+    opacity: 1;
+}
+
+.carousel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+/* Show/Hide Carousel Button */
+.show-carousel-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 5rem;  /* Décalé vers la gauche pour éviter le chatbot */
+    z-index: 1100;
+    background: #22304a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 2px 12px rgba(40, 40, 80, 0.13);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.show-carousel-btn.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.show-carousel-btn:hover {
+    background: #2a365d;
+    transform: scale(1.1);
+}
+
+/* Hide Carousel Button */
+.hide-carousel-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hide-carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Chatbot Styles */
+.chatbot-toggle {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;  /* Changé de left à right */
+    z-index: 1100;
+    background: #22304a;  /* Même couleur que les autres chatbots */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    box-shadow: 0 4px 16px rgba(34, 48, 74, 0.3);  /* Ajusté pour la nouvelle couleur */
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chatbot-toggle:hover {
+    background: #2a365d;  /* Hover cohérent */
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(34, 48, 74, 0.5);
+}
+
+.chatbot-container {
+    position: fixed;
+    bottom: 100px;
+    right: 2rem;
+    width: 350px;
+    height: 500px;
+    background: #22304a;
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    display: flex;  /* Changé de 'none' à 'flex' pour afficher directement */
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-header {
+    background: #D90429;  /* Rouge comme le chatbot restaurants */
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+}
+
+.chatbot-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.chatbot-close:hover {
+    opacity: 1;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #22304a;  /* Fond sombre */
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.chat-bubble {
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+.chat-bubble.user-message {
+    align-self: flex-end;
+    background: #333;  /* Gris foncé pour les messages utilisateur */
+    color: #fff;
+}
+
+.chat-bubble.bot-message {
+    align-self: flex-start;
+    background: #000;  /* Noir pour les messages bot */
+    color: #fff;
+}
+
+.chat-bubble.error {
+    background: #D90429;  /* Rouge pour les erreurs */
+    color: #fff;
+    font-weight: bold;
+}
+
+.chatbot-input-container {
+    padding: 1rem;
+    background: #1E1E1E;  /* Fond sombre pour la zone de saisie */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-form {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.chatbot-input {
+    flex: 1;
+    border: none;
+    background: #fff;
+    border-radius: 20px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    outline: none;
+    color: #000;
+}
+
+.chatbot-send {
+    background: #D90429;  /* Rouge pour le bouton d'envoi */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.chatbot-send:hover {
+    background: #c70812;  /* Rouge plus foncé au hover */
+}
