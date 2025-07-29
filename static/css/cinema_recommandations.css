@@ -1,0 +1,157 @@
+/* Cinema Recommendations Page Styles */
+
+/* Hero Video Container Styles */
+.cinema-hero-video-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.cinema-hero-video-container video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.cinema-hero-text-block {
+  position: relative;
+  z-index: 2;
+  margin-left: 3vw;
+  margin-right: auto;
+  background: rgba(24,24,24,0.65);
+  border-radius: 18px;
+  padding: 2rem 2.5rem 2rem 2.5rem;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.cinema-hero-text-block h1 {
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  text-shadow: none;
+}
+
+.cinema-hero-text-block p {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  font-weight: 400;
+  margin-bottom: 1.3rem;
+  text-shadow: none;
+  animation: fadeInUp 1.2s;
+}
+
+.cinema-hero-text-block a {
+  display: inline-block;
+  padding: 0.6rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #e50914;
+  border: none;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px #e5091444;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.18s;
+}
+
+.cinema-hero-text-block a:hover {
+  background: #b0060f;
+  color: #fff;
+}
+
+/* Chatbot Styles */
+.chatbot-container {
+  background: #fff;
+  color: #212529;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+#chatbot-input {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  padding: 0.8rem 1.2rem;
+  color: #212529 !important;
+  font-size: 1rem;
+  caret-color: #b61b23;
+}
+
+#chatbot-input::placeholder {
+  color: #6c757d !important;
+}
+
+.chat-message {
+  color: #212529 !important;
+}
+
+.chatbot-header {
+  background: #b61b23;
+  color: #fff;
+}
+
+.chat-message.user {
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.chat-message.bot {
+  background: #b61b23;
+  color: #fff;
+}
+
+/* Animations */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(40px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .cinema-hero-video-container {
+    height: 220px;
+  }
+  
+  .cinema-hero-text-block {
+    max-width: 98vw;
+    margin: 0 auto;
+    padding: 1.2rem 1rem;
+    align-items: center;
+  }
+  
+  .cinema-hero-text-block h1 {
+    font-size: 1.5rem;
+  }
+}

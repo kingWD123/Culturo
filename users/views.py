@@ -171,237 +171,266 @@ def get_movie_urns_from_titles(titles):
 @csrf_exempt
 def cinema_chatbot_api(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        history = data.get("history", [])
-
-        system_prompt = (
-            "You are an assistant specialized in movie recommendations via ClooAI. "
-            "Ask adaptive questions to gather available information. "
-            "The user is not required to provide all information.\n\n"
-            "Questions to ask (one by one, according to responses):\n"
-            "2. What genres do you prefer? (action, thriller, comedy, etc.) (optional)\n"
-            "3. In which city/country are you located? (optional)\n"
-            "4. What is your approximate age? (optional)\n"
-            "5. What movie period do you prefer? (recent years, classics, etc.) (optional)\n"
-            "6. What minimum rating do you want? (optional)\n"
-            "7. What language do you prefer? (optional)\n\n"
-            "When you have enough information (at least 3-4 criteria), display a JSON summary with only the provided information:\n"
-            '{\n'
-            '  "films_aimes": ["title1", "title2"], // only if provided\n'
-            '  "genres": ["action", "thriller"], // only if provided\n'
-            '  "localisation": "Paris", // only if provided\n'
-            '  "age": "18_to_35", // only if provided\n'
-            '  "genre": "male", // only if provided\n'
-            '  "annee_min": 2000, // only if provided\n'
-            '  "annee_max": 2024, // only if provided\n'
-            '  "note_min": 3.5, // only if provided\n'
-            '  "langue": "english" // only if provided\n'
-            '}\n\n'
-            "Only propose the JSON summary when you have at least some useful information. "
-            "Make a small summary of the information provided by the user at the end of their last message. "
-            "Adapt your questions according to previous responses. "
-            "Adapt to the user's language, and keep in mind that the user is here to discover"
-        )
-
-        messages = [{"role": "user", "parts": [system_prompt]}]
-        for m in history:
-            messages.append({"role": m["role"], "parts": [m["content"]]})
-
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(messages)
-        bot_message = response.text
-
-        user_data = None
-        qloo_url = None
-        urn_not_found = []
-        recommendations = None
         try:
-            start = bot_message.index("{")
-            end = bot_message.rindex("}") + 1
-            user_data = json.loads(bot_message[start:end])
-            # Préparer les paramètres pour l'URL ClooAI (seulement les infos fournies)
+            print("🚀 [DEBUG] Starting cinema_chatbot_api")
+            data = json.loads(request.body)
+            history = data.get("history", [])
+            print(f"📥 [DEBUG] Received history: {history}")
+
+            system_prompt = (
+                "You are an assistant specialized in movie recommendations via ClooAI. "
+                "Ask adaptive questions to gather available information. "
+                "The user is not required to provide all information.\n\n"
+                "Questions to ask (one by one, according to responses):\n"
+                "2. What genres do you prefer? (action, thriller, comedy, etc.) (optional)\n"
+                "3. In which city/country are you located? (optional)\n"
+                "4. What is your approximate age? (optional)\n"
+                "5. What movie period do you prefer? (recent years, classics, etc.) (optional)\n"
+                "6. What minimum rating do you want? (optional)\n"
+                "7. What language do you prefer? (optional)\n\n"
+                "When you have enough information (at least 3-4 criteria), display a JSON summary with only the provided information:\n"
+                '{\n'
+                '  "films_aimes": ["title1", "title2"], // only if provided\n'
+                '  "genres": ["action", "thriller"], // only if provided\n'
+                '  "localisation": "Paris", // only if provided\n'
+                '  "age": "18_to_35", // only if provided\n'
+                '  "genre": "male", // only if provided\n'
+                '  "annee_min": 2000, // only if provided\n'
+                '  "annee_max": 2024, // only if provided\n'
+                '  "note_min": 3.5, // only if provided\n'
+                '  "langue": "english" // only if provided\n'
+                '}\n\n'
+                "Only propose the JSON summary when you have at least some useful information. "
+                "Make a small summary of the information provided by the user at the end of their last message. "
+                "Adapt your questions according to previous responses. "
+                "Adapt to the user's language, and keep in mind that the user is here to discover"
+            )
+
+            messages = [{"role": "user", "parts": [system_prompt]}]
+            for m in history:
+                messages.append({"role": m["role"], "parts": [m["content"]]})
+
+            print("🤖 [DEBUG] Calling Gemini API")
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(messages)
+            bot_message = response.text
+            print(f"✅ [DEBUG] Gemini response: {bot_message[:100]}...")
+
+            user_data = None
+            qloo_url = None
+            urn_not_found = []
+            recommendations = None
+            entity_ids = []
             extra_params = {}
             
-            # Films aimés (entités d'intérêt)
-            entity_ids = user_data.get("films_aimes", [])
-            if entity_ids:
-                entity_ids, urn_not_found = get_movie_urns_from_titles(entity_ids)
-            
-            # Genres avec poids (seulement si fournis)
-            genres = user_data.get("genres", [])
-            if genres:
-                genre_tags = []
-                for genre in genres:
-                    # Mapping des genres vers les URNs ClooAI
-                    genre_mapping = {
-                        "action": "urn:tag:genre:media:action",
-                        "thriller": "urn:tag:genre:media:thriller",
-                        "comedie": "urn:tag:genre:media:comedy",
-                        "drame": "urn:tag:genre:media:drama",
-                        "science_fiction": "urn:tag:genre:media:sci_fi",
-                        "horreur": "urn:tag:genre:media:horror",
-                        "romance": "urn:tag:genre:media:romance",
-                        "aventure": "urn:tag:genre:media:adventure",
-                        "animation": "urn:tag:genre:media:animation",
-                        "documentaire": "urn:tag:genre:media:documentary"
-                    }
-                    if genre.lower() in genre_mapping:
-                        genre_tags.append({"tag": genre_mapping[genre.lower()], "weight": 20})
+            try:
+                start = bot_message.index("{")
+                end = bot_message.rindex("}") + 1
+                user_data = json.loads(bot_message[start:end])
+                print(f"📊 [DEBUG] Parsed user_data: {user_data}")
                 
-                if genre_tags:
-                    extra_params['signal.interests.tags'] = json.dumps(genre_tags)
-            
-            # Localisation géographique (seulement si fournie)
-            if user_data.get("localisation"):
-                extra_params['filter.location.query'] = user_data["localisation"]
-            
-            # Démographie - âge (mapping vers valeurs acceptées par ClooAI)
-            if user_data.get("age"):
-                age_value = user_data["age"].lower().replace(" ", "").replace("_", "")
-                age_map = {
-                    "18to35": "35_and_younger",
-                    "18to25": "24_and_younger",
-                    "25to29": "25_to_29",
-                    "30to34": "30_to_34",
-                    "35to44": "35_to_44",
-                    "36to55": "36_to_55",
-                    "45to54": "45_to_54",
-                    "55andolder": "55_and_older",
-                    "35andyounger": "35_and_younger",
-                    "24andyounger": "24_and_younger"
-                }
-                mapped_age = None
-                for key, val in age_map.items():
-                    if key in age_value: 
-                        mapped_age = val
-                        break
-                if mapped_age:
-                    extra_params['signal.demographics.age'] = mapped_age
-            
-            # Démographie - genre (seulement si fourni)
-            if user_data.get("genre"):
-                extra_params['signal.demographics.gender'] = user_data["genre"]
-            
-            # Filtrage temporel (seulement si fourni)
-            if user_data.get("annee_min"):
-                extra_params['filter.release_year.min'] = user_data["annee_min"]
-            if user_data.get("annee_max"):
-                extra_params['filter.release_year.max'] = user_data["annee_max"]
-            
-            # Note minimale (seulement si fournie)
-            if user_data.get("note_min"):
-                extra_params['filter.rating.min'] = user_data["note_min"]
-            
-            # Langue (seulement si fournie)
-            if user_data.get("langue"):
-                extra_params['filter.language'] = user_data["langue"]
-
-            if extra_params:
-                extra_params['feature.explainability'] = True
-            
-            # Générer l'URL seulement si on a au moins quelques paramètres
-            if entity_ids or extra_params:
-                if 'feature.explainability' in extra_params:
-                    extra_params['feature.explainability'] = True
-                qloo_url = build_qloo_url(
-                    entity_type="urn:entity:movie",
-                    entity_ids=entity_ids,
-                    extra_params=extra_params
-                )
-                print("[Qloo URL]", qloo_url)
-                # Appeler l'API Qloo/ClooAI pour obtenir les recommandations
-                try:
-                    qloo_headers = {
-                        "x-api-key": settings.CLOOAI_API_KEY,
-                        "Accept": "application/json"
-                    }
-                    qloo_response = requests.get(qloo_url, headers=qloo_headers)
-
-                    if qloo_response.status_code == 200:
-                        qloo_data = qloo_response.json()
-                        # Extraire les titres recommandés (adapter selon la structure de la réponse)
-                        titles = []
-                        # Initialiser le dictionnaire des détails des films dans la session s'il n'existe pas
-                        if 'movie_details' not in request.session:
-                            request.session['movie_details'] = {}
-                            
-                        for element in qloo_data["results"]["entities"]:
-                            entity_id = element.get("entity_id")
-                            film = {
-                                "name": element.get("name"),
-                                "entity_id": entity_id,
-                                "properties": element.get("properties", {}),
-                                "tags": element.get("tags", []),
-                                "external": element.get("external", {}),
-                                "release_year": element.get("properties", {}).get("release_year"),
-                                "description": element.get("properties", {}).get("description"),
-                                "image": element.get("properties", {}).get("image", {}).get("url"),
-                                "genres": [tag.get("name") for tag in element.get("tags", [])],
-                                "release_country": element.get("properties", {}).get("release_country"),
-                                "imdb_id": None,
-                                "imdb_user_rating": None,
-                                "imdb_user_rating_count": None
-                            }
-                            
-                            # Ajouter les informations IMDB si disponibles
-                            imdb = element.get("external", {}).get("imdb", [])
-                            if imdb and isinstance(imdb, list) and len(imdb) > 0:
-                                imdb_info = imdb[0]
-                                film["imdb_id"] = imdb_info.get("id")
-                                film["imdb_user_rating"] = imdb_info.get("user_rating")
-                                film["imdb_user_rating_count"] = imdb_info.get("user_rating_count")
-                            
-                            # Stocker les détails complets du film dans la session
-                            if entity_id:
-                                request.session['movie_details'][entity_id] = film
-                                # S'assurer que la session est sauvegardée
-                                request.session.modified = True
-                            
-                            # Ajouter à la liste des recommandations
-                            titles.append(film)
-                        
-                        recommendations = titles
-                    else:
-                        recommendations = [f"Erreur API Qloo: {qloo_response.status_code}"]
-                except Exception as api_exc:
-                    recommendations = [f"Erreur lors de l'appel API Qloo: {api_exc}"]
-            else:
-                print("Pas assez d'informations pour générer une URL de recommandation")
+                # Préparer les paramètres pour l'URL ClooAI (seulement les infos fournies)
+                extra_params = {}
                 
-        except Exception as e:
-            print(f"Erreur lors du parsing JSON: {e}")
-            pass
-
-        # Message d'avertissement si certains titres n'ont pas d'URN
-        warning = None  
-        if urn_not_found:
-            warning = f"Aucun identifiant ClooAI trouvé pour : {', '.join(urn_not_found)}. Les recommandations seront moins précises."
-
-        # Si recommandations prêtes, stocke-les dans la session
-        if recommendations and (user_data is not None and (entity_ids or extra_params)):
-            request.session['cinema_recommendations'] = recommendations
-            request.session['cinema_qloo_url'] = qloo_url
-            
-            # S'assurer que les détails des films sont bien stockés dans la session
-            if 'movie_details' not in request.session:
-                request.session['movie_details'] = {}
+                # Films aimés (entités d'intérêt)
+                entity_ids = user_data.get("films_aimes", [])
+                if entity_ids:
+                    entity_ids, urn_not_found = get_movie_urns_from_titles(entity_ids)
                 
-            # Mise à jour des détails des films dans la session
-            for film in recommendations:
-                if 'entity_id' in film and film['entity_id']:
-                    request.session['movie_details'][film['entity_id']] = film
+                # Genres avec poids (seulement si fournis)
+                genres = user_data.get("genres", [])
+                if genres:
+                    genre_tags = []
+                    for genre in genres:
+                        # Mapping des genres vers les URNs ClooAI
+                        genre_mapping = {
+                            "action": "urn:tag:genre:media:action",
+                            "thriller": "urn:tag:genre:media:thriller",
+                            "comedie": "urn:tag:genre:media:comedy",
+                            "comedy": "urn:tag:genre:media:comedy",
+                            "drame": "urn:tag:genre:media:drama",
+                            "science_fiction": "urn:tag:genre:media:sci_fi",
+                            "horreur": "urn:tag:genre:media:horror",
+                            "romance": "urn:tag:genre:media:romance",
+                            "aventure": "urn:tag:genre:media:adventure",
+                            "animation": "urn:tag:genre:media:animation",
+                            "documentaire": "urn:tag:genre:media:documentary"
+                        }
+                        if genre.lower() in genre_mapping:
+                            genre_tags.append({"tag": genre_mapping[genre.lower()], "weight": 20})
                     
-            # Marquer la session comme modifiée pour s'assurer qu'elle est sauvegardée
-            request.session.modified = True
+                    if genre_tags:
+                        extra_params['signal.interests.tags'] = json.dumps(genre_tags)
+                
+                # Localisation géographique (seulement si fournie)
+                if user_data.get("localisation"):
+                    extra_params['filter.location.query'] = user_data["localisation"]
+                
+                # Démographie - âge (mapping vers valeurs acceptées par ClooAI)
+                if user_data.get("age"):
+                    age_value = user_data["age"].lower().replace(" ", "").replace("_", "")
+                    age_map = {
+                        "18to35": "35_and_younger",
+                        "18to25": "24_and_younger",
+                        "25to29": "25_to_29",
+                        "30to34": "30_to_34",
+                        "35to44": "35_to_44",
+                        "36to55": "36_to_55",
+                        "45to54": "45_to_54",
+                        "55andolder": "55_and_older",
+                        "35andyounger": "35_and_younger",
+                        "24andyounger": "24_and_younger"
+                    }
+                    mapped_age = None
+                    for key, val in age_map.items():
+                        if key in age_value: 
+                            mapped_age = val
+                            break
+                    if mapped_age:
+                        extra_params['signal.demographics.age'] = mapped_age
+                
+                # Démographie - genre (seulement si fourni)
+                if user_data.get("genre"):
+                    extra_params['signal.demographics.gender'] = user_data["genre"]
+                
+                # Filtrage temporel (seulement si fourni)
+                if user_data.get("annee_min"):
+                    extra_params['filter.release_year.min'] = user_data["annee_min"]
+                if user_data.get("annee_max"):
+                    extra_params['filter.release_year.max'] = user_data["annee_max"]
+                
+                # Note minimale (seulement si fournie)
+                if user_data.get("note_min"):
+                    extra_params['filter.rating.min'] = user_data["note_min"]
+                
+                # Langue (seulement si fournie)
+                if user_data.get("langue"):
+                    extra_params['filter.language'] = user_data["langue"]
 
-        return JsonResponse({
-            "message": bot_message,
-            # "user_data": user_data,
-            "qloo_url": qloo_url,
-            "done": user_data is not None and (entity_ids or extra_params),
-            "warning": warning,
-            "recommendations": recommendations
-        })
+                if extra_params:
+                    extra_params['feature.explainability'] = True
+                
+                # Générer l'URL seulement si on a au moins quelques paramètres
+                if entity_ids or extra_params:
+                    qloo_url = build_qloo_url(
+                        entity_type="urn:entity:movie",
+                        entity_ids=entity_ids,
+                        extra_params=extra_params
+                    )
+                    print("[Qloo URL]", qloo_url)
+                    # Appeler l'API Qloo/ClooAI pour obtenir les recommandations
+                    try:
+                        qloo_headers = {
+                            "x-api-key": settings.CLOOAI_API_KEY,
+                            "Accept": "application/json"
+                        }
+                        qloo_response = requests.get(qloo_url, headers=qloo_headers)
+
+                        if qloo_response.status_code == 200:
+                            qloo_data = qloo_response.json()
+                            # Extraire les titres recommandés (adapter selon la structure de la réponse)
+                            titles = []
+                            # Initialiser le dictionnaire des détails des films dans la session s'il n'existe pas
+                            if 'movie_details' not in request.session:
+                                request.session['movie_details'] = {}
+                                
+                            for element in qloo_data["results"]["entities"]:
+                                entity_id = element.get("entity_id")
+                                film = {
+                                    "name": element.get("name"),
+                                    "entity_id": entity_id,
+                                    "properties": element.get("properties", {}),
+                                    "tags": element.get("tags", []),
+                                    "external": element.get("external", {}),
+                                    "release_year": element.get("properties", {}).get("release_year"),
+                                    "description": element.get("properties", {}).get("description"),
+                                    "image": element.get("properties", {}).get("image", {}).get("url"),
+                                    "genres": [tag.get("name") for tag in element.get("tags", [])],
+                                    "release_country": element.get("properties", {}).get("release_country"),
+                                    "imdb_id": None,
+                                    "imdb_user_rating": None,
+                                    "imdb_user_rating_count": None
+                                }
+                                
+                                # Ajouter les informations IMDB si disponibles
+                                imdb = element.get("external", {}).get("imdb", [])
+                                if imdb and isinstance(imdb, list) and len(imdb) > 0:
+                                    imdb_info = imdb[0]
+                                    film["imdb_id"] = imdb_info.get("id")
+                                    film["imdb_user_rating"] = imdb_info.get("user_rating")
+                                    film["imdb_user_rating_count"] = imdb_info.get("user_rating_count")
+                                
+                                # Stocker les détails complets du film dans la session
+                                if entity_id:
+                                    request.session['movie_details'][entity_id] = film
+                                    # S'assurer que la session est sauvegardée
+                                    request.session.modified = True
+                                
+                                # Ajouter à la liste des recommandations
+                                titles.append(film)
+                            
+                            recommendations = titles
+                        else:
+                            recommendations = [f"Erreur API Qloo: {qloo_response.status_code}"]
+                    except Exception as api_exc:
+                        recommendations = [f"Erreur lors de l'appel API Qloo: {api_exc}"]
+                else:
+                    print("Pas assez d'informations pour générer une URL de recommandation")
+                    
+            except (ValueError, json.JSONDecodeError) as e:
+                print(f"⚠️ [DEBUG] No JSON found in bot message or parsing error: {e}")
+                pass
+            except Exception as e:
+                print(f"❌ [DEBUG] Error processing user data: {e}")
+                pass
+
+            # Message d'avertissement si certains titres n'ont pas d'URN
+            warning = None  
+            if urn_not_found:
+                warning = f"Aucun identifiant ClooAI trouvé pour : {', '.join(urn_not_found)}. Les recommandations seront moins précises."
+
+            # Si recommandations prêtes, stocke-les dans la session
+            if recommendations and (user_data is not None and (entity_ids or extra_params)):
+                request.session['cinema_recommendations'] = recommendations
+                request.session['cinema_qloo_url'] = qloo_url
+                
+                # S'assurer que les détails des films sont bien stockés dans la session
+                if 'movie_details' not in request.session:
+                    request.session['movie_details'] = {}
+                    
+                # Mise à jour des détails des films dans la session
+                for film in recommendations:
+                    if 'entity_id' in film and film['entity_id']:
+                        request.session['movie_details'][film['entity_id']] = film
+                        
+                # Marquer la session comme modifiée pour s'assurer qu'elle est sauvegardée
+                request.session.modified = True
+
+            print("✅ [DEBUG] Returning successful response")
+            return JsonResponse({
+                "message": bot_message,
+                "qloo_url": qloo_url,
+                "done": user_data is not None and (entity_ids or extra_params),
+                "warning": warning,
+                "recommendations": recommendations
+            })
+
+        except json.JSONDecodeError as e:
+            print(f"❌ [DEBUG] JSON decode error: {e}")
+            return JsonResponse({
+                "message": "Sorry, I had trouble understanding your request. Could you please try again?",
+                "error": "json_decode_error"
+            }, status=400)
+            
+        except Exception as e:
+            print(f"❌ [DEBUG] Unexpected error in cinema_chatbot_api: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            return JsonResponse({
+                "message": "I'm experiencing some technical difficulties. Let me try to help you anyway! What kind of movies are you interested in?",
+                "error": "server_error"
+            }, status=200)  # Retourner 200 pour éviter le catch côté client
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
 
