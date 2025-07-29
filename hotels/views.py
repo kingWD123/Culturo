@@ -238,9 +238,10 @@ def hotel_chatbot_api(request):
                 })
             
             # For other queries, use Gemini
-            system_prompt = """You are a helpful hotel recommendation assistant. Your goal is to understand the user's hotel preferences and provide personalized recommendations.
-Be conversational and helpful. Ask one question at a time to avoid overwhelming the user.
-Give short responses with less thant 20 words\n
+            system_prompt = """You are a helpful hotel recommendation assistant. Your goal is to understand the user's hotel preferences.
+Be conversational and helpful. Ask one question at a time to avoid overwhelming the user.\n
+Only ask one question at a time.\n
+Give short responses\n\n
 Ask questions about:
 - Destination/location
 - Budget range
