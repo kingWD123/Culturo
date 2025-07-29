@@ -82,122 +82,15 @@ Itinerary, ItineraryDay, ItineraryItem:
 
 ### ✅ Prerequisites
 - Python 3.8+  
-- Django 4.2+  
+- Django 5.2+  
 - API keys for Gemini, Qloo, and Unsplash
 
-### 📦 Installation Steps
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/culturo.git
-cd culturo
-
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate      # On Unix/macOS
-venv\Scripts\activate       # On Windows
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Add your API keys in settings.py or a .env file
-# Example (settings.py)
-GEMINI_API_KEY = 'your_gemini_key'
-CLOOAI_API_KEY = 'your_qloo_key'
-UNSPLASH_ACCESS_KEY = 'your_unsplash_key'
-
-# 5. Run migrations
-python manage.py makemigrations
-python manage.py migrate
-
-# 6. Start the development server
-python manage.py runserver
-```
-
-### 🌐 Access the App
-- App: [http://localhost:8000](http://localhost:8000)  
-- Admin Panel: [http://localhost:8000/admin](http://localhost:8000/admin)
-
----
-
-## 📱 User Guide
-
-### 🏠 Home Page
-- Immersive welcome UI with discovery sections  
-- Quick access to destinations, food, and cinema
-
-### 🌍 Destinations
-- Ask the chatbot: *"I want to visit Paris"*  
-- Get personalized recommendations with interactive maps
-
-### 🍴 Restaurants
-- Ask: *"Find restaurants in Tokyo"*  
-- See curated suggestions with ratings and prices
-
-### 🏨 Hotels
-- Select hotels based on preference, price, and location  
-- View them on the interactive map
-
-### 🎥 Cinema
-- Discover films tailored to your taste  
-- Use the chatbot for cinema-based queries
-
----
-
-## 🎨 Design & UI
-
-- 🎨 **Colors:** Gradient-based modern palette  
-- 🔤 **Typography:** Inter (Google Fonts)  
-- 📦 **UI Components:** Cards, overlays, and image tiles  
-- ✨ **Animations:** Smooth hover and page transitions  
-- 📱 **Responsive:** Mobile-first and touch-optimized
-
----
-
-## 🔮 Roadmap
-
-### ✅ Current Features
-- Gemini & Qloo API integrations  
-- Destination, hotel, and restaurant recommendations  
-- Chatbot and map components  
-- Modern, responsive design
-
-### 🚧 In Progress
-- User authentication and saved preferences  
-- Itinerary builder  
-- Favorite places and activity history
-
-### 📅 Future Vision
-- Native mobile app  
-- Booking integrations  
-- Augmented reality exploration
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from everyone!
-
-```bash
-# Contributing steps
-- Fork this repository
-- Create a new branch (feature/my-feature)
-- Commit your changes
-- Push the branch
-- Open a Pull Request
-```
-
-### 📌 Guidelines
-- Follow [PEP8](https://peps.python.org/pep-0008/) coding style  
-- Write clear, descriptive commit messages  
-- Include unit tests for new features
-
----
-
-## 📄 Dependencies
-
-- **Django 4.2** – Web framework  
+### 📄 Dependencies
+- **Django 5.2** – Web framework  
+- **google-generativeai** – Gemini AI integration
 - **Requests** – API calls  
+- **Pydantic** – Data validation
+- **grpcio** – Google API communication
 - **Pillow** – Image processing  
 - **Leaflet.js** – Interactive maps  
 
@@ -221,12 +114,6 @@ We welcome contributions from everyone!
 
 ---
 
-## ⚖️ License
-
-This project is licensed under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.
-
----
 
 **Culturo – Transform your passion into a cultural passport 🌍✨**
 
