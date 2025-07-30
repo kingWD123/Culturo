@@ -1,7 +1,7 @@
 {% extends 'users/base.html' %}
 {% load static %}
 
-{% block title %}Connexion - Culturo{% endblock %}
+{% block title %}Login - Culturo{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -310,8 +310,8 @@
         <div class="login-card">
             <div class="login-header">
                 <div class="login-logo">🌍 CULTURO</div>
-                <h1 class="login-title">Connexion</h1>
-                <p class="login-subtitle">Accédez à votre univers culturel</p>
+                <h1 class="login-title">Login</h1>
+                <p class="login-subtitle">Access your cultural universe</p>
             </div>
             
             <form method="post" class="login-form">
@@ -323,11 +323,11 @@
                         id="username" 
                         name="username" 
                         class="form-input" 
-                        placeholder="Entrez votre nom d'utilisateur"
+                        placeholder="Enter your username"
                         required
                         autocomplete="username"
                     >
-                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <label for="username" class="form-label">Username</label>
                 </div>
                 
                 <div class="form-group">
@@ -336,19 +336,19 @@
                         id="password" 
                         name="password" 
                         class="form-input" 
-                        placeholder="Entrez votre mot de passe"
+                        placeholder="Enter your password"
                         required
                         autocomplete="current-password"
                     >
-                    <label for="password" class="form-label">Mot de passe</label>
+                    <label for="password" class="form-label">Password</label>
                 </div>
                 
-                <button type="submit" class="btn-login">Se connecter</button>
+                <button type="submit" class="btn-login">Sign In</button>
             </form>
             
             <div class="auth-link">
-                <p>Pas encore de compte ?</p>
-                <a href="{% url 'register' %}">S'inscrire maintenant</a>
+                <p>Don't have an account yet?</p>
+                <a href="{% url 'register' %}">Sign up now</a>
             </div>
         </div>
     </div>
