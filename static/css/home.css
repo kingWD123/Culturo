@@ -7,9 +7,13 @@
 
 /* Container spécifique pour la page d'accueil avec espacement approprié */
 .home .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 0.25rem; /* Réduit de 0.5rem à 0.25rem - vraiment au minimum ! */
+
+    width: 100%;
+    max-width: 1140px; /* comme Bootstrap */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 /* Section hero avec espacement approprié */
