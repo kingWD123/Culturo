@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chatbot-input');
     const chatBox = document.getElementById('chatbot-messages');
     
-    // Initialize chat history with welcome message
+    // Initialize chat history with welcome message only if chatbot elements exist
     const welcomeMessageElement = document.querySelector('.chat-bubble.bot-message');
     const welcomeMessage = welcomeMessageElement ? welcomeMessageElement.textContent.trim() : "Hello! I'm your hotel assistant.";
     let chatHistory = [
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Initial chat history:', chatHistory);
 
-    // Chatbot toggle functionality
+    // Chatbot toggle functionality - only if elements exist
     if (toggle && chatbot) {
         toggle.addEventListener('click', () => {
             if (chatbot.style.display === 'none') {
@@ -232,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Chatbot form submission - only if all required elements exist
     if (chatForm && chatInput && chatBox) {
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -351,24 +352,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateMap(data.hotels);
                 updateCarousel(data.hotels);
                 
-                // Update chat history with initial conversation
-                chatHistory = [
-                    { role: 'model', content: welcomeMessage },
-                    { role: 'user', content: initialHistory[0].content },
-                    { role: 'model', content: data.message }
-                ];
-                console.log('Chat history after initial response:', JSON.stringify(chatHistory));
-                
-                // Display bot response
-                let botMsg = data.message;
-                botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
-                
-                if (botMsg && botMsg.trim() && chatBox) {
-                    const botDiv = document.createElement('div');
-                    botDiv.className = 'chat-bubble bot-message';
-                    botDiv.textContent = botMsg.trim();
-                    chatBox.appendChild(botDiv);
-                    chatBox.scrollTop = chatBox.scrollHeight;
+                // Update chat history with initial conversation only if chatbox exists
+                if (chatBox) {
+                    chatHistory = [
+                        { role: 'model', content: welcomeMessage },
+                        { role: 'user', content: initialHistory[0].content },
+                        { role: 'model', content: data.message }
+                    ];
+                    console.log('Chat history after initial response:', JSON.stringify(chatHistory));
+                    
+                    // Display bot response
+                    let botMsg = data.message;
+                    botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                    
+                    if (botMsg && botMsg.trim()) {
+                        const botDiv = document.createElement('div');
+                        botDiv.className = 'chat-bubble bot-message';
+                        botDiv.textContent = botMsg.trim();
+                        chatBox.appendChild(botDiv);
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
                 }
             } else {
                 console.warn('No hotels received in initial response, using fallback data');
@@ -382,20 +385,20 @@ document.addEventListener('DOMContentLoaded', function() {
             updateMap(fallbackHotels);
             updateCarousel(fallbackHotels);
             
-            // Add a friendly message instead of error
+            // Add a friendly message instead of error only if chatbox exists
             if (chatBox) {
                 const botDiv = document.createElement('div');
                 botDiv.className = 'chat-bubble bot-message';
                 botDiv.textContent = 'Here are some popular hotel destinations worldwide! I can help you find more specific recommendations based on your preferences. Where would you like to stay?';
                 chatBox.appendChild(botDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Update chat history
+                chatHistory = [
+                    { role: 'model', content: welcomeMessage },
+                    { role: 'model', content: 'Here are some popular hotel destinations worldwide! I can help you find more specific recommendations based on your preferences. Where would you like to stay?' }
+                ];
             }
-            
-            // Update chat history
-            chatHistory = [
-                { role: 'model', content: welcomeMessage },
-                { role: 'model', content: 'Here are some popular hotel destinations worldwide! I can help you find more specific recommendations based on your preferences. Where would you like to stay?' }
-            ];
         }
     }
 

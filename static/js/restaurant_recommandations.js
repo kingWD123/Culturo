@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return cookieValue;
     }
 
-    // Chatbot Logic
+    // Chatbot Logic - only initialize if elements exist
     const toggle = document.getElementById('chatbot-toggle');
     const chatbot = document.getElementById('restaurant-chatbot');
     const closeBtnChatbot = document.getElementById('chatbot-close');
@@ -103,96 +103,105 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatInput = document.getElementById('chatbot-input');
     const chatBox = document.getElementById('chatbot-messages');
     
-    // Initialize chat history with welcome message
-    const welcomeMessage = document.querySelector('.chat-bubble.bot-message').textContent.trim();
+    // Initialize chat history with welcome message only if chatbot elements exist
+    const welcomeMessageElement = document.querySelector('.chat-bubble.bot-message');
+    const welcomeMessage = welcomeMessageElement ? welcomeMessageElement.textContent.trim() : "Hello! I'm your restaurant assistant.";
     let chatHistory = [
         { role: 'model', content: welcomeMessage }
     ];
     
     console.log('Initial chat history:', chatHistory);
 
-    toggle.addEventListener('click', () => {
-        chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
-    });
+    // Chatbot toggle functionality - only if elements exist
+    if (toggle && chatbot) {
+        toggle.addEventListener('click', () => {
+            chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
+        });
+    }
 
-    closeBtnChatbot.addEventListener('click', () => {
-        chatbot.style.display = 'none';
-    });
+    if (closeBtnChatbot && chatbot) {
+        closeBtnChatbot.addEventListener('click', () => {
+            chatbot.style.display = 'none';
+        });
+    }
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const userMsg = chatInput.value.trim();
-        if (!userMsg) return;
+    // Chatbot form submission - only if all required elements exist
+    if (chatForm && chatInput && chatBox) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMsg = chatInput.value.trim();
+            if (!userMsg) return;
 
-        try {
-            console.log('Sending user message:', userMsg);
-            console.log('Current conversation history:', JSON.stringify(chatHistory));
-            
-            // Display user message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'chat-bubble user-message';
-            userDiv.textContent = userMsg;
-            chatBox.appendChild(userDiv);
-            chatInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-            chatHistory.push({ role: 'user', content: userMsg });
-
-            // Call restaurant API with correct URL
-            console.log('Calling restaurant API...');
-            const response = await fetch("/restaurants/api/chatbot/", {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ history: chatHistory })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP Error: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('API response:', data);
-
-            // Filter technical JSON from response
-            let botMsg = data.message;
-            botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
-            console.log('Filtered bot message:', botMsg);
-
-            // Always display conversational bot response
-            if (botMsg && botMsg.trim()) {
-                const botDiv = document.createElement('div');
-                botDiv.className = 'chat-bubble bot-message';
-                botDiv.textContent = botMsg.trim();
-                chatBox.appendChild(botDiv);
+            try {
+                console.log('Sending user message:', userMsg);
+                console.log('Current conversation history:', JSON.stringify(chatHistory));
+                
+                // Display user message
+                const userDiv = document.createElement('div');
+                userDiv.className = 'chat-bubble user-message';
+                userDiv.textContent = userMsg;
+                chatBox.appendChild(userDiv);
+                chatInput.value = '';
                 chatBox.scrollTop = chatBox.scrollHeight;
-            } else {
-                console.warn('Empty bot message after filtering');
-            }
-            
-            chatHistory.push({ role: 'model', content: data.message });
+                chatHistory.push({ role: 'user', content: userMsg });
 
-            // Display recommendations only if they exist
-            if (data.restaurants && data.restaurants.length > 0) {
-                console.log('Updating map and carousel with', data.restaurants.length, 'restaurants');
-                updateMap(data.restaurants);
-                updateCarousel(data.restaurants);
-                // Make carousel visible if it's not already
-                carouselContainer.classList.remove('hidden');
-                showCarouselBtn.classList.remove('visible');
-            } else {
-                console.warn('No restaurants received in response');
+                // Call restaurant API with correct URL
+                console.log('Calling restaurant API...');
+                const response = await fetch("/restaurants/api/chatbot/", {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('API response:', data);
+
+                // Filter technical JSON from response
+                let botMsg = data.message;
+                botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                console.log('Filtered bot message:', botMsg);
+
+                // Always display conversational bot response
+                if (botMsg && botMsg.trim()) {
+                    const botDiv = document.createElement('div');
+                    botDiv.className = 'chat-bubble bot-message';
+                    botDiv.textContent = botMsg.trim();
+                    chatBox.appendChild(botDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                } else {
+                    console.warn('Empty bot message after filtering');
+                }
+                
+                chatHistory.push({ role: 'model', content: data.message });
+
+                // Display recommendations only if they exist
+                if (data.restaurants && data.restaurants.length > 0) {
+                    console.log('Updating map and carousel with', data.restaurants.length, 'restaurants');
+                    updateMap(data.restaurants);
+                    updateCarousel(data.restaurants);
+                    // Make carousel visible if it's not already
+                    carouselContainer.classList.remove('hidden');
+                    showCarouselBtn.classList.remove('visible');
+                } else {
+                    console.warn('No restaurants received in response');
+                }
+            } catch (error) {
+                console.error('Error during chatbot interaction:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message error';
+                errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
+                chatBox.appendChild(errorDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
-        } catch (error) {
-            console.error('Error during chatbot interaction:', error);
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'chat-bubble bot-message error';
-            errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
-            chatBox.appendChild(errorDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    });
+        });
+    }
 
     // --- Initial Load ---
     async function fetchInitialRestaurants() {
@@ -280,33 +289,38 @@ document.addEventListener('DOMContentLoaded', function () {
             carouselContainer.classList.remove('hidden');
             showCarouselBtn.classList.remove('visible');
             
-            // Add initial bot message about the recommendations
-            const initialBotMessage = "Here are some recommendations for popular restaurants around the world! Tell me which type of cuisine or city interests you for personalized suggestions.";
-            
-            // Update chat history
-            chatHistory = [
-                { role: 'model', content: welcomeMessage },
-                { role: 'model', content: initialBotMessage }
-            ];
-            
-            // Display the initial bot message
-            const botDiv = document.createElement('div');
-            botDiv.className = 'chat-bubble bot-message';
-            botDiv.textContent = initialBotMessage;
-            chatBox.appendChild(botDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            console.log('Chat history after initial response:', JSON.stringify(chatHistory));
+            // Add initial bot message about the recommendations only if chatbox exists
+            if (chatBox) {
+                const initialBotMessage = "Here are some recommendations for popular restaurants around the world! Tell me which type of cuisine or city interests you for personalized suggestions.";
+                
+                // Update chat history
+                chatHistory = [
+                    { role: 'model', content: welcomeMessage },
+                    { role: 'model', content: initialBotMessage }
+                ];
+                
+                // Display the initial bot message
+                const botDiv = document.createElement('div');
+                botDiv.className = 'chat-bubble bot-message';
+                botDiv.textContent = initialBotMessage;
+                chatBox.appendChild(botDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                console.log('Chat history after initial response:', JSON.stringify(chatHistory));
+            }
             
         } catch (error) {
             console.error("Error loading initial restaurants:", error);
             document.getElementById('carouselTrack').innerHTML = "<p style='color:white;opacity:0.7;padding:1rem;'>Erreur lors du chargement des restaurants.</p>";
             
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'chat-bubble bot-message error';
-            errorDiv.textContent = 'Désolé, une erreur s\'est produite lors du chargement des recommandations initiales. Posez-moi une question pour obtenir des recommandations.';
-            chatBox.appendChild(errorDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Only display error in chatbox if it exists
+            if (chatBox) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message error';
+                errorDiv.textContent = 'Désolé, une erreur s\'est produite lors du chargement des recommandations initiales. Posez-moi une question pour obtenir des recommandations.';
+                chatBox.appendChild(errorDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
         }
     }
 

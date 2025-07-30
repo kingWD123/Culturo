@@ -5,6 +5,19 @@
     box-sizing: border-box;
 }
 
+/* Container spécifique pour la page d'accueil avec espacement approprié */
+.home .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0.25rem; /* Réduit de 0.5rem à 0.25rem - vraiment au minimum ! */
+}
+
+/* Section hero avec espacement approprié */
+.hero {
+    padding: 1rem 0; /* Réduit de 1.5rem à 1rem */
+    background: #181818;
+}
+
 /* Spécificité accrue pour éviter d'impacter la navbar/footer globaux */
 body.home {
     line-height: 1.6;
@@ -27,8 +40,6 @@ body.home, .home .container, .section, .hero, .testimonial-content, .newsletter-
 }
 .quote {
     background: #232323 !important;
-    color: #b3b3b3 !important;
-    border-left: 4px solid #e50914 !important;
 }
 .newsletter-form {
     background: #232323 !important;
@@ -164,16 +175,15 @@ body.home, .home .container, .section, .hero, .testimonial-content, .newsletter-
     border-radius: 36px;
     background: #181818;
     box-shadow: 0 4px 32px rgba(0,0,0,0.12);
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-    margin-bottom: 2.5rem;
+    padding: 0.75rem 0.25rem; /* Réduit de 1rem 0.5rem à 0.75rem 0.25rem - minimum absolu ! */
+    margin-bottom: 0.75rem; /* Réduit de 1rem à 0.75rem */
 }
 
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem; /* Réduit de 1.5rem à 1rem */
 }
 
 .section-title {

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import json
 import requests
@@ -51,6 +52,7 @@ def build_qloo_url(base_url, **params):
     return f"{base_url}?{urlencode(query_params)}"
 
 @csrf_exempt
+@login_required
 def hotel_chatbot_api(request):
     if request.method == 'POST':
         try:

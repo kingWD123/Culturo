@@ -1,0 +1,561 @@
+{% extends 'users/base.html' %}
+{% load static %}
+
+{% block title %}Inscription - Culturo{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset pour cette page spécifique */
+    .register-page {
+        background: #181818;
+        min-height: calc(100vh - 160px); /* Ajusté pour laisser place au header et footer */
+        position: relative;
+        overflow: hidden;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    /* Background avec effet parallax */
+    .register-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            rgba(24, 24, 24, 0.95) 0%,
+            rgba(229, 9, 20, 0.1) 50%,
+            rgba(24, 24, 24, 0.95) 100%
+        ),
+        url('{% static "images/saxophone.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        filter: blur(2px);
+        z-index: -1;
+    }
+    
+    /* Container principal */
+    .register-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 160px); /* Ajusté pour header/footer */
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Carte d'inscription style Netflix */
+    .register-card {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease-out;
+        margin: 2rem auto;
+    }
+    
+    /* Effet de brillance subtil */
+    .register-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .register-card:hover::before {
+        left: 100%;
+    }
+    
+    /* Header de la carte */
+    .register-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .register-logo {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #e50914 0%, #ff6b6b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+    }
+    
+    .register-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    
+    .register-subtitle {
+        color: #b3b3b3;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    
+    /* Formulaire */
+    .register-form {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Amélioration de l'alignement des champs */
+    .form-group {
+        margin-bottom: 1.8rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 1.2rem 1.25rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 400;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        box-sizing: border-box;
+        line-height: 1.4;
+    }
+    
+    .form-input::placeholder {
+        color: #b3b3b3;
+        font-weight: 400;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .form-input:focus::placeholder {
+        opacity: 1;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #e50914;
+        background: rgba(229, 9, 20, 0.1);
+        box-shadow: 
+            0 0 0 3px rgba(229, 9, 20, 0.2),
+            0 8px 25px rgba(229, 9, 20, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Labels flottants améliorés */
+    .form-label {
+        position: absolute;
+        top: 1.2rem;
+        left: 1.25rem;
+        color: #b3b3b3;
+        font-size: 1rem;
+        font-weight: 500;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: transparent;
+        padding: 0 0.5rem;
+        z-index: 1;
+    }
+    
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        top: -0.6rem;
+        left: 1rem;
+        font-size: 0.85rem;
+        color: #e50914;
+        background: rgba(0, 0, 0, 0.9);
+        border-radius: 4px;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    /* Bouton d'inscription style Netflix amélioré */
+    .btn-register {
+        width: 100%;
+        padding: 1.2rem;
+        background: linear-gradient(135deg, #e50914 0%, #b0060f 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        margin-top: 1rem;
+        box-sizing: border-box;
+    }
+    
+    .btn-register::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 15px 35px rgba(229, 9, 20, 0.4),
+            0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-register:hover::before {
+        left: 100%;
+    }
+    
+    .btn-register:active {
+        transform: translateY(-1px);
+    }
+    
+    /* Lien de connexion */
+    .login-link {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .login-text {
+        color: #b3b3b3;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .btn-login-link {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        background: transparent;
+        color: #e50914;
+        border: 2px solid #e50914;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .btn-login-link:hover {
+        background: #e50914;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(229, 9, 20, 0.3);
+    }
+    
+    /* Animations d'entrée */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive amélioré */
+    @media (max-width: 768px) {
+        .register-page {
+            min-height: calc(100vh - 120px);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .register-container {
+            padding: 1rem;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .register-card {
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 100%;
+        }
+        
+        .register-title {
+            font-size: 1.75rem;
+        }
+        
+        .register-logo {
+            font-size: 2rem;
+        }
+        
+        .form-input {
+            padding: 1rem 1.25rem;
+        }
+        
+        .form-label {
+            top: 1rem;
+        }
+        
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: -0.5rem;
+        }
+    }
+    
+    /* Effet de particules subtil */
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: rgba(229, 9, 20, 0.3);
+        border-radius: 50%;
+        animation: float 6s infinite linear;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Indicateur de validation des mots de passe */
+    .password-match {
+        border-color: #2ed573 !important;
+        background: rgba(46, 213, 115, 0.1) !important;
+    }
+    
+    .password-mismatch {
+        border-color: #ff4757 !important;
+        background: rgba(255, 71, 87, 0.1) !important;
+    }
+    
+    /* Assurer que le header et footer restent visibles */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Ajustement pour éviter les conflits avec le header fixe */
+    .register-page {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <!-- Background avec effet -->
+    <div class="register-background"></div>
+    
+    <!-- Particules flottantes -->
+    <div class="particles">
+        <div class="particle" style="left: 15%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 25%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 35%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 45%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 55%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 65%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 75%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 7s;"></div>
+    </div>
+    
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="register-logo">🎨 Culturo</div>
+                <h1 class="register-title">Rejoignez-nous !</h1>
+                <p class="register-subtitle">Créez votre compte et explorez un monde de culture</p>
+            </div>
+            
+            <form method="post" class="register-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Entrez votre nom d'utilisateur"
+                        required
+                        autocomplete="username"
+                    >
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="exemple@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                    <label for="email" class="form-label">Adresse email</label>
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="password" 
+                        id="password1" 
+                        name="password1" 
+                        class="form-input" 
+                        placeholder="Minimum 8 caractères"
+                        required
+                        autocomplete="new-password"
+                    >
+                    <label for="password1" class="form-label">Mot de passe</label>
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="password" 
+                        id="password2" 
+                        name="password2" 
+                        class="form-input" 
+                        placeholder="Répétez votre mot de passe"
+                        required
+                        autocomplete="new-password"
+                    >
+                    <label for="password2" class="form-label">Confirmer le mot de passe</label>
+                </div>
+                
+                <button type="submit" class="btn-register">
+                    Créer mon compte
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p class="login-text">Déjà membre de Culturo ?</p>
+                <a href="{% url 'login' %}" class="btn-login-link">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Effet de parallax subtil pour le background
+document.addEventListener('mousemove', (e) => {
+    const background = document.querySelector('.register-background');
+    if (background) {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        background.style.transform = `translate(${x * 10}px, ${y * 10}px)`;
+    }
+});
+
+// Animation des particules aléatoires
+function createParticle() {
+    const particlesContainer = document.querySelector('.particles');
+    if (particlesContainer) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+        
+        particlesContainer.appendChild(particle);
+        
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.remove();
+            }
+        }, 8000);
+    }
+}
+
+// Créer des particules périodiquement
+setInterval(createParticle, 800);
+
+// Validation en temps réel des mots de passe améliorée
+const password1 = document.getElementById('password1');
+const password2 = document.getElementById('password2');
+
+function validatePasswords() {
+    if (password2.value === '') {
+        password2.classList.remove('password-match', 'password-mismatch');
+        return;
+    }
+    
+    if (password1.value !== password2.value) {
+        password2.classList.remove('password-match');
+        password2.classList.add('password-mismatch');
+    } else {
+        password2.classList.remove('password-mismatch');
+        password2.classList.add('password-match');
+    }
+}
+
+if (password1 && password2) {
+    password1.addEventListener('input', validatePasswords);
+    password2.addEventListener('input', validatePasswords);
+}
+
+// Animation d'entrée séquentielle des champs
+document.addEventListener('DOMContentLoaded', function() {
+    const formGroups = document.querySelectorAll('.form-group');
+    formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            group.style.transition = 'all 0.5s ease';
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}
