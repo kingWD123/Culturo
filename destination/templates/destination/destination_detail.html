@@ -273,6 +273,62 @@
         transform: scale(1.04) rotate(-1deg);
     }
 
+    /* Destination info styles */
+    .destination-info-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #181824;
+        border-radius: 24px;
+        box-shadow: 0 8px 48px #eb3452cc, 0 2px 16px #000a;
+        margin-bottom: 2rem;
+    }
+
+    .destination-info-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .destination-info-header h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #eb3452;
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .destination-location {
+        font-size: 1.2rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+
+    .destination-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #fff;
+        text-align: justify;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .destination-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    .destination-tag {
+        background: #eb3452;
+        color: #fff;
+        padding: 0.3rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
     .no-images-container {
         display: flex;
         flex-direction: column;
@@ -297,6 +353,7 @@
         text-decoration: none;
         font-weight: 600;
         transition: background 0.2s;
+        margin-top: 2rem;
     }
 
     .back-to-destinations:hover {
@@ -304,7 +361,49 @@
         color: #fff;
         text-decoration: none;
     }
+
+    @media (max-width: 768px) {
+        .destination-info-container {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .destination-info-header h1 {
+            font-size: 2rem;
+        }
+
+        .destination-description {
+            font-size: 1rem;
+        }
+    }
 </style>
+
+<!-- Always show destination info -->
+<div class="destination-info-container">
+    <div class="destination-info-header">
+        <h1>{{ destination_info.name|title }}</h1>
+        {% if destination_info.location1 or destination_info.country %}
+        <div class="destination-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {% if destination_info.location1 %}{{ destination_info.location1 }}{% endif %}
+            {% if destination_info.location1 and destination_info.country %}, {% endif %}
+            {% if destination_info.country %}{{ destination_info.country }}{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="destination-description">
+        {{ destination_info.description|linebreaks }}
+    </div>
+    
+    {% if destination_info.tags %}
+    <div class="destination-tags">
+        {% for tag in destination_info.tags %}
+        <span class="destination-tag">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
 
 {% if images %}
 <div class="hero-modern">
@@ -313,13 +412,13 @@
     <div class="hero-modern-content">
         <div class="hero-modern-card">
             <h1>
-                <span class="hero-main">Discover the wonders of</span><br>
+                <span class="hero-main">Découvrez les merveilles de</span><br>
                 <span class="hero-dest">{{ name|title }}</span>
             </h1>
             <p class="hero-sub">
-                Let yourself be inspired by the beauty and culture of this unique destination.
+                Laissez-vous inspirer par la beauté et la culture de cette destination unique.
             </p>
-            <a href="#portfolio" class="hero-btn">Explore the gallery</a>
+            <a href="#portfolio" class="hero-btn">Explorer la galerie</a>
         </div>
     </div>
 </div>
@@ -332,14 +431,20 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="no-images-container">
-    <h1 class="no-images-message">No images found for {{ name|title }}</h1>
-    <p style="color: #ccc; margin-bottom: 2rem;">
-        We couldn't find images for this destination at the moment.
+<div style="text-align: center; padding: 2rem;">
+    <p style="color: #ccc; font-size: 1.1rem; margin-bottom: 1rem;">
+        <i class="fas fa-camera"></i> Aucune image disponible pour le moment
     </p>
-    <a href="{% url 'destination:destination_recommandations' %}" class="back-to-destinations">
-        <i class="fas fa-arrow-left"></i> Back to Destinations
-    </a>
+    <p style="color: #888; font-size: 0.9rem;">
+        Les images seront ajoutées prochainement pour enrichir votre découverte de cette destination.
+    </p>
 </div>
 {% endif %}
+
+<div style="text-align: center; margin-top: 3rem;">
+    <a href="{% url 'destination:destination_recommandations' %}" class="back-to-destinations">
+        <i class="fas fa-arrow-left"></i> Retour aux Destinations
+    </a>
+</div>
+
 {% endblock %}

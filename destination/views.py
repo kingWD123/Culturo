@@ -242,6 +242,9 @@ def destination_chatbot_api(request):
 def destination_detail(request, name):
     access_key = getattr(settings, 'UNSPLASH_ACCESS_KEY', None)
     images = []
+    destination_info = None
+    
+    # Get images from Unsplash
     if access_key:
         url = f"https://api.unsplash.com/search/photos?query={name}&client_id={access_key}&per_page=30&orientation=landscape"
         try:
@@ -250,5 +253,75 @@ def destination_detail(request, name):
             images = [img['urls']['regular'] for img in data.get('results', [])]
         except Exception as e:
             print(f"Unsplash error: {e}")
-    return render(request, "destination/destination_detail.html", {"name": name, "images": images})
+    
+    # Get destination information from Qloo API
+    try:
+        qloo_params = {
+            "filter.type": "urn:entity:destination",
+            "filter.name": name
+        }
+        qloo_url = build_qloo_url(extra_params=qloo_params)
+        qloo_headers = {
+            "x-api-key": settings.CLOOAI_API_KEY,
+            "Accept": "application/json"
+        }
+        qloo_response = requests.get(qloo_url, headers=qloo_headers)
+        
+        if qloo_response.status_code == 200:
+            qloo_data = qloo_response.json()
+            entities = qloo_data.get("results", {}).get("entities", [])
+            if entities:
+                entity = entities[0]  # Take the first match
+                properties = entity.get("properties", {})
+                geocode = properties.get("geocode", {})
+                location = entity.get("location", {})
+                
+                destination_info = {
+                    "name": entity.get("name"),
+                    "location1": geocode.get("admin1_region"),
+                    "location2": geocode.get("admin2_region"),
+                    "country": geocode.get("country_code"),
+                    "latitude": location.get("lat"),
+                    "longitude": location.get("lon"),
+                    "popularity": entity.get("popularity"),
+                    "tags": properties.get("tags", [])
+                }
+                
+                # Generate description using Gemini
+                try:
+                    model = genai.GenerativeModel("gemini-2.0-flash")
+                    prompt = f"""
+                    Write a compelling and informative description for the destination "{name}" located in {destination_info.get('location1', '')}, {destination_info.get('country', '')}.
+                    
+                    Include information about:
+                    - What makes this destination special and unique
+                    - Main attractions and activities
+                    - Cultural highlights
+                    - Best time to visit
+                    - Local cuisine or specialties
+                    
+                    Keep it engaging, informative, and around 200-300 words. Write in French.
+                    """
+                    
+                    response = model.generate_content(prompt)
+                    destination_info["description"] = response.text
+                except Exception as e:
+                    print(f"Gemini error for description: {e}")
+                    destination_info["description"] = f"Découvrez {name}, une destination fascinante qui vous attend avec ses merveilles uniques et son charme authentique."
+        
+    except Exception as e:
+        print(f"Qloo API error: {e}")
+    
+    # If no destination info found, create a basic one
+    if not destination_info:
+        destination_info = {
+            "name": name,
+            "description": f"Découvrez {name}, une destination fascinante qui vous attend avec ses merveilles uniques et son charme authentique."
+        }
+    
+    return render(request, "destination/destination_detail.html", {
+        "name": name, 
+        "images": images,
+        "destination_info": destination_info
+    })
 
