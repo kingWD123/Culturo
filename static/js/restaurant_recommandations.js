@@ -145,6 +145,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 chatBox.scrollTop = chatBox.scrollHeight;
                 chatHistory.push({ role: 'user', content: userMsg });
 
+                // Show loading indicator
+                const loadingElement = document.getElementById('chatbot-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+
                 // Call restaurant API with correct URL
                 console.log('Calling restaurant API...');
                 const response = await fetch("/restaurants/api/chatbot/", {
@@ -162,6 +169,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 const data = await response.json();
                 console.log('API response:', data);
+
+                // Hide loading indicator
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
 
                 // Filter technical JSON from response
                 let botMsg = data.message;
@@ -194,6 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } catch (error) {
                 console.error('Error during chatbot interaction:', error);
+                
+                // Hide loading indicator
+                const loadingElement = document.getElementById('chatbot-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-bubble bot-message error';
                 errorDiv.textContent = 'Sorry, an error occurred. Please try again.';

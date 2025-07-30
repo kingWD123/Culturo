@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         markers.forEach(marker => map.removeLayer(marker));
         markers = [];
 
-        if (!destinations || destinations.length === 0) return;
+        if (!destinations || destinations.length === 0) {
+            return;
+        }
 
         destinations.forEach(dest => {
             const locationString = `${dest.location1 || ''}${dest.location2 ? ', ' + dest.location2 : ''}`;
@@ -29,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Center map on the first result
         map.setView([destinations[0].latitude, destinations[0].longitude], 8);
+
+        // Hide loading indicator after map update (recommendations are displayed)
+        const loadingElement = document.getElementById('chatbot-loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
     }
 
     // Function to update the carousel with new destinations
@@ -119,6 +127,12 @@ document.addEventListener('DOMContentLoaded', function () {
             chatBox.scrollTop = chatBox.scrollHeight;
             chatHistory.push({ role: 'user', content: userMsg });
 
+            // Show loading indicator immediately when API call starts
+            const loadingElement = document.getElementById('chatbot-loading');
+            if (loadingElement) {
+                loadingElement.style.display = 'block';
+            }
+
             // Call destination API
             try {
                 const response = await fetch("/destination/api/", {
@@ -148,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Display recommendations only if they exist
                 if (data.destinations && data.destinations.length > 0) {
                     console.log('Updating map and carousel with destinations:', data.destinations);
+                    // The loading will be hidden inside updateMap function
                     updateMap(data.destinations);
                     updateCarousel(data.destinations);
                     
@@ -158,9 +173,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } else {
                     console.log('No destinations received in response');
+                    // Hide loading indicator if no destinations received
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
                 }
             } catch (error) {
                 console.error('Error during chatbot interaction:', error);
+                
+                // Hide loading indicator on error
+                const loadingElement = document.getElementById('chatbot-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-bubble bot-message';
                 errorDiv.textContent = 'Sorry, an error occurred. Please try again.';

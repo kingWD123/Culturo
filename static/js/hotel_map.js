@@ -104,6 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 map.setView([48.8566, 2.3522], 2);
             }
         }
+        
+        // Hide loading indicator after map update (recommendations are displayed)
+        const loadingElement = document.getElementById('chatbot-loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
     }
 
     // Function to update carousel with hotels
@@ -252,6 +258,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 chatBox.scrollTop = chatBox.scrollHeight;
                 chatHistory.push({ role: 'user', content: userMsg });
 
+                // Show loading indicator immediately when API call starts
+                const loadingElement = document.getElementById('chatbot-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                }
+
                 // Call hotel API with correct URL
                 console.log('Calling hotel API...');
                 const response = await fetch("/hotels/api/chatbot/", {
@@ -268,6 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('API Error Response:', errorText);
+                    // Hide loading indicator on error
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
                     throw new Error(`HTTP Error: ${response.status} - ${errorText}`);
                 }
                 
@@ -299,9 +315,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateCarousel(data.hotels);
                 } else {
                     console.warn('No hotels received in response');
+                    // Hide loading indicator if no hotels received
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
                 }
             } catch (error) {
                 console.error('Error during chatbot interaction:', error);
+                // Hide loading indicator on error
+                const loadingElement = document.getElementById('chatbot-loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-bubble bot-message error';
                 errorDiv.textContent = 'Sorry, an error occurred. Please try again.';

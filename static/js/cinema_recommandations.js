@@ -106,7 +106,14 @@ function initializeChatbot() {
             // Add to chatHistory
             chatHistory.push({ role: 'user', content: userMsg });
             
-            // Show loading spinner
+            // Show loading indicator in chatbot
+            const loadingElement = document.getElementById('chatbot-loading');
+            if (loadingElement) {
+                loadingElement.style.display = 'block';
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+            
+            // Show loading spinner for recommendations section
             if (recLoading) recLoading.style.display = 'flex';
             
             try {
@@ -124,7 +131,8 @@ function initializeChatbot() {
                 var data = await response.json();
                 console.log('Backend response:', data);
                 
-                // Hide loading spinner
+                // Hide loading indicators
+                if (loadingElement) loadingElement.style.display = 'none';
                 if (recLoading) recLoading.style.display = 'none';
                 
                 // Display bot response
@@ -158,7 +166,8 @@ function initializeChatbot() {
             } catch (error) {
                 console.error('Chatbot API Error:', error);
                 
-                // Hide loading spinner
+                // Hide loading indicators
+                if (loadingElement) loadingElement.style.display = 'none';
                 if (recLoading) recLoading.style.display = 'none';
                 
                 // Display error message
