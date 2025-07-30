@@ -298,7 +298,7 @@ We welcome contributions from everyone!
 
 ## 📞 Contact
 
-- 📧 Email: [contact@culturo.com](mailto:contact@culturo.com)  
+- 📧 Email: [contact@culturo.com](sorolj@ept.sn)  
 - 🐙 GitHub: [Culturo Repository](https://github.com/kingWD123/Culturo)  
 - 📚 Documentation: Project Wiki
 
