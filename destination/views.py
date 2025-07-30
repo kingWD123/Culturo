@@ -5,6 +5,7 @@ import json
 import re
 import ast
 import requests
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import google.generativeai as genai
 from urllib.parse import urlencode
@@ -55,6 +56,7 @@ def destination_recommandations(request):
     return render(request, 'destination/destination_recommandations.html')
 
 @csrf_exempt
+@login_required
 def destination_chatbot_api(request):
     try:
         print(f"Request method: {request.method}")

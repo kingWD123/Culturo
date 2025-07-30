@@ -151,6 +151,11 @@ footer {
     margin-bottom: 1rem;
 }
 
+.footer-social {
+    margin-top: 1.5rem;
+    padding-top: 10px;
+}
+
 .footer-social a {
     font-size: 1.3rem;
     margin-right: 0.7rem;

@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 # Import Google Generative AI
 import google.generativeai as genai
@@ -57,6 +58,7 @@ def restaurant_recommandations(request):
 
 # API du chatbot pour les restaurants
 @csrf_exempt
+@login_required
 def restaurant_chatbot_api(request):
     try:
         print(f"=== DEBUG CHATBOT API ===")

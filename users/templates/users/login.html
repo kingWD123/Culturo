@@ -1,0 +1,356 @@
+{% extends 'users/base.html' %}
+{% load static %}
+
+{% block title %}Connexion - Culturo{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset pour cette page spécifique */
+    .login-page {
+        background: #181818;
+        min-height: calc(100vh - 160px);
+        position: relative;
+        overflow: hidden;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    /* Background avec effet parallax */
+    .login-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            rgba(24, 24, 24, 0.95) 0%,
+            rgba(229, 9, 20, 0.1) 50%,
+            rgba(24, 24, 24, 0.95) 100%
+        );
+        background-size: cover;
+        background-position: center;
+        filter: blur(2px);
+        z-index: -1;
+    }
+    
+    /* Container principal */
+    .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 160px);
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Carte de connexion style Netflix */
+    .login-card {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease-out;
+        margin: 2rem auto;
+    }
+    
+    /* Effet de brillance subtil */
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .login-card:hover::before {
+        left: 100%;
+    }
+    
+    /* Header de la carte */
+    .login-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .login-logo {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #e50914 0%, #ff6b6b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+    }
+    
+    .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    
+    .login-subtitle {
+        color: #b3b3b3;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    
+    /* Formulaire */
+    .login-form {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .form-group {
+        margin-bottom: 1.8rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 1.2rem 1.25rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 400;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        box-sizing: border-box;
+        line-height: 1.4;
+    }
+    
+    .form-input::placeholder {
+        color: #b3b3b3;
+        font-weight: 400;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .form-input:focus::placeholder {
+        opacity: 1;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #e50914;
+        background: rgba(229, 9, 20, 0.1);
+        box-shadow: 
+            0 0 0 3px rgba(229, 9, 20, 0.2),
+            0 8px 25px rgba(229, 9, 20, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Labels flottants */
+    .form-label {
+        position: absolute;
+        top: 1.2rem;
+        left: 1.25rem;
+        color: #b3b3b3;
+        font-size: 1rem;
+        font-weight: 500;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: transparent;
+        padding: 0 0.5rem;
+        z-index: 1;
+    }
+    
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        top: -0.6rem;
+        left: 1rem;
+        font-size: 0.85rem;
+        color: #e50914;
+        background: rgba(0, 0, 0, 0.9);
+        border-radius: 4px;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    /* Bouton de connexion style Netflix */
+    .btn-login {
+        width: 100%;
+        padding: 1.2rem;
+        background: linear-gradient(135deg, #e50914 0%, #b0060f 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: left 0.5s;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 15px 35px rgba(229, 9, 20, 0.4),
+            0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-login:hover::before {
+        left: 100%;
+    }
+    
+    .btn-login:active {
+        transform: translateY(-1px);
+    }
+    
+    /* Lien d'inscription */
+    .auth-link {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .auth-link p {
+        color: #b3b3b3;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-link a {
+        color: #e50914;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    
+    .auth-link a:hover {
+        color: #fff;
+        background: rgba(229, 9, 20, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Animation d'entrée */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 1rem;
+        }
+        
+        .login-card {
+            padding: 2rem;
+            margin: 1rem auto;
+        }
+        
+        .login-title {
+            font-size: 1.5rem;
+        }
+        
+        .login-logo {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-background"></div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">🌍 CULTURO</div>
+                <h1 class="login-title">Connexion</h1>
+                <p class="login-subtitle">Accédez à votre univers culturel</p>
+            </div>
+            
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Entrez votre nom d'utilisateur"
+                        required
+                        autocomplete="username"
+                    >
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Entrez votre mot de passe"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <label for="password" class="form-label">Mot de passe</label>
+                </div>
+                
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+            
+            <div class="auth-link">
+                <p>Pas encore de compte ?</p>
+                <a href="{% url 'register' %}">S'inscrire maintenant</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

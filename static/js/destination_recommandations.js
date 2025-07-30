@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showCarouselBtn.classList.remove('visible');
     });
 
-    // Chatbot Logic
+    // Chatbot Logic - only initialize if elements exist
     const toggle = document.getElementById('chatbot-toggle');
     const chatbot = document.getElementById('destination-chatbot');
     const closeBtnChatbot = document.getElementById('chatbot-close');
@@ -85,80 +85,90 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatBox = document.getElementById('chatbot-messages');
     let chatHistory = [];
 
-    // Show chatbot by default on page load
-    chatbot.style.display = 'flex';
+    // Show chatbot by default on page load - only if it exists
+    if (chatbot) {
+        chatbot.style.display = 'flex';
+    }
 
-    toggle.addEventListener('click', () => {
-        chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
-    });
+    // Chatbot toggle functionality - only if elements exist
+    if (toggle && chatbot) {
+        toggle.addEventListener('click', () => {
+            chatbot.style.display = chatbot.style.display === 'none' || chatbot.style.display === '' ? 'flex' : 'none';
+        });
+    }
 
-    closeBtnChatbot.addEventListener('click', () => {
-        chatbot.style.display = 'none';
-    });
+    if (closeBtnChatbot && chatbot) {
+        closeBtnChatbot.addEventListener('click', () => {
+            chatbot.style.display = 'none';
+        });
+    }
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const userMsg = chatInput.value.trim();
-        if (!userMsg) return;
+    // Chatbot form submission - only if all required elements exist
+    if (chatForm && chatInput && chatBox) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMsg = chatInput.value.trim();
+            if (!userMsg) return;
 
-        // Display user message
-        const userDiv = document.createElement('div');
-        userDiv.className = 'chat-bubble user-message';
-        userDiv.textContent = userMsg;
-        chatBox.appendChild(userDiv);
-        chatInput.value = '';
-        chatBox.scrollTop = chatBox.scrollHeight;
-        chatHistory.push({ role: 'user', content: userMsg });
+            // Display user message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'chat-bubble user-message';
+            userDiv.textContent = userMsg;
+            chatBox.appendChild(userDiv);
+            chatInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatHistory.push({ role: 'user', content: userMsg });
 
-        // Call destination API
-        try {
-            const response = await fetch("/destination/api/", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history: chatHistory })
-            });
-            const data = await response.json();
-            
-            console.log('API Response:', data);
-            console.log('Destinations received:', data.destinations);
+            // Call destination API
+            try {
+                const response = await fetch("/destination/api/", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                console.log('Destinations received:', data.destinations);
 
-            // Filter out technical JSON from the response
-            let botMsg = data.message;
-            botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
+                // Filter out technical JSON from the response
+                let botMsg = data.message;
+                botMsg = botMsg.replace(/```json[\s\S]*?```/gi, '');
 
-            // Always display the conversational bot response
-            if (botMsg.trim()) {
-                const botDiv = document.createElement('div');
-                botDiv.className = 'chat-bubble bot-message';
-                botDiv.textContent = botMsg.trim();
-                chatBox.appendChild(botDiv);
+                // Always display the conversational bot response
+                if (botMsg.trim()) {
+                    const botDiv = document.createElement('div');
+                    botDiv.className = 'chat-bubble bot-message';
+                    botDiv.textContent = botMsg.trim();
+                    chatBox.appendChild(botDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+                chatHistory.push({ role: 'model', content: data.message });
+
+                // Display recommendations only if they exist
+                if (data.destinations && data.destinations.length > 0) {
+                    console.log('Updating map and carousel with destinations:', data.destinations);
+                    updateMap(data.destinations);
+                    updateCarousel(data.destinations);
+                    
+                    // Make carousel visible if it's hidden
+                    if (carouselContainer.classList.contains('hidden')) {
+                        carouselContainer.classList.remove('hidden');
+                        showCarouselBtn.classList.remove('visible');
+                    }
+                } else {
+                    console.log('No destinations received in response');
+                }
+            } catch (error) {
+                console.error('Error during chatbot interaction:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-bubble bot-message';
+                errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
+                chatBox.appendChild(errorDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
-            chatHistory.push({ role: 'model', content: data.message });
-
-            // Display recommendations only if they exist
-            if (data.destinations && data.destinations.length > 0) {
-                console.log('Updating map and carousel with destinations:', data.destinations);
-                updateMap(data.destinations);
-                updateCarousel(data.destinations);
-                
-                // Make carousel visible if it's hidden
-                if (carouselContainer.classList.contains('hidden')) {
-                    carouselContainer.classList.remove('hidden');
-                    showCarouselBtn.classList.remove('visible');
-                }
-            } else {
-                console.log('No destinations received in response');
-            }
-        } catch (error) {
-            console.error('Error during chatbot interaction:', error);
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'chat-bubble bot-message';
-            errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
-            chatBox.appendChild(errorDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    });
+        });
+    }
 
     // --- Initial Load ---
     async function fetchInitialDestinations() {

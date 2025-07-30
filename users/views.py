@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+from .models import CulturalProfile
 import json
 import random
 from datetime import datetime, timedelta
@@ -15,7 +18,6 @@ import time
 
 # Configure Gemini
 genai.configure(api_key=settings.GEMINI_API_KEY)
-
 
 def home(request):
     """Culturo homepage"""
@@ -169,6 +171,7 @@ def get_movie_urns_from_titles(titles):
     return urns, not_found
 
 @csrf_exempt
+@login_required
 def cinema_chatbot_api(request):
     if request.method == "POST":
         try:
@@ -602,3 +605,128 @@ def cinema_recommendations_result(request):
         'recommendations': recommendations,
         'qloo_url': qloo_url
     })
+
+
+def register_view(request):
+    """Vue d'inscription"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        
+        # Validation
+        if not all([username, email, password1, password2]):
+            messages.error(request, 'Tous les champs sont requis.')
+            return render(request, 'users/register.html')
+        
+        if password1 != password2:
+            messages.error(request, 'Les mots de passe ne correspondent pas.')
+            return render(request, 'users/register.html')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Ce nom d\'utilisateur existe déjà.')
+            return render(request, 'users/register.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Cet email est déjà utilisé.')
+            return render(request, 'users/register.html')
+        
+        try:
+            # Créer l'utilisateur
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1
+            )
+            
+            # Créer le profil culturel
+            CulturalProfile.objects.create(user=user)
+            
+            messages.success(request, 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.')
+            return redirect('login')
+            
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la création du compte: {str(e)}')
+            return render(request, 'users/register.html')
+    
+    return render(request, 'users/register.html')
+
+def login_view(request):
+    """Vue de connexion"""
+    if request.user.is_authenticated:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        if not username or not password:
+            messages.error(request, 'Nom d\'utilisateur et mot de passe requis.')
+            return render(request, 'users/login.html')
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Bienvenue {user.username} !')
+            
+            # Rediriger vers la page demandée ou home
+            next_url = request.GET.get('next', 'home')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
+    
+    return render(request, 'users/login.html')
+
+def logout_view(request):
+    """Vue de déconnexion"""
+    logout(request)
+    messages.success(request, 'Vous avez été déconnecté avec succès.')
+    return redirect('home')
+
+@login_required
+def profile_view(request):
+    """Vue du profil utilisateur"""
+    try:
+        cultural_profile = request.user.cultural_profile
+    except CulturalProfile.DoesNotExist:
+        cultural_profile = CulturalProfile.objects.create(user=request.user)
+    
+    if request.method == 'POST':
+        # Mise à jour du profil utilisateur
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', user.email)
+        user.save()
+        
+        # Mise à jour du profil culturel
+        cultural_profile.preferred_music_genres = request.POST.getlist('music_genres')
+        cultural_profile.preferred_film_genres = request.POST.getlist('film_genres')
+        cultural_profile.preferred_cuisine_types = request.POST.getlist('cuisine_types')
+        cultural_profile.preferred_activities = request.POST.getlist('activities')
+        cultural_profile.adventure_level = int(request.POST.get('adventure_level', 5))
+        cultural_profile.budget_level = request.POST.get('budget_level', 'moderate')
+        cultural_profile.travel_style = request.POST.get('travel_style', 'cultural')
+        cultural_profile.save()
+        
+        messages.success(request, 'Profil mis à jour avec succès !')
+        return redirect('profile')
+    
+    context = {
+        'cultural_profile': cultural_profile,
+        'music_genres': CulturalProfile.MUSIC_GENRES,
+        'film_genres': CulturalProfile.FILM_GENRES,
+        'cuisine_types': CulturalProfile.CUISINE_TYPES,
+        'cultural_activities': CulturalProfile.CULTURAL_ACTIVITIES,
+        'budget_levels': CulturalProfile.BUDGET_LEVELS,
+        'travel_styles': CulturalProfile.TRAVEL_STYLES,
+    }
+    return render(request, 'users/profile.html', context)
+
+# ================= EXISTING VIEWS =================
+
+def home(request):
+    """Page d'accueil"""
+    return render(request, 'users/home.html')

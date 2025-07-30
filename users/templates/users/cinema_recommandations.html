@@ -149,7 +149,10 @@
     </section>
 </div>
 
+
+
 <!-- Floating Chatbot Icon and Chat Window -->
+{% if user.is_authenticated %}
 <button id="chatbot-toggle" aria-label="Open Chatbot"
     style="position: fixed; bottom: 32px; right: 32px; z-index: 9999; background: #b61b23; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 16px rgba(40,40,80,0.13); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;">
     <i class="fas fa-comments"></i>
@@ -178,6 +181,7 @@
                 class="fas fa-paper-plane"></i></button>
     </form>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
