@@ -1,6 +1,6 @@
 /* Use a variable for the navbar height to make it easily adjustable */
 :root {
-    --navbar-height: 80px;
+    --navbar-height: 90px;
     /* Adjust this value based on your actual navbar height */
 }
 

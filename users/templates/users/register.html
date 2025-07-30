@@ -1,7 +1,7 @@
 {% extends 'users/base.html' %}
 {% load static %}
 
-{% block title %}Inscription - Culturo{% endblock %}
+{% block title %}Register - Culturo{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -412,8 +412,8 @@
         <div class="register-card">
             <div class="register-header">
                 <div class="register-logo">🎨 Culturo</div>
-                <h1 class="register-title">Rejoignez-nous !</h1>
-                <p class="register-subtitle">Créez votre compte et explorez un monde de culture</p>
+                <h1 class="register-title">Join us!</h1>
+                <p class="register-subtitle">Create your account and explore a world of culture</p>
             </div>
             
             <form method="post" class="register-form">
@@ -425,11 +425,11 @@
                         id="username" 
                         name="username" 
                         class="form-input" 
-                        placeholder="Entrez votre nom d'utilisateur"
+                        placeholder="Enter your username"
                         required
                         autocomplete="username"
                     >
-                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <label for="username" class="form-label">Username</label>
                 </div>
                 
                 <div class="form-group">
@@ -438,11 +438,11 @@
                         id="email" 
                         name="email" 
                         class="form-input" 
-                        placeholder="exemple@email.com"
+                        placeholder="example@email.com"
                         required
                         autocomplete="email"
                     >
-                    <label for="email" class="form-label">Adresse email</label>
+                    <label for="email" class="form-label">Email address</label>
                 </div>
                 
                 <div class="form-group">
@@ -451,11 +451,11 @@
                         id="password1" 
                         name="password1" 
                         class="form-input" 
-                        placeholder="Minimum 8 caractères"
+                        placeholder="Minimum 8 characters"
                         required
                         autocomplete="new-password"
                     >
-                    <label for="password1" class="form-label">Mot de passe</label>
+                    <label for="password1" class="form-label">Password</label>
                 </div>
                 
                 <div class="form-group">
@@ -464,21 +464,21 @@
                         id="password2" 
                         name="password2" 
                         class="form-input" 
-                        placeholder="Répétez votre mot de passe"
+                        placeholder="Repeat your password"
                         required
                         autocomplete="new-password"
                     >
-                    <label for="password2" class="form-label">Confirmer le mot de passe</label>
+                    <label for="password2" class="form-label">Confirm password</label>
                 </div>
                 
                 <button type="submit" class="btn-register">
-                    Créer mon compte
+                    Create my account
                 </button>
             </form>
             
             <div class="login-link">
-                <p class="login-text">Déjà membre de Culturo ?</p>
-                <a href="{% url 'login' %}" class="btn-login-link">Se connecter</a>
+                <p class="login-text">Already a Culturo member?</p>
+                <a href="{% url 'login' %}" class="btn-login-link">Sign in</a>
             </div>
         </div>
     </div>
