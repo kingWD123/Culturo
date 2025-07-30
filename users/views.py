@@ -685,46 +685,6 @@ def logout_view(request):
     messages.success(request, 'Vous avez été déconnecté avec succès.')
     return redirect('home')
 
-@login_required
-def profile_view(request):
-    """Vue du profil utilisateur"""
-    try:
-        cultural_profile = request.user.cultural_profile
-    except CulturalProfile.DoesNotExist:
-        cultural_profile = CulturalProfile.objects.create(user=request.user)
-    
-    if request.method == 'POST':
-        # Mise à jour du profil utilisateur
-        user = request.user
-        user.first_name = request.POST.get('first_name', '')
-        user.last_name = request.POST.get('last_name', '')
-        user.email = request.POST.get('email', user.email)
-        user.save()
-        
-        # Mise à jour du profil culturel
-        cultural_profile.preferred_music_genres = request.POST.getlist('music_genres')
-        cultural_profile.preferred_film_genres = request.POST.getlist('film_genres')
-        cultural_profile.preferred_cuisine_types = request.POST.getlist('cuisine_types')
-        cultural_profile.preferred_activities = request.POST.getlist('activities')
-        cultural_profile.adventure_level = int(request.POST.get('adventure_level', 5))
-        cultural_profile.budget_level = request.POST.get('budget_level', 'moderate')
-        cultural_profile.travel_style = request.POST.get('travel_style', 'cultural')
-        cultural_profile.save()
-        
-        messages.success(request, 'Profil mis à jour avec succès !')
-        return redirect('profile')
-    
-    context = {
-        'cultural_profile': cultural_profile,
-        'music_genres': CulturalProfile.MUSIC_GENRES,
-        'film_genres': CulturalProfile.FILM_GENRES,
-        'cuisine_types': CulturalProfile.CUISINE_TYPES,
-        'cultural_activities': CulturalProfile.CULTURAL_ACTIVITIES,
-        'budget_levels': CulturalProfile.BUDGET_LEVELS,
-        'travel_styles': CulturalProfile.TRAVEL_STYLES,
-    }
-    return render(request, 'users/profile.html', context)
-
 # ================= EXISTING VIEWS =================
 
 def home(request):
